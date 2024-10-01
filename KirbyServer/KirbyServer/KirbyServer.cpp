@@ -1,10 +1,38 @@
 ﻿// KirbyServer.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include "framework.h"
 #include "KirbyServer.h"
+#include <WinSock2.h>
+
+#pragma comment(lib, "ws2_32.lib")
+
+#include <iostream>
+#include <string>
+#include <list>
+
+using namespace std;
 
 #define MAX_LOADSTRING 100
+#define WM_ASYNC WM_USER + 1
+
+int InitServer(HWND hWnd);
+int CloseServer();
+SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr);
+
+void SendMessageToClient(char* buffer);
+void ReadMessage(TCHAR* msg, char* buffer);
+void CloseClient(SOCKET socket);
+
+WSADATA wsaData;
+SOCKET s, cs;
+SOCKADDR_IN addr = { 0 }, c_addr = { 0 };
+
+list<SOCKET>  socketList;
+
+TCHAR msg[200] = { 0 };
+char buffer[100];
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -112,6 +140,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_COMMAND:
         break;
+    case WM_CREATE:
+        return InitServer(hWnd);
+    case WM_ASYNC:
+        switch (lParam)
+        {
+        case FD_ACCEPT:
+            AcceptSocket(hWnd, s, c_addr);
+            break;
+        case FD_READ:
+            ReadMessage(msg, buffer);
+            if (_tcscmp(msg, _T("")))
+            {
+                //뭔가 서버 화면에 띄우는 코드
+            }
+            break;
+        case FD_CLOSE:
+            CloseClient(wParam);
+            break;
+        }
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
@@ -129,3 +176,83 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
+int InitServer(HWND hWnd)
+{
+    WSAStartup(MAKEWORD(2, 2), &wsaData);
+    s = socket(AF_INET, SOCK_STREAM, 0);
+
+    addr.sin_family = AF_INET;
+    addr.sin_port = 12346;
+    addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+
+    bind(s, (LPSOCKADDR)&addr, sizeof(addr));
+
+    if (listen(s, 5) == SOCKET_ERROR)
+        return 0;
+
+    WSAAsyncSelect(s, hWnd, WM_ASYNC, FD_ACCEPT);
+    return 0;
+}
+
+int CloseServer()
+{
+    closesocket(s);
+    WSACleanup();
+    return 0;
+}
+
+SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr)
+{
+    SOCKET cs;
+    int _size = sizeof(c_addr);
+    cs = accept(s, (LPSOCKADDR)&c_addr, &_size);
+    WSAAsyncSelect(cs, hWnd, WM_ASYNC, FD_READ | FD_CLOSE);
+
+    socketList.push_back(cs);
+
+    return cs;
+}
+
+void ReadMessage(TCHAR* msg, char* buffer)
+{
+    for (list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    {
+        SOCKET cs = (*it);
+        int msgLen = recv(cs, buffer, 100, 0);
+        if (msgLen > 0)
+        {
+            buffer[msgLen] == NULL;
+#ifdef _UNICODE
+            msgLen = MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), NULL, NULL);
+            MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), msg, msgLen);
+            msg[msgLen] = NULL;
+#else
+            strcpy_s(msg, buffer);
+#endif
+            SendMessageToClient(buffer);
+        }
+    }
+}
+
+void SendMessageToClient(char* buffer)
+{
+    for (list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    {
+        SOCKET cs = (*it);
+        send(cs, (LPSTR)buffer, strlen(buffer) + 1, 0);
+    }
+}
+
+void CloseClient(SOCKET socket)
+{
+    for (list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    {
+        SOCKET cs = (*it);
+        if (cs == socket)
+        {
+            closesocket(cs);
+            it = socketList.erase(it);
+            break;
+        }
+    }
+}
