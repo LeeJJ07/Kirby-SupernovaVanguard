@@ -2,8 +2,9 @@
 
 void DrawPlayer(HDC hdc, std::vector<Player*> &p)
 {
-	for (int i = 0; i < p.size() && p[i] != NULL; i++)
+	for (int i = 0; i < p.size(); i++)
 	{
+		if (!p[i]) continue;
 		int left = p[i]->GetPos().x - p[i]->GetRadius();
 		int right = p[i]->GetPos().x + p[i]->GetRadius();
 		int top = p[i]->GetPos().y - p[i]->GetRadius();

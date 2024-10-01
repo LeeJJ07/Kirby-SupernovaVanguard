@@ -120,7 +120,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case FD_READ:
 			ReadMessage(socket, client, uData);
-			SetPlayer(client, uData);
 			break;
 		}
 		break;
@@ -141,7 +140,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_DESTROY:
-		CloseClient(socket);
+		CloseClient(socket,client, myID);
 		PostQuitMessage(0);
 		break;
 	default:
@@ -170,4 +169,5 @@ void DoubleBuffering(HDC hdc, std::vector<Player*> client)
 
 	SelectObject(memdc, oldBit);
 	DeleteDC(memdc);
+	DeleteObject(hBrush);
 }

@@ -47,13 +47,11 @@ int SendMessageToServer(SOCKET &s, TCHAR* str)
 
 void ReadMessage(SOCKET &s, std::vector<Player*>& p, UserData &uD)
 {
-	int bytesReceived;
-	while ((bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0)) == -1);
+	int bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0);
 
-	if (bytesReceived != sizeof(UserData))
+	if (bytesReceived > 0)
 	{
-		MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
-		return;
+		SetPlayer(p, uD);
 	}
 }
 
@@ -69,8 +67,10 @@ void ReadInitMessage(SOCKET& s, UserData& uD)
 	}
 }
 
-void CloseClient(SOCKET& s)
+void CloseClient(SOCKET& s, std::vector<Player*>& p, int id)
 {
+	p[id] = NULL;
+
 	closesocket(s);
 	WSACleanup();
 }

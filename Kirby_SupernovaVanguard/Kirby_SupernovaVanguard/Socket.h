@@ -33,6 +33,6 @@ static int msgCount;
 int InitClient(HWND hWnd, SOCKET&);
 int SendMessageToServer(SOCKET &, TCHAR*);
 void ReadMessage(SOCKET&, std::vector<Player*>&, UserData&);
-void CloseClient(SOCKET&);
+void CloseClient(SOCKET&, std::vector<Player*>&, int);
 void ReadInitMessage(SOCKET&, UserData&);
 // <<
