@@ -47,7 +47,10 @@ int SendMessageToServer(SOCKET &s, TCHAR* str)
 
 void ReadMessage(SOCKET &s, UserData &uD)
 {
-	if (recv(s, (char*)&uD, sizeof(UserData), 0))
+	int bytesReceived;
+	while ((bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0)) == -1);
+
+	if (bytesReceived != sizeof(UserData))
 	{
 		MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
 		return;
