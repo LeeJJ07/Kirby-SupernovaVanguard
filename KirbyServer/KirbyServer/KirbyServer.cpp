@@ -227,6 +227,9 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
     SendToClient({ cs, userData });
 
     socketList.push_back({ cs, userData });
+
+    SendToAll();
+
     return cs;
 }
 
