@@ -13,3 +13,4 @@ struct UserData
 };
 
 void SetUserData(UserData&, Player*);
+void SetPlayer(Player*, UserData&);

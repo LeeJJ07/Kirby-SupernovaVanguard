@@ -4,7 +4,6 @@
 
 #define MAX_LOADSTRING 100
 
-
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
 WCHAR szWindowClass[MAX_LOADSTRING];
@@ -89,29 +88,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static SOCKET socket;
 	static TCHAR str[200];
-	static Player* client;
+	static std::vector<Player*> client(4);
 	static UserData uData;
 
 	switch (message)
 	{
 	case WM_CREATE:
 	{
+		SetTimer(hWnd, 1, 10, NULL);
+
 		if (InitClient(hWnd, socket))
 		{
-			ReadMessage(socket, uData);
-			client = new Player({ 100, 100 });
+			ReadInitMessage(socket, uData);
+			client[uData.id] = new Player();
 
-			SetUserData(uData, client);
+			//SetUserData(uData, client);
+			SetPlayer(client[uData.id], uData);
 
 			send(socket, (LPSTR)buffer, msgLen + 1, 0);
 		}
 		break;
 	}
+	case WM_TIMER:
+		InvalidateRgn(hWnd, NULL, FALSE);
+		break;
 	case WM_ASYNC:
 		switch (lParam)
 		{
 		case FD_READ:
-			//ReadMessage(socket);
+			ReadMessage(socket, uData);
 			InvalidateRgn(hWnd, NULL, TRUE);
 			break;
 		}
@@ -127,6 +132,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
 
+			DoubleBuffering(hdc, client);
+
 			EndPaint(hWnd, &ps);
 		}
 		break;
@@ -138,4 +145,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
+}
+
+void DoubleBuffering(HDC hdc, std::vector<Player*> client)
+{
+	HDC memdc;
+	static HBITMAP  hBit, oldBit;
+
+	memdc = CreateCompatibleDC(hdc);
+	hBit = CreateCompatibleBitmap(hdc, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	SelectObject(memdc, hBit);
+	HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	RECT rect = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+
+	FillRect(memdc, &rect, hBrush);
+
+	DrawPlayer(memdc, client);
+
+	BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memdc, 0, 0, SRCCOPY);
+
+	SelectObject(memdc, oldBit);
+	DeleteDC(memdc);
 }

@@ -57,6 +57,18 @@ void ReadMessage(SOCKET &s, UserData &uD)
 	}
 }
 
+void ReadInitMessage(SOCKET& s, UserData& uD)
+{
+	int bytesReceived;
+	while ((bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0)) == -1);
+
+	if (bytesReceived != sizeof(UserData))
+	{
+		MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
+		return;
+	}
+}
+
 void CloseClient(SOCKET& s)
 {
 	closesocket(s);

@@ -21,3 +21,5 @@ public:
 	void SetLookingDir(PAIR p) { lookingDir = p; }
 	void SetPos(POINT p) { pos = p; }
 };
+
+void DrawPlayer(HDC, std::vector<Player*>);

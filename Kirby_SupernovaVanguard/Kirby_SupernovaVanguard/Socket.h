@@ -31,4 +31,5 @@ int InitClient(HWND hWnd, SOCKET&);
 int SendMessageToServer(SOCKET &, TCHAR*);
 void ReadMessage(SOCKET&, UserData&);
 void CloseClient(SOCKET&);
+void ReadInitMessage(SOCKET&, UserData&);
 // <<
