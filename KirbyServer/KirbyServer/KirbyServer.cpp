@@ -14,16 +14,27 @@
 
 using namespace std;
 
+typedef struct userData
+{
+    pair<double, double> lookingDir;
+    POINT center;
+    POINT pos;
+    int radius;
+    int moveDir;
+    short id;
+}UserData;
+
 #define MAX_LOADSTRING 100
 #define WM_ASYNC WM_USER + 1
 
 int InitServer(HWND hWnd);
 int CloseServer();
-SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr);
+SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
 
-void SendMessageToClient(char* buffer);
+void SendMessageToClient(UserData buffer);
 void ReadMessage(TCHAR* msg, char* buffer);
 void CloseClient(SOCKET socket);
+void SetUserData(UserData& userData, int id);
 
 WSADATA wsaData;
 SOCKET s, cs;
@@ -136,6 +147,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static short userID = 0;
     switch (message)
     {
     case WM_COMMAND:
@@ -146,7 +158,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch (lParam)
         {
         case FD_ACCEPT:
-            AcceptSocket(hWnd, s, c_addr);
+            AcceptSocket(hWnd, s, c_addr, userID++);
             break;
         case FD_READ:
             ReadMessage(msg, buffer);
@@ -187,7 +199,7 @@ int InitServer(HWND hWnd)
 
     bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
-    if (listen(s, 5) == SOCKET_ERROR)
+    if (listen(s, 100) == SOCKET_ERROR)
         return 0;
 
     WSAAsyncSelect(s, hWnd, WM_ASYNC, FD_ACCEPT);
@@ -201,7 +213,7 @@ int CloseServer()
     return 0;
 }
 
-SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr)
+SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 {
     SOCKET cs;
     int _size = sizeof(c_addr);
@@ -209,6 +221,11 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr)
     WSAAsyncSelect(cs, hWnd, WM_ASYNC, FD_READ | FD_CLOSE);
 
     socketList.push_back(cs);
+
+    UserData userData;
+    
+    SetUserData(userData, userID);
+    SendMessageToClient(userData);
 
     return cs;
 }
@@ -229,17 +246,17 @@ void ReadMessage(TCHAR* msg, char* buffer)
 #else
             strcpy_s(msg, buffer);
 #endif
-            SendMessageToClient(buffer);
+            //SendMessageToClient(buffer);
         }
     }
 }
 
-void SendMessageToClient(char* buffer)
+void SendMessageToClient(UserData buffer)
 {
     for (list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
     {
         SOCKET cs = (*it);
-        send(cs, (LPSTR)buffer, strlen(buffer) + 1, 0);
+        send(cs, (char*)&buffer, sizeof(UserData), 0);
     }
 }
 
@@ -255,4 +272,14 @@ void CloseClient(SOCKET socket)
             break;
         }
     }
+}
+
+void SetUserData(UserData& userData, int id)
+{
+    userData.id = id;
+    userData.center = { 50 * (id + 1), 50 * (id + 1)};
+    userData.lookingDir = { 1.0, 1.0 };
+    userData.moveDir = 0;
+    userData.pos = { 50 * (id + 1), 50 * (id + 1) };
+    userData.radius = 10;
 }
