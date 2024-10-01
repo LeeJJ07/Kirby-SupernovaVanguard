@@ -32,8 +32,8 @@ int CloseServer();
 SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
 
 void SendToClient(pair<SOCKET, UserData> cs);
-void SendToOther(UserData userData);
-void ReadMessage(TCHAR* msg, char* buffer);
+void SendToAll();
+void ReadMessage();
 void CloseClient(SOCKET socket);
 void SetUserData(UserData& userData, int id);
 
@@ -162,7 +162,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             AcceptSocket(hWnd, s, c_addr, userID++);
             break;
         case FD_READ:
-            //ReadMessage(msg, buffer);
+            ReadMessage();
             if (_tcscmp(msg, _T("")))
             {
                 //뭔가 서버 화면에 띄우는 코드
@@ -230,14 +230,14 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
     return cs;
 }
 
-void ReadMessage(TCHAR* msg, char* buffer)
+void ReadMessage()
 {
     for (list<pair<SOCKET,UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
     {
         pair<SOCKET,UserData> cs = (*it);
-        int msgLen = recv(cs.first, buffer, 100, 0);
-
-        //SendToClient(cs.second);
+        int msgLen = recv(cs.first, (char*)&cs.second, sizeof(UserData), 0);
+        if (msgLen > 0)
+            SendToAll();
     }
 }
 
