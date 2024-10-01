@@ -123,11 +123,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		break;
-	case WM_CHAR:
-		str[msgCount++] = 'w';
-		str[msgCount] = NULL;
-		return SendMessageToServer(socket, str);
-		break;
 	
 	case WM_PAINT:
 		{
@@ -145,6 +140,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	DWORD newTime = GetTickCount64();
+	static DWORD oldTime = newTime;
+
+	if (newTime - oldTime < 5)
+		return 0;
+
+	oldTime = newTime;
+
+	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+	{
+		client[myID]->SetPos({ client[myID]->GetPos().x - 1, client[myID]->GetPos().y });
+		SetUserData(uData, client[myID]);
+		send(socket, (char*)&uData, sizeof(UserData), NULL);
+	}
+	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+	{
+		client[myID]->SetPos({ client[myID]->GetPos().x + 1, client[myID]->GetPos().y });
+		SetUserData(uData, client[myID]);
+		send(socket, (char*)&uData, sizeof(UserData), NULL);
+	}
+	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
+	{
+		
 	}
 	return 0;
 }
