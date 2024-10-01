@@ -140,7 +140,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_DESTROY:
-		CloseClient(socket,client, myID);
+		CloseClient(socket, client, myID);
 		PostQuitMessage(0);
 		break;
 	default:

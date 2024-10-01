@@ -32,7 +32,7 @@ int CloseServer();
 SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
 
 void SendToClient(pair<SOCKET, UserData> cs);
-void SendToAll();
+void SendToAll(pair<SOCKET, UserData> cs);
 void ReadMessage();
 void CloseClient(SOCKET socket);
 void SetUserData(UserData& userData, int id);
@@ -228,7 +228,7 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 
     socketList.push_back({ cs, userData });
 
-    SendToAll();
+    SendToAll({ cs , userData });
 
     return cs;
 }
@@ -240,7 +240,9 @@ void ReadMessage()
         pair<SOCKET,UserData> cs = (*it);
         int msgLen = recv(cs.first, (char*)&cs.second, sizeof(UserData), 0);
         if (msgLen > 0)
-            SendToAll();
+        {
+            SendToAll(cs);
+        }
     }
 }
 
@@ -251,16 +253,12 @@ void SendToClient(pair<SOCKET, UserData> cs)
 }
 
 // 모든 유저들에게 업데이트 된 정보를 전달
-void SendToAll()
+void SendToAll(pair<SOCKET, UserData> cs)
 {
-    for (list<pair<SOCKET, UserData>>::iterator it1 = socketList.begin(); it1 != socketList.end(); it1++)
+    for (list<pair<SOCKET, UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
     {
-        pair<SOCKET, UserData> cs1 = (*it1);
-        for (list<pair<SOCKET, UserData>>::iterator it2 = socketList.begin(); it2 != socketList.end(); it2++)
-        {
-            pair<SOCKET, UserData> cs2 = (*it2);
-            send(cs1.first, (char*)&cs2.second, sizeof(UserData), 0);
-        }
+        pair<SOCKET, UserData> cs1 = (*it);
+        send(cs1.first, (char*)&cs.second, sizeof(UserData), 0);
     }
 }
 
