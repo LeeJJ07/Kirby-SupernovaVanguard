@@ -92,6 +92,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static TCHAR str[200];
 	static std::vector<Player*> client(4);
 	static UserData uData;
+	static int myID;
 
 	switch (message)
 	{
@@ -102,7 +103,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (InitClient(hWnd, socket))
 		{
 			ReadInitMessage(socket, uData);
-			client[uData.id] = new Player();
+			myID = uData.id;
+
+			client[myID] = new Player();
 
 			//SetUserData(uData, client);
 			SetPlayer(client, uData);
