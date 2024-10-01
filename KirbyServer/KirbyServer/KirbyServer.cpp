@@ -31,7 +31,8 @@ int InitServer(HWND hWnd);
 int CloseServer();
 SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
 
-void SendMessageToClient(UserData buffer);
+void SendToClient(pair<SOCKET, UserData> cs);
+void SendToOther(UserData userData);
 void ReadMessage(TCHAR* msg, char* buffer);
 void CloseClient(SOCKET socket);
 void SetUserData(UserData& userData, int id);
@@ -40,7 +41,7 @@ WSADATA wsaData;
 SOCKET s, cs;
 SOCKADDR_IN addr = { 0 }, c_addr = { 0 };
 
-list<SOCKET>  socketList;
+list<pair<SOCKET, UserData>>  socketList;
 
 TCHAR msg[200] = { 0 };
 char buffer[100];
@@ -161,7 +162,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             AcceptSocket(hWnd, s, c_addr, userID++);
             break;
         case FD_READ:
-            ReadMessage(msg, buffer);
+            //ReadMessage(msg, buffer);
             if (_tcscmp(msg, _T("")))
             {
                 //뭔가 서버 화면에 띄우는 코드
@@ -220,54 +221,54 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
     cs = accept(s, (LPSOCKADDR)&c_addr, &_size);
     WSAAsyncSelect(cs, hWnd, WM_ASYNC, FD_READ | FD_CLOSE);
 
-    socketList.push_back(cs);
-
     UserData userData;
-    
     SetUserData(userData, userID);
-    SendMessageToClient(userData);
 
+    SendToClient({ cs, userData });
+
+    socketList.push_back({ cs, userData });
     return cs;
 }
 
 void ReadMessage(TCHAR* msg, char* buffer)
 {
-    for (list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    for (list<pair<SOCKET,UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
     {
-        SOCKET cs = (*it);
-        int msgLen = recv(cs, buffer, 100, 0);
-        if (msgLen > 0)
-        {
-            buffer[msgLen] == NULL;
-#ifdef _UNICODE
-            msgLen = MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), NULL, NULL);
-            MultiByteToWideChar(CP_ACP, 0, buffer, strlen(buffer), msg, msgLen);
-            msg[msgLen] = NULL;
-#else
-            strcpy_s(msg, buffer);
-#endif
-            //SendMessageToClient(buffer);
-        }
+        pair<SOCKET,UserData> cs = (*it);
+        int msgLen = recv(cs.first, buffer, 100, 0);
+
+        //SendToClient(cs.second);
     }
 }
 
-void SendMessageToClient(UserData buffer)
+// 현재 연결된 유저한테 정보를 알려줌
+void SendToClient(pair<SOCKET, UserData> cs)
 {
-    for (list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    send(cs.first, (char*)&cs.second, sizeof(UserData), 0);
+}
+
+// 모든 유저들에게 업데이트 된 정보를 전달
+void SendToAll()
+{
+    for (list<pair<SOCKET, UserData>>::iterator it1 = socketList.begin(); it1 != socketList.end(); it1++)
     {
-        SOCKET cs = (*it);
-        send(cs, (char*)&buffer, sizeof(UserData), 0);
+        pair<SOCKET, UserData> cs1 = (*it1);
+        for (list<pair<SOCKET, UserData>>::iterator it2 = socketList.begin(); it2 != socketList.end(); it2++)
+        {
+            pair<SOCKET, UserData> cs2 = (*it2);
+            send(cs1.first, (char*)&cs2.second, sizeof(UserData), 0);
+        }
     }
 }
 
 void CloseClient(SOCKET socket)
 {
-    for (list<SOCKET>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    for (list<pair<SOCKET, UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
     {
-        SOCKET cs = (*it);
-        if (cs == socket)
+        pair<SOCKET, UserData> cs = (*it);
+        if (cs.first == socket)
         {
-            closesocket(cs);
+            closesocket(cs.first);
             it = socketList.erase(it);
             break;
         }
