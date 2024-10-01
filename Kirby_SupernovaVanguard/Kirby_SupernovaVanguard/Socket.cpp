@@ -45,7 +45,7 @@ int SendMessageToServer(SOCKET &s, TCHAR* str)
 	return 1;
 }
 
-void ReadMessage(SOCKET &s, UserData &uD)
+void ReadMessage(SOCKET &s, std::vector<Player*>& p, UserData &uD)
 {
 	int bytesReceived;
 	while ((bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0)) == -1);

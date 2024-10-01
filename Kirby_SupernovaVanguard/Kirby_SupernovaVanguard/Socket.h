@@ -5,12 +5,15 @@
 
 #include <WinSock2.h>
 #include "framework.h"
+#include "Player.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
 #define WM_ASYNC WM_USER + 1
 
 struct UserData;
+
+class Player;
 
 struct USER
 {
@@ -29,7 +32,7 @@ static int msgCount;
 
 int InitClient(HWND hWnd, SOCKET&);
 int SendMessageToServer(SOCKET &, TCHAR*);
-void ReadMessage(SOCKET&, UserData&);
+void ReadMessage(SOCKET&, std::vector<Player*>&, UserData&);
 void CloseClient(SOCKET&);
 void ReadInitMessage(SOCKET&, UserData&);
 // <<

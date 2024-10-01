@@ -97,7 +97,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 	{
-		SetTimer(hWnd, 1, 10, NULL);
+		SetTimer(hWnd, 1, 1, NULL);
 
 		if (InitClient(hWnd, socket))
 		{
@@ -105,9 +105,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			client[uData.id] = new Player();
 
 			//SetUserData(uData, client);
-			SetPlayer(client[uData.id], uData);
-
-			send(socket, (LPSTR)buffer, msgLen + 1, 0);
+			SetPlayer(client, uData);
 		}
 		break;
 	}
@@ -118,8 +116,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (lParam)
 		{
 		case FD_READ:
-			ReadMessage(socket, uData);
-			InvalidateRgn(hWnd, NULL, TRUE);
+			ReadMessage(socket, client, uData);
+			SetPlayer(client, uData);
 			break;
 		}
 		break;
