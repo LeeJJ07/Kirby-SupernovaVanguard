@@ -91,7 +91,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static SOCKET socket;
 	static TCHAR str[200];
-	static std::vector<Player*> client(4);
+	static std::vector<Player*> client(8);
 	static UserData uData, myData;
 	static short myID;
 
@@ -150,22 +150,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 	{
-		x -= 5;
+		x -= 3;
 		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
 	{
-		x += 5;
+		x += 3;
 		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
 	{
-		y += 5;
+		y += 3;
 		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
 	{
-		y -= 5;
+		y -= 3;
 		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
@@ -181,14 +181,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	oldTime = newTime;
 	
-	aD.playerMove = { x,y };
 	aD.id = myID;
+	aD.playerMove = { x,y };
 	aD.cursorMove = { 0,0 };
 
 	send(socket, (char*)&aD, sizeof(ActionData), NULL);
 
 	isChange = false;
-
 	x = 0, y = 0;
 	aD.playerMove = { x,y };
 	
