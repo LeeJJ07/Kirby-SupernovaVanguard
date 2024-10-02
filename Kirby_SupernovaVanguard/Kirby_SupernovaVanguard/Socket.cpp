@@ -1,5 +1,6 @@
 #include "Socket.h"
 #include "UserData.h"
+#include "ActionData.h"
 
 int InitClient(HWND hWnd, SOCKET &s)
 {
@@ -49,9 +50,13 @@ void ReadMessage(SOCKET &s, std::vector<Player*>& p, UserData &uD)
 {
 	int bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0);
 
-	if (bytesReceived > 0)
+	if (bytesReceived == sizeof(UserData))
 	{
 		SetPlayer(p, uD);
+	}
+	else if (bytesReceived == sizeof(ActionData))
+	{
+		SetPlayer(p[uD.id], uD);
 	}
 }
 

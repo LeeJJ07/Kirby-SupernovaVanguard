@@ -45,6 +45,9 @@
     <ClInclude Include="UserData.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="ActionData.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Kirby_SupernovaVanguard.cpp">

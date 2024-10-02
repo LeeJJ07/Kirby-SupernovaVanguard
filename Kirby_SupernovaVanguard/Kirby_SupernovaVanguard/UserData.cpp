@@ -26,9 +26,11 @@ void SetPlayer(Player* &p, UserData& ud)
 	if (!p)
 		p = new Player();
 
+	POINT temp = { p->GetCenter().x + ud.center.x,p->GetCenter().y + ud.center.y };
+
 	p->SetCenter(ud.center);
 	p->SetLookingDir(ud.lookingDir);
 	p->SetMoveDir(ud.moveDir);
-	p->SetPos(ud.pos);
+	p->SetPos(temp);
 	p->SetRadius(ud.radius);
 }

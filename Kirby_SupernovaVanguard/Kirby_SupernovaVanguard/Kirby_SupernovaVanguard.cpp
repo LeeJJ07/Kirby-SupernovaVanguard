@@ -1,6 +1,7 @@
 ﻿#include "Socket.h"
 #include "Kirby_SupernovaVanguard.h"
 #include "UserData.h"
+#include "ActionData.h"
 
 #define MAX_LOADSTRING 100
 
@@ -141,6 +142,32 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
+
+	static int x, y;
+
+	static ActionData aD;
+
+	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+	{
+		x -= 5;
+	}
+	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+	{
+		x += 5;
+	}
+	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+	{
+		y += 5;
+	}
+	if (GetAsyncKeyState(VK_UP) & 0x8000)
+	{
+		y -= 5;
+	}
+	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
+	{
+
+	}
+
 	DWORD newTime = GetTickCount64();
 	static DWORD oldTime = newTime;
 
@@ -148,35 +175,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return 0;
 
 	oldTime = newTime;
+	
+	aD.playerMove = { x,y };
+	aD.id = myID;
+	aD.cursorMove = { 0,0 };
 
-	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
-	{
-		client[myID]->SetPos({ client[myID]->GetPos().x - 3, client[myID]->GetPos().y });
-		SetUserData(myData, client[myID]);
-		send(socket, (char*)&myData, sizeof(UserData), NULL);
-	}
-	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
-	{
-		client[myID]->SetPos({ client[myID]->GetPos().x + 3, client[myID]->GetPos().y });
-		SetUserData(myData, client[myID]);
-		send(socket, (char*)&myData, sizeof(UserData), NULL);
-	}
-	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
-	{
-		client[myID]->SetPos({ client[myID]->GetPos().x, client[myID]->GetPos().y + 3 });
-		SetUserData(myData, client[myID]);
-		send(socket, (char*)&myData, sizeof(UserData), NULL);
-	}
-	if (GetAsyncKeyState(VK_UP) & 0x8000)
-	{
-		client[myID]->SetPos({ client[myID]->GetPos().x, client[myID]->GetPos().y - 3 });
-		SetUserData(myData, client[myID]);
-		send(socket, (char*)&myData, sizeof(UserData), NULL);
-	}
-	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
-	{
-		
-	}
+	x = 0, y = 0;
+
+	send(socket, (char*)&aD, sizeof(ActionData), NULL);
+	
 	return 0;
 }
 
