@@ -163,10 +163,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         case FD_READ:
             ReadMessage();
-            if (_tcscmp(msg, _T("")))
-            {
-                //뭔가 서버 화면에 띄우는 코드
-            }
             break;
         case FD_CLOSE:
             CloseClient(wParam);
@@ -200,7 +196,7 @@ int InitServer(HWND hWnd)
 
     bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
-    if (listen(s, 100) == SOCKET_ERROR)
+    if (listen(s, 10) == SOCKET_ERROR)
         return 0;
 
     WSAAsyncSelect(s, hWnd, WM_ASYNC, FD_ACCEPT);
