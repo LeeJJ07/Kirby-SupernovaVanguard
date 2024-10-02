@@ -50,7 +50,7 @@ void ReadMessage(SOCKET &s, std::vector<Player*>& p, UserData &uD)
 {
 	int bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0);
 
-	if (bytesReceived == sizeof(UserData))
+	if (bytesReceived > 0)
 	{
 		SetPlayer(p, uD);
 	}

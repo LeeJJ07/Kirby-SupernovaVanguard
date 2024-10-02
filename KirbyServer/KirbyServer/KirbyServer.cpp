@@ -10,7 +10,7 @@
 
 #include <iostream>
 #include <string>
-#include <list>
+#include <vector>
 
 using namespace std;
 
@@ -40,13 +40,14 @@ typedef struct receiveData
 
 #define MAX_LOADSTRING 100
 #define WM_ASYNC WM_USER + 1
+#define TIMER_01 1  
 
 int InitServer(HWND hWnd);
 int CloseServer();
 SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
 
 void SendToClient(pair<SOCKET, UserData> cs);
-void SendToAll(pair<SOCKET, UserData> cs);
+void SendToAll();
 void ReadData();
 void CloseClient(SOCKET socket);
 void InitUserData(UserData& userData, int id);
@@ -56,7 +57,7 @@ WSADATA wsaData;
 SOCKET s, cs;
 SOCKADDR_IN addr = { 0 }, c_addr = { 0 };
 
-list<pair<SOCKET, UserData>>  socketList;
+vector<pair<SOCKET, UserData>>  socketList;
 
 TCHAR msg[200] = { 0 };
 char buffer[100];
@@ -168,7 +169,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_COMMAND:
         break;
+    case WM_TIMER:
+        switch (wParam)
+        {
+        case TIMER_01:
+            SendToAll();
+            break;
+        }
+        break;
     case WM_CREATE:
+        SetTimer(hWnd, TIMER_01, 20, NULL);
         return InitServer(hWnd);
     case WM_ASYNC:
         switch (lParam)
@@ -239,22 +249,22 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 
     socketList.push_back({ cs, userData });
 
-    SendToAll({ cs , userData });
+    SendToAll();//{ cs , userData }
 
     return cs;
 }
 
 void ReadData()
 {
-    for (list<pair<SOCKET,UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    for (vector<pair<SOCKET,UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
     {
         pair<SOCKET,UserData> cs = (*it);
         ReceiveData temp;
         int msgLen = recv(cs.first, (char*)&temp, sizeof(ReceiveData), 0);
         if (msgLen > 0)
         {
-            SetUserData(cs.second, temp);
-            SendToAll(cs);
+            SetUserData(socketList[temp.id].second, temp);
+            //SendToAll(socketList[temp.id]);
         }
     }
 }
@@ -266,18 +276,25 @@ void SendToClient(pair<SOCKET, UserData> cs)
 }
 
 // 모든 유저들에게 업데이트 된 정보를 전달
-void SendToAll(pair<SOCKET, UserData> cs)
+void SendToAll()//pair<SOCKET, UserData> cs
 {
-    for (list<pair<SOCKET, UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    for (int i = 0; i < socketList.size(); i++)
+    {
+        for (int j = 0; j < socketList.size(); j++)
+        {
+            send(socketList[i].first, (char*)&socketList[j].second, sizeof(UserData), 0);
+        }
+    }/*
+    for (vector<pair<SOCKET, UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
     {
         pair<SOCKET, UserData> cs1 = (*it);
         send(cs1.first, (char*)&cs.second, sizeof(UserData), 0);
-    }
+    }*/
 }
 
 void CloseClient(SOCKET socket)
 {
-    for (list<pair<SOCKET, UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
+    for (vector<pair<SOCKET, UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
     {
         pair<SOCKET, UserData> cs = (*it);
         if (cs.first == socket)
