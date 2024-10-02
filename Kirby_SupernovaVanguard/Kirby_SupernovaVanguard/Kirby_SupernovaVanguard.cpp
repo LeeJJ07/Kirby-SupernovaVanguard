@@ -144,24 +144,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 
 	static int x, y;
+	static bool isChange = false;
 
 	static ActionData aD;
 
 	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 	{
 		x -= 5;
+		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
 	{
 		x += 5;
+		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
 	{
 		y += 5;
+		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
 	{
 		y -= 5;
+		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
 	{
@@ -171,7 +176,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	DWORD newTime = GetTickCount64();
 	static DWORD oldTime = newTime;
 
-	if (newTime - oldTime < 1)
+	if (newTime - oldTime < 1 || !isChange)
 		return 0;
 
 	oldTime = newTime;
@@ -180,9 +185,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	aD.id = myID;
 	aD.cursorMove = { 0,0 };
 
-	x = 0, y = 0;
-
 	send(socket, (char*)&aD, sizeof(ActionData), NULL);
+
+	isChange = false;
+
+	x = 0, y = 0;
 	
 	return 0;
 }

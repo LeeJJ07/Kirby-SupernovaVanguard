@@ -54,10 +54,6 @@ void ReadMessage(SOCKET &s, std::vector<Player*>& p, UserData &uD)
 	{
 		SetPlayer(p, uD);
 	}
-	else if (bytesReceived == sizeof(ActionData))
-	{
-		SetPlayer(p[uD.id], uD);
-	}
 }
 
 void ReadInitMessage(SOCKET& s, UserData& uD)
