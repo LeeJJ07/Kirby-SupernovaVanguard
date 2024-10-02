@@ -176,7 +176,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	DWORD newTime = GetTickCount64();
 	static DWORD oldTime = newTime;
 
-	if (newTime - oldTime < 1 || !isChange)
+	if (newTime - oldTime < 20 || !isChange)
 		return 0;
 
 	oldTime = newTime;
@@ -190,6 +190,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	isChange = false;
 
 	x = 0, y = 0;
+	aD.playerMove = { x,y };
 	
 	return 0;
 }
