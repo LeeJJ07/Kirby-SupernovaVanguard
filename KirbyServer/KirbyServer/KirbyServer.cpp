@@ -14,6 +14,8 @@
 
 using namespace std;
 
+enum State { RECEIVE, SEND };
+
 typedef struct userData
 {
     pair<double, double> lookingDir;
@@ -24,6 +26,18 @@ typedef struct userData
     short id;
 }UserData;
 
+typedef struct sendData
+{
+
+}SendData;
+
+typedef struct receiveData
+{
+    short id;
+    POINT playerMove;
+    POINT cursorMove;
+}ReceiveData;
+
 #define MAX_LOADSTRING 100
 #define WM_ASYNC WM_USER + 1
 
@@ -33,9 +47,10 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
 
 void SendToClient(pair<SOCKET, UserData> cs);
 void SendToAll(pair<SOCKET, UserData> cs);
-void ReadMessage();
+void ReadData();
 void CloseClient(SOCKET socket);
-void SetUserData(UserData& userData, int id);
+void InitUserData(UserData& userData, int id);
+void SetUserData(UserData& uData, ReceiveData rData);
 
 WSADATA wsaData;
 SOCKET s, cs;
@@ -162,7 +177,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             AcceptSocket(hWnd, s, c_addr, userID++);
             break;
         case FD_READ:
-            ReadMessage();
+            ReadData();
             break;
         case FD_CLOSE:
             CloseClient(wParam);
@@ -218,7 +233,7 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
     WSAAsyncSelect(cs, hWnd, WM_ASYNC, FD_READ | FD_CLOSE);
 
     UserData userData;
-    SetUserData(userData, userID);
+    InitUserData(userData, userID);
 
     SendToClient({ cs, userData });
 
@@ -229,14 +244,16 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
     return cs;
 }
 
-void ReadMessage()
+void ReadData()
 {
     for (list<pair<SOCKET,UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
     {
         pair<SOCKET,UserData> cs = (*it);
-        int msgLen = recv(cs.first, (char*)&cs.second, sizeof(UserData), 0);
+        ReceiveData temp;
+        int msgLen = recv(cs.first, (char*)&temp, sizeof(ReceiveData), 0);
         if (msgLen > 0)
         {
+            SetUserData(cs.second, temp);
             SendToAll(cs);
         }
     }
@@ -272,7 +289,7 @@ void CloseClient(SOCKET socket)
     }
 }
 
-void SetUserData(UserData& userData, int id)
+void InitUserData(UserData& userData, int id)
 {
     userData.id = id;
     userData.center = { 50 * (id + 1), 50 * (id + 1)};
@@ -280,4 +297,11 @@ void SetUserData(UserData& userData, int id)
     userData.moveDir = 0;
     userData.pos = { 50 * (id + 1), 50 * (id + 1) };
     userData.radius = 10;
+}
+
+void SetUserData(UserData& uData, ReceiveData rData)
+{
+    uData.pos.x += rData.playerMove.x;
+    uData.pos.y += rData.playerMove.y;
+    //마우스 위치도 설정 필요
 }
