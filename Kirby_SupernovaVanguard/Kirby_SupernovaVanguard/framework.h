@@ -16,6 +16,4 @@
 #include <stdio.h>
 #include <list>
 #include <vector>
-
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1200
+#include <atlstr.h>

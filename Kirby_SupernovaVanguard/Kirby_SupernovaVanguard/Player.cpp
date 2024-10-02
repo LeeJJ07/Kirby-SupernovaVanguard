@@ -1,6 +1,6 @@
 #include "Player.h"
 
-void DrawPlayer(HDC hdc, std::vector<Player*> &p)
+void DrawPlayer(HDC hdc, std::vector<Player*> p)
 {
 	for (int i = 0; i < p.size(); i++)
 	{

@@ -1,7 +1,9 @@
-﻿#include "Socket.h"
+﻿
 #include "Kirby_SupernovaVanguard.h"
 #include "UserData.h"
 #include "ActionData.h"
+#include "Camera.h"
+#include "Socket.h"
 
 #define MAX_LOADSTRING 100
 
@@ -14,6 +16,7 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void DoubleBuffering(HDC , std::vector<Player*> );
+void Render(HDC , std::vector<Player*>, Camera);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_opt_ HINSTANCE hPrevInstance,
@@ -74,7 +77,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance;
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-	  CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+	  0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -94,6 +97,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static std::vector<Player*> client(8);
 	static UserData uData, myData;
 	static short myID;
+	static Camera camera;
 
 	switch (message)
 	{
@@ -108,8 +112,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			client[myID] = new Player();
 
-			//SetUserData(uData, client);
 			SetPlayer(client, myData);
+
+			camera.SetTargetObject(client[myID]);
+			//camera.SetCameraPos(client[myID]->GetPos());
 		}
 		break;
 	}
@@ -135,7 +141,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
 
-			DoubleBuffering(hdc, client);
+			DoubleBuffering(hdc, client, camera);
+
+			CString t;
+
+			t.Format(_T("%d"), client[myID]->GetPos().x);
+			TextOut(hdc, 0, 0, t, t.GetLength());
+			t.Format(_T("%d"), client[myID]->GetPos().y);
+			TextOut(hdc, 50, 0, t, t.GetLength());
 
 			EndPaint(hWnd, &ps);
 		}
@@ -199,25 +212,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void DoubleBuffering(HDC hdc, std::vector<Player*> client)
+void DoubleBuffering(HDC hdc, std::vector<Player*> client, Camera c)
 {
 	HDC memdc;
 	static HBITMAP  hBit, oldBit;
 
 	memdc = CreateCompatibleDC(hdc);
-	hBit = CreateCompatibleBitmap(hdc, WINDOW_WIDTH, WINDOW_HEIGHT);
+	hBit = CreateCompatibleBitmap(hdc, CAMERA_WIDTH, CAMERA_HEIGHT);
 
 	SelectObject(memdc, hBit);
 	HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
-	RECT rect = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+	RECT rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
 
 	FillRect(memdc, &rect, hBrush);
 
-	DrawPlayer(memdc, client);
+	Render(memdc, client, c);
 
-	BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memdc, 0, 0, SRCCOPY);
+	transpa
+
+	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, memdc, 0, 0, SRCCOPY);
 
 	SelectObject(memdc, oldBit);
 	DeleteDC(memdc);
 	DeleteObject(hBrush);
+}
+
+void Render(HDC memdc, std::vector<Player*> client, Camera c)
+{
+	c.Update();
+
+	DrawPlayer();
 }

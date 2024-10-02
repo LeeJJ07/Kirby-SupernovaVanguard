@@ -22,4 +22,4 @@ public:
 	void SetPos(POINT p) { pos = p; }
 };
 
-void DrawPlayer(HDC, std::vector<Player*>&);
+void DrawPlayer(HDC, std::vector<Player*>);

@@ -128,10 +128,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ActionData.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Circle2D.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Collider2D.h" />
     <ClInclude Include="Kirby_SupernovaVanguard.h" />
+    <ClInclude Include="Map.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Rectangle2D.h" />
     <ClInclude Include="Resource.h" />
@@ -140,7 +142,9 @@
     <ClInclude Include="UserData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Kirby_SupernovaVanguard.cpp" />
+    <ClCompile Include="Map.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="UserData.cpp" />
