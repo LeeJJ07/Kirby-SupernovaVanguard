@@ -91,8 +91,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static SOCKET socket;
 	static TCHAR str[200];
 	static std::vector<Player*> client(4);
-	static UserData uData;
-	static int myID;
+	static UserData uData, myData;
+	static short myID;
 
 	switch (message)
 	{
@@ -102,13 +102,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		if (InitClient(hWnd, socket))
 		{
-			ReadInitMessage(socket, uData);
-			myID = uData.id;
+			ReadInitMessage(socket, myData);
+			myID = myData.id;
 
 			client[myID] = new Player();
 
 			//SetUserData(uData, client);
-			SetPlayer(client, uData);
+			SetPlayer(client, myData);
 		}
 		break;
 	}
@@ -144,22 +144,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	DWORD newTime = GetTickCount64();
 	static DWORD oldTime = newTime;
 
-	if (newTime - oldTime < 5)
+	if (newTime - oldTime < 1)
 		return 0;
 
 	oldTime = newTime;
 
 	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 	{
-		client[myID]->SetPos({ client[myID]->GetPos().x - 1, client[myID]->GetPos().y });
-		SetUserData(uData, client[myID]);
-		send(socket, (char*)&uData, sizeof(UserData), NULL);
+		client[myID]->SetPos({ client[myID]->GetPos().x - 3, client[myID]->GetPos().y });
+		SetUserData(myData, client[myID]);
+		send(socket, (char*)&myData, sizeof(UserData), NULL);
 	}
 	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
 	{
-		client[myID]->SetPos({ client[myID]->GetPos().x + 1, client[myID]->GetPos().y });
-		SetUserData(uData, client[myID]);
-		send(socket, (char*)&uData, sizeof(UserData), NULL);
+		client[myID]->SetPos({ client[myID]->GetPos().x + 3, client[myID]->GetPos().y });
+		SetUserData(myData, client[myID]);
+		send(socket, (char*)&myData, sizeof(UserData), NULL);
+	}
+	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+	{
+		client[myID]->SetPos({ client[myID]->GetPos().x, client[myID]->GetPos().y + 3 });
+		SetUserData(myData, client[myID]);
+		send(socket, (char*)&myData, sizeof(UserData), NULL);
+	}
+	if (GetAsyncKeyState(VK_UP) & 0x8000)
+	{
+		client[myID]->SetPos({ client[myID]->GetPos().x, client[myID]->GetPos().y - 3 });
+		SetUserData(myData, client[myID]);
+		send(socket, (char*)&myData, sizeof(UserData), NULL);
 	}
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
 	{
