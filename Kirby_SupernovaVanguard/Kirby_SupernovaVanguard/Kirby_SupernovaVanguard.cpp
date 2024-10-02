@@ -99,7 +99,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 	{
-		SetTimer(hWnd, 1, 1, NULL);
+		SetTimer(hWnd, 1, 20, NULL);
 
 		if (InitClient(hWnd, socket))
 		{
@@ -114,7 +114,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	case WM_TIMER:
-		InvalidateRgn(hWnd, NULL, FALSE);
+		switch(wParam)
+		{
+		case 1:
+			InvalidateRgn(hWnd, NULL, FALSE);
+			break;
+		}
 		break;
 	case WM_ASYNC:
 		switch (lParam)
