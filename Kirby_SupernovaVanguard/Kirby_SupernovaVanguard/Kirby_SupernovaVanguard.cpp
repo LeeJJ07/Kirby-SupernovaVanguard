@@ -1,9 +1,9 @@
-﻿
-#include "Kirby_SupernovaVanguard.h"
+﻿#include "Kirby_SupernovaVanguard.h"
 #include "UserData.h"
 #include "ActionData.h"
 #include "Camera.h"
 #include "Socket.h"
+#include "Map.h"
 
 #define MAX_LOADSTRING 100
 
@@ -15,8 +15,13 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
-void DoubleBuffering(HDC , std::vector<Player*> );
-void Render(HDC , std::vector<Player*>, Camera);
+void DoubleBuffering(HDC , std::vector<Player*>);
+void DrawCamera(HDC, RECT);
+void InitObjArr();
+
+Collider2D*** map;
+
+Camera camera;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_opt_ HINSTANCE hPrevInstance,
@@ -97,13 +102,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	static std::vector<Player*> client(8);
 	static UserData uData, myData;
 	static short myID;
-	static Camera camera;
 
 	switch (message)
 	{
 	case WM_CREATE:
 	{
-		SetTimer(hWnd, 1, 20, NULL);
+		SetTimer(hWnd, 1, 1, NULL);
+
+		//InitMap(map);
+		InitObjArr();
 
 		if (InitClient(hWnd, socket))
 		{
@@ -114,8 +121,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			SetPlayer(client, myData);
 
+			//Create(client[myID], map);
+			Create(client[myID]);
+
+			//client[myID]->SetPos({ 51,51 });
+
 			camera.SetTargetObject(client[myID]);
-			//camera.SetCameraPos(client[myID]->GetPos());
 		}
 		break;
 	}
@@ -141,7 +152,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
 
-			DoubleBuffering(hdc, client, camera);
+			DoubleBuffering(hdc, client);
 
 			CString t;
 
@@ -212,34 +223,69 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void DoubleBuffering(HDC hdc, std::vector<Player*> client, Camera c)
+void DoubleBuffering(HDC hdc, std::vector<Player*> client)
 {
 	HDC memdc;
-	static HBITMAP  hBit, oldBit;
+	static HBITMAP  hBit, mapBit, oldBit;
+
+	camera.Resize();
+	camera.Update();
+
+	int cTop = camera.GetCameraPos().y - CAMERA_HEIGHT / 2;
+	int cBottom = camera.GetCameraPos().y + CAMERA_HEIGHT / 2;
+	int cLeft = camera.GetCameraPos().x - CAMERA_WIDTH / 2;
+	int cRight = camera.GetCameraPos().x + CAMERA_WIDTH / 2;
 
 	memdc = CreateCompatibleDC(hdc);
 	hBit = CreateCompatibleBitmap(hdc, CAMERA_WIDTH, CAMERA_HEIGHT);
+	mapBit = CreateCompatibleBitmap(memdc, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y);
 
-	SelectObject(memdc, hBit);
-	HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
-	RECT rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
+	SelectObject(memdc, mapBit);
+	/*HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	RECT rect = { 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y };*/
 
-	FillRect(memdc, &rect, hBrush);
+	RECT cameraFrame = { cLeft ,cTop, cRight, cBottom };
 
-	Render(memdc, client, c);
+	/*cameraFrame.top;
+	cameraFrame.left;
+	cameraFrame.right;
+	cameraFrame.bottom;
 
-	transpa
+	FillRect(memdc, &rect, hBrush);*/
 
-	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, memdc, 0, 0, SRCCOPY);
+	DrawCamera(memdc, cameraFrame);
 
+	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, memdc, cLeft, cTop, SRCCOPY);
+\
 	SelectObject(memdc, oldBit);
 	DeleteDC(memdc);
-	DeleteObject(hBrush);
+	//DeleteObject(hBrush);
 }
 
-void Render(HDC memdc, std::vector<Player*> client, Camera c)
+void DrawCamera(HDC hdc, RECT rect)
 {
-	c.Update();
+	for (int i = 0; i < objnum; i++)
+	{
+		switch (objArr[i]->GetType())
+		{
+		case TERRAIN:
+			break;
+		case PLAYER:
+			DrawPlayer(hdc, (Player*)objArr[i]);
+			break;
+		case ENEMY:
+			break;
+		case PMISSILE:
+			break;
+		case EMISSILE:
+			break;
+		default:
+			continue;
+		}
+	}
+}
 
-	DrawPlayer();
+void InitObjArr()
+{
+	objArr = new Collider2D*[1000];
 }

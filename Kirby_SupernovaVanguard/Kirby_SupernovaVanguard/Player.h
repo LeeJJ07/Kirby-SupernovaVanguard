@@ -7,19 +7,16 @@
 class Player :public Circle2D
 {
 private:
-	POINT pos;
 	PAIR lookingDir;
 	int moveDir;
 public:
-	Player(POINT pos = { 0,0 }, PAIR lD = { 0,0 }, int mD = 0, int centerX = 0, int centerY = 0, int r = BASERADIUS)
-		:Circle2D(centerX, centerY, r), pos(pos), lookingDir(lD), moveDir(mD) {}
+	Player(PAIR lD = { 0,0 }, int mD = 0, POINT p = { 0,0 }, POINT c = { 0,0 }, short t = PLAYER, int r = BASERADIUS)
+		:Circle2D(p, c, t, r), lookingDir(lD), moveDir(mD) {}
 	~Player() {}
 	int GetMoveDir() { return moveDir; }
 	PAIR GetLookingDir() { return lookingDir; }
-	POINT GetPos() { return pos; }
 	void SetMoveDir(int d) { moveDir = d; }
 	void SetLookingDir(PAIR p) { lookingDir = p; }
-	void SetPos(POINT p) { pos = p; }
 };
 
-void DrawPlayer(HDC, std::vector<Player*>);
+void DrawPlayer(HDC, Player*);
