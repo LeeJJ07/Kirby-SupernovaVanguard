@@ -94,6 +94,9 @@
 >>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Multithread.h">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Kirby_SupernovaVanguard.rc">

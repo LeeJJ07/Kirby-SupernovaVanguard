@@ -25,3 +25,5 @@ public:
 	Camera() :cameraPos({ 0,0 }), targetObject(nullptr) {}
 	~Camera(){}
 };
+
+static Camera camera;
