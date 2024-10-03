@@ -145,11 +145,8 @@
     <ClInclude Include="UserData.h" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
     <ClCompile Include="GameScene.cpp" />
-=======
     <ClCompile Include="Camera.cpp" />
->>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
     <ClCompile Include="Kirby_SupernovaVanguard.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Multithread.h" />
