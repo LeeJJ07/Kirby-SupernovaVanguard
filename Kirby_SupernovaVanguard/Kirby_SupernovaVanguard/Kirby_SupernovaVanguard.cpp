@@ -1,12 +1,25 @@
 ﻿#include "Kirby_SupernovaVanguard.h"
 #include "UserData.h"
 #include "ActionData.h"
+<<<<<<< HEAD
+#include "StartScene.h"
+=======
 #include "Camera.h"
 #include "Socket.h"
 #include "Map.h"
+<<<<<<< HEAD
 #include "Multithread.h"
+=======
+>>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
+>>>>>>> 2f600fb41d3c2a2cc7f77c32df44745cb38a6793
 
 #define MAX_LOADSTRING 100
+#define TIMER_START 1
+#define TIMER_START 1
+#define TIMER_START 1
+
+enum SceneState { START, SELECT, GAME };
+RECT        rectView;
 
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
@@ -89,8 +102,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance;
 
+   int width = GetSystemMetrics(SM_CXSCREEN);
+   int height = GetSystemMetrics(SM_CYSCREEN);
+
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+<<<<<<< HEAD
+	   CW_USEDEFAULT, 0, width, height, nullptr, nullptr, hInstance, nullptr);
+=======
 	  0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, nullptr, nullptr, hInstance, nullptr);
+>>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
 
    if (!hWnd)
    {
@@ -105,15 +125,31 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	static SceneState curScene;
+
 	static SOCKET socket;
+
+	static StartScene startScene;
 
 	switch (message)
 	{
 	case WM_CREATE:
 	{
+<<<<<<< HEAD
 		InitializeCriticalSection(&cs);
+=======
+<<<<<<< HEAD
+		GetClientRect(hWnd, &rectView);
+
+		curScene = START;
+
+		SetTimer(hWnd, TIMER_START, 20, NULL);
+=======
+		SetTimer(hWnd, 1, 1, NULL);
+>>>>>>> 2f600fb41d3c2a2cc7f77c32df44745cb38a6793
 
 		InitObjArr();
+>>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
 
 		if (InitClient(hWnd, socket))
 		{
@@ -144,7 +180,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		switch(wParam)
 		{
-		case 1:
+		case TIMER_START:
 			InvalidateRgn(hWnd, NULL, FALSE);
 			break;
 		}
@@ -158,7 +194,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		break;
+<<<<<<< HEAD
+=======
+	
+	case WM_PAINT:
+		{
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(hWnd, &ps);
+
+			if (curScene == START)
+				startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView);
+			//DoubleBuffering(hdc, client);
+
+			CString t;
+
+			t.Format(_T("%d"), client[myID]->GetPos().x);
+			TextOut(hdc, 0, 0, t, t.GetLength());
+			t.Format(_T("%d"), client[myID]->GetPos().y);
+			TextOut(hdc, 50, 0, t, t.GetLength());
+
+			EndPaint(hWnd, &ps);
+		}
+		break;
+>>>>>>> 2f600fb41d3c2a2cc7f77c32df44745cb38a6793
 	case WM_DESTROY:
+		KillTimer(hWnd, TIMER_START);
 		CloseClient(socket, client, myID);
 		PostQuitMessage(0);
 		break;

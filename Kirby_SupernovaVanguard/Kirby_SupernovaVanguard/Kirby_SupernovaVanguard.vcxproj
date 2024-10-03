@@ -132,22 +132,31 @@
     <ClInclude Include="Circle2D.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Collider2D.h" />
+    <ClInclude Include="GameScene.h" />
     <ClInclude Include="Kirby_SupernovaVanguard.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Rectangle2D.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="SelectScene.h" />
     <ClInclude Include="Socket.h" />
+    <ClInclude Include="StartScene.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UserData.h" />
   </ItemGroup>
   <ItemGroup>
+<<<<<<< HEAD
+    <ClCompile Include="GameScene.cpp" />
+=======
     <ClCompile Include="Camera.cpp" />
+>>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
     <ClCompile Include="Kirby_SupernovaVanguard.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Multithread.h" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SelectScene.cpp" />
     <ClCompile Include="Socket.cpp" />
+    <ClCompile Include="StartScene.cpp" />
     <ClCompile Include="UserData.cpp" />
   </ItemGroup>
   <ItemGroup>
