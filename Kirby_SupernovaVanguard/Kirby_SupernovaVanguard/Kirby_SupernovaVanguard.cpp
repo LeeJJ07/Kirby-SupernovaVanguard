@@ -1,17 +1,12 @@
 ﻿#include "Kirby_SupernovaVanguard.h"
 #include "UserData.h"
 #include "ActionData.h"
-<<<<<<< HEAD
 #include "StartScene.h"
-=======
 #include "Camera.h"
 #include "Socket.h"
 #include "Map.h"
->>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
 
 #define MAX_LOADSTRING 100
-#define TIMER_START 1
-#define TIMER_START 1
 #define TIMER_START 1
 
 enum SceneState { START, SELECT, GAME };
@@ -95,11 +90,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    int height = GetSystemMetrics(SM_CYSCREEN);
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-<<<<<<< HEAD
-	   CW_USEDEFAULT, 0, width, height, nullptr, nullptr, hInstance, nullptr);
-=======
 	  0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, nullptr, nullptr, hInstance, nullptr);
->>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
 
    if (!hWnd)
    {
@@ -128,19 +119,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 	{
-<<<<<<< HEAD
 		GetClientRect(hWnd, &rectView);
 
 		curScene = START;
 
 		SetTimer(hWnd, TIMER_START, 20, NULL);
-=======
-		SetTimer(hWnd, 1, 1, NULL);
 
 		//InitMap(map);
 		InitObjArr();
->>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
-
 		if (InitClient(hWnd, socket))
 		{
 			ReadInitMessage(socket, myData);
