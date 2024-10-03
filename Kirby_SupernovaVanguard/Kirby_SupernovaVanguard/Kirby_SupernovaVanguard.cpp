@@ -2,8 +2,15 @@
 #include "Kirby_SupernovaVanguard.h"
 #include "UserData.h"
 #include "ActionData.h"
+#include "StartScene.h"
 
 #define MAX_LOADSTRING 100
+#define TIMER_START 1
+#define TIMER_START 1
+#define TIMER_START 1
+
+enum SceneState { START, SELECT, GAME };
+RECT        rectView;
 
 HINSTANCE hInst;
 WCHAR szTitle[MAX_LOADSTRING];
@@ -73,8 +80,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance;
 
+   int width = GetSystemMetrics(SM_CXSCREEN);
+   int height = GetSystemMetrics(SM_CYSCREEN);
+
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-	  CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+	   CW_USEDEFAULT, 0, width, height, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -89,17 +99,25 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	static SceneState curScene;
+
 	static SOCKET socket;
 	static TCHAR str[200];
 	static std::vector<Player*> client(8);
 	static UserData uData, myData;
 	static short myID;
 
+	static StartScene startScene;
+
 	switch (message)
 	{
 	case WM_CREATE:
 	{
-		SetTimer(hWnd, 1, 20, NULL);
+		GetClientRect(hWnd, &rectView);
+
+		curScene = START;
+
+		SetTimer(hWnd, TIMER_START, 20, NULL);
 
 		if (InitClient(hWnd, socket))
 		{
@@ -116,7 +134,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		switch(wParam)
 		{
-		case 1:
+		case TIMER_START:
 			InvalidateRgn(hWnd, NULL, FALSE);
 			break;
 		}
@@ -135,12 +153,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
 
-			DoubleBuffering(hdc, client);
+			if (curScene == START)
+				startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView);
+			//DoubleBuffering(hdc, client);
 
 			EndPaint(hWnd, &ps);
 		}
 		break;
 	case WM_DESTROY:
+		KillTimer(hWnd, TIMER_START);
 		CloseClient(socket, client, myID);
 		PostQuitMessage(0);
 		break;
