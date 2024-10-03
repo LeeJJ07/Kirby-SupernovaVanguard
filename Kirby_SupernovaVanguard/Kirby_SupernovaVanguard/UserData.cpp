@@ -1,4 +1,5 @@
 #include "UserData.h"
+#include "Map.h"
 
 void SetUserData(UserData& ud, Player* p)
 {
@@ -12,7 +13,10 @@ void SetUserData(UserData& ud, Player* p)
 void SetPlayer(std::vector<Player*>& p, UserData& ud)
 {
 	if (!p[ud.id])
+	{
 		p[ud.id] = new Player();
+		Create(p[ud.id]);
+	}
 	
 	p[ud.id]->SetCenter(ud.center);
 	p[ud.id]->SetLookingDir(ud.lookingDir);

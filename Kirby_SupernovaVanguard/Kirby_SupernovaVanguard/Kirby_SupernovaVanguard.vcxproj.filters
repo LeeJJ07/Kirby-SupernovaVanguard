@@ -48,6 +48,7 @@
     <ClInclude Include="ActionData.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="StartScene.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -55,6 +56,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="GameScene.h">
+=======
+    <ClInclude Include="Map.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+>>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,6 +78,7 @@
     <ClCompile Include="UserData.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="StartScene.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -78,6 +86,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="GameScene.cpp">
+=======
+    <ClCompile Include="Map.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+>>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

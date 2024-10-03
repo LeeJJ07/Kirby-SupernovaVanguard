@@ -1,8 +1,13 @@
-﻿#include "Socket.h"
-#include "Kirby_SupernovaVanguard.h"
+﻿#include "Kirby_SupernovaVanguard.h"
 #include "UserData.h"
 #include "ActionData.h"
+<<<<<<< HEAD
 #include "StartScene.h"
+=======
+#include "Camera.h"
+#include "Socket.h"
+#include "Map.h"
+>>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
 
 #define MAX_LOADSTRING 100
 #define TIMER_START 1
@@ -20,7 +25,13 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
-void DoubleBuffering(HDC , std::vector<Player*> );
+void DoubleBuffering(HDC , std::vector<Player*>);
+void DrawCamera(HDC, RECT);
+void InitObjArr();
+
+Collider2D*** map;
+
+Camera camera;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_opt_ HINSTANCE hPrevInstance,
@@ -84,7 +95,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    int height = GetSystemMetrics(SM_CYSCREEN);
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+<<<<<<< HEAD
 	   CW_USEDEFAULT, 0, width, height, nullptr, nullptr, hInstance, nullptr);
+=======
+	  0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, nullptr, nullptr, hInstance, nullptr);
+>>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
 
    if (!hWnd)
    {
@@ -113,11 +128,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 	{
+<<<<<<< HEAD
 		GetClientRect(hWnd, &rectView);
 
 		curScene = START;
 
 		SetTimer(hWnd, TIMER_START, 20, NULL);
+=======
+		SetTimer(hWnd, 1, 1, NULL);
+
+		//InitMap(map);
+		InitObjArr();
+>>>>>>> 4b7570e4bb408ab224c4e5da3e92f5cba9f20b1d
 
 		if (InitClient(hWnd, socket))
 		{
@@ -126,8 +148,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			client[myID] = new Player();
 
-			//SetUserData(uData, client);
 			SetPlayer(client, myData);
+
+			//Create(client[myID], map);
+			Create(client[myID]);
+
+			//client[myID]->SetPos({ 51,51 });
+
+			camera.SetTargetObject(client[myID]);
 		}
 		break;
 	}
@@ -156,6 +184,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			if (curScene == START)
 				startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView);
 			//DoubleBuffering(hdc, client);
+
+			CString t;
+
+			t.Format(_T("%d"), client[myID]->GetPos().x);
+			TextOut(hdc, 0, 0, t, t.GetLength());
+			t.Format(_T("%d"), client[myID]->GetPos().y);
+			TextOut(hdc, 50, 0, t, t.GetLength());
 
 			EndPaint(hWnd, &ps);
 		}
@@ -223,22 +258,66 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 void DoubleBuffering(HDC hdc, std::vector<Player*> client)
 {
 	HDC memdc;
-	static HBITMAP  hBit, oldBit;
+	static HBITMAP  hBit, mapBit, oldBit;
+
+	camera.Resize();
+	camera.Update();
+
+	int cTop = camera.GetCameraPos().y - CAMERA_HEIGHT / 2;
+	int cBottom = camera.GetCameraPos().y + CAMERA_HEIGHT / 2;
+	int cLeft = camera.GetCameraPos().x - CAMERA_WIDTH / 2;
+	int cRight = camera.GetCameraPos().x + CAMERA_WIDTH / 2;
 
 	memdc = CreateCompatibleDC(hdc);
-	hBit = CreateCompatibleBitmap(hdc, WINDOW_WIDTH, WINDOW_HEIGHT);
+	hBit = CreateCompatibleBitmap(hdc, CAMERA_WIDTH, CAMERA_HEIGHT);
+	mapBit = CreateCompatibleBitmap(memdc, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y);
 
-	SelectObject(memdc, hBit);
-	HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
-	RECT rect = { 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT };
+	SelectObject(memdc, mapBit);
+	/*HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	RECT rect = { 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y };*/
 
-	FillRect(memdc, &rect, hBrush);
+	RECT cameraFrame = { cLeft ,cTop, cRight, cBottom };
 
-	DrawPlayer(memdc, client);
+	/*cameraFrame.top;
+	cameraFrame.left;
+	cameraFrame.right;
+	cameraFrame.bottom;
 
-	BitBlt(hdc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, memdc, 0, 0, SRCCOPY);
+	FillRect(memdc, &rect, hBrush);*/
 
+	DrawCamera(memdc, cameraFrame);
+
+	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, memdc, cLeft, cTop, SRCCOPY);
+\
 	SelectObject(memdc, oldBit);
 	DeleteDC(memdc);
-	DeleteObject(hBrush);
+	//DeleteObject(hBrush);
+}
+
+void DrawCamera(HDC hdc, RECT rect)
+{
+	for (int i = 0; i < objnum; i++)
+	{
+		switch (objArr[i]->GetType())
+		{
+		case TERRAIN:
+			break;
+		case PLAYER:
+			DrawPlayer(hdc, (Player*)objArr[i]);
+			break;
+		case ENEMY:
+			break;
+		case PMISSILE:
+			break;
+		case EMISSILE:
+			break;
+		default:
+			continue;
+		}
+	}
+}
+
+void InitObjArr()
+{
+	objArr = new Collider2D*[1000];
 }
