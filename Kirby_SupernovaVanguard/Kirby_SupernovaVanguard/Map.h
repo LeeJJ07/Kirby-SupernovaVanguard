@@ -1,7 +1,7 @@
 #pragma once
 
-#define MAX_MAP_SIZE_X 5000
-#define MAX_MAP_SIZE_Y 3000
+#define MAX_MAP_SIZE_X 4000
+#define MAX_MAP_SIZE_Y 2000
 
 class Collider2D;
 

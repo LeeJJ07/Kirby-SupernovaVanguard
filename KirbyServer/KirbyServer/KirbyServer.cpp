@@ -180,7 +180,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_CREATE:
-		SetTimer(hWnd, TIMER_01, 20, NULL);
+		SetTimer(hWnd, TIMER_01, 5, NULL);
 		return InitServer(hWnd);
 	case WM_ASYNC:
 		switch (lParam)

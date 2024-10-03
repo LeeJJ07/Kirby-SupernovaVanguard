@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Socket.h"
 #include "Map.h"
+#include "Multithread.h"
 
 #define MAX_LOADSTRING 100
 
@@ -18,10 +19,17 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 void DoubleBuffering(HDC , std::vector<Player*>);
 void DrawCamera(HDC, RECT);
 void InitObjArr();
+void Paint(void*);
 
-Collider2D*** map;
+TCHAR str[200];
+std::vector<Player*> client(4);
+UserData uData, myData;
+short myID;
 
-Camera camera;
+DWORD dwThID1, dwThID2;
+HANDLE hThreads[2];
+
+unsigned long ulStackSize = 0;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_opt_ HINSTANCE hPrevInstance,
@@ -98,18 +106,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static SOCKET socket;
-	static TCHAR str[200];
-	static std::vector<Player*> client(8);
-	static UserData uData, myData;
-	static short myID;
 
 	switch (message)
 	{
 	case WM_CREATE:
 	{
-		SetTimer(hWnd, 1, 1, NULL);
+		InitializeCriticalSection(&cs);
 
-		//InitMap(map);
 		InitObjArr();
 
 		if (InitClient(hWnd, socket))
@@ -121,13 +124,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			SetPlayer(client, myData);
 
-			//Create(client[myID], map);
 			Create(client[myID]);
-
-			//client[myID]->SetPos({ 51,51 });
 
 			camera.SetTargetObject(client[myID]);
 		}
+
+		hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, &hWnd, 0, (unsigned*)&dwThID1);
+		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID2);
+
+		if (hThreads[0])
+			ResumeThread(hThreads[0]);
+		if (hThreads[1])
+			ResumeThread(hThreads[1]);
+
+		WaitForSingleObject(hThreads, INFINITE); 
+
 		break;
 	}
 	case WM_TIMER:
@@ -143,25 +154,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case FD_READ:
 			ReadMessage(socket, client, uData);
+			InvalidateRgn(hWnd, NULL, FALSE);
 			break;
-		}
-		break;
-	
-	case WM_PAINT:
-		{
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(hWnd, &ps);
-
-			DoubleBuffering(hdc, client);
-
-			CString t;
-
-			t.Format(_T("%d"), client[myID]->GetPos().x);
-			TextOut(hdc, 0, 0, t, t.GetLength());
-			t.Format(_T("%d"), client[myID]->GetPos().y);
-			TextOut(hdc, 50, 0, t, t.GetLength());
-
-			EndPaint(hWnd, &ps);
 		}
 		break;
 	case WM_DESTROY:
@@ -179,22 +173,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 	{
-		x -= 3;
+		x -= 1;
 		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
 	{
-		x += 3;
+		x += 1;
 		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
 	{
-		y += 3;
+		y += 1;
 		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
 	{
-		y -= 3;
+		y -= 1;
 		isChange = true;
 	}
 	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
@@ -205,7 +199,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	DWORD newTime = GetTickCount64();
 	static DWORD oldTime = newTime;
 
-	if (newTime - oldTime < 20 || !isChange)
+	if (newTime - oldTime < 5 || !isChange)
 		return 0;
 
 	oldTime = newTime;
@@ -240,25 +234,27 @@ void DoubleBuffering(HDC hdc, std::vector<Player*> client)
 	hBit = CreateCompatibleBitmap(hdc, CAMERA_WIDTH, CAMERA_HEIGHT);
 	mapBit = CreateCompatibleBitmap(memdc, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y);
 
-	SelectObject(memdc, mapBit);
-	/*HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
-	RECT rect = { 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y };*/
+	oldBit = (HBITMAP)SelectObject(memdc, mapBit);
+	HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	RECT rect = { 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y };
 
 	RECT cameraFrame = { cLeft ,cTop, cRight, cBottom };
 
-	/*cameraFrame.top;
+	cameraFrame.top;
 	cameraFrame.left;
 	cameraFrame.right;
 	cameraFrame.bottom;
 
-	FillRect(memdc, &rect, hBrush);*/
+	FillRect(memdc, &rect, hBrush);
 
 	DrawCamera(memdc, cameraFrame);
 
 	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, memdc, cLeft, cTop, SRCCOPY);
-\
+
 	SelectObject(memdc, oldBit);
 	DeleteDC(memdc);
+	DeleteObject(hBit);
+	DeleteObject(mapBit);
 	//DeleteObject(hBrush);
 }
 
@@ -288,4 +284,22 @@ void DrawCamera(HDC hdc, RECT rect)
 void InitObjArr()
 {
 	objArr = new Collider2D*[1000];
+}
+
+void Paint(void* pParam)
+{
+	HWND hWnd = (HWND)pParam;
+	PAINTSTRUCT ps;
+	HDC hdc = BeginPaint(hWnd, &ps);
+
+	DoubleBuffering(hdc, client);
+
+	CString t;
+
+	t.Format(_T("%d"), client[myID]->GetPos().x);
+	TextOut(hdc, 0, 0, t, t.GetLength());
+	t.Format(_T("%d"), client[myID]->GetPos().y);
+	TextOut(hdc, 50, 0, t, t.GetLength());
+
+	EndPaint(hWnd, &ps);
 }

@@ -145,6 +145,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Kirby_SupernovaVanguard.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Multithread.h" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="UserData.cpp" />
