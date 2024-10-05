@@ -219,7 +219,7 @@ int InitServer(HWND hWnd)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.77");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -308,7 +308,6 @@ void CloseClient(SOCKET socket)
 			break;
 		}
 	}
-
 
 	/*for (vector<pair<SOCKET, UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
 	{

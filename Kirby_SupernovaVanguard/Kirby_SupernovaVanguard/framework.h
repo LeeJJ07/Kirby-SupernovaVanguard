@@ -17,3 +17,5 @@
 #include <list>
 #include <vector>
 #include <atlstr.h>
+#include <mutex>
+#include <condition_variable>

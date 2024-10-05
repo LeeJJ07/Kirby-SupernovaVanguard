@@ -24,15 +24,23 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 void DoubleBuffering(HDC , std::vector<Player*>);
 void DrawCamera(HDC, RECT);
 void InitObjArr();
-void Paint(void*);
+unsigned __stdcall Paint(HWND );
+unsigned __stdcall Send();
+unsigned __stdcall Read();
 
 TCHAR str[200];
 std::vector<Player*> client(4);
 UserData uData, myData;
 short myID;
+static SOCKET cSocket;
 
-DWORD dwThID1, dwThID2;
-HANDLE hThreads[2];
+std::mutex mtx;  // 스레드 간 상호 배제를 위한 뮤텍스
+std::condition_variable cv;  // 스레드 간 동기화를 위한 조건 변수
+int turn;  // A(0), B(1), C(1)
+LPARAM temp;
+
+DWORD dwThID1, dwThID2, dwThID3;
+HANDLE hThreads[3];
 
 unsigned long ulStackSize = 0;
 
@@ -111,11 +119,16 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
+int x, y;
+bool isChange = false;
+
+ActionData aD;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static SceneState curScene;
+	temp = lParam;
 
-	static SOCKET socket;
+	static SceneState curScene;
 
 	static StartScene startScene;
 
@@ -128,12 +141,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		curScene = START;
 
-		SetTimer(hWnd, TIMER_START, 20, NULL);
+		SetTimer(hWnd, TIMER_START, 1, NULL);
 
 		InitObjArr();
-		if (InitClient(hWnd, socket))
+		if (InitClient(hWnd, cSocket))
 		{
-			ReadInitMessage(socket, myData);
+			ReadInitMessage(cSocket, myData);
 			myID = myData.id;
 
 			client[myID] = new Player();
@@ -145,15 +158,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			camera.SetTargetObject(client[myID]);
 		}
 
-		hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, &hWnd, 0, (unsigned*)&dwThID1);
-		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID2);
+		hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
+		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
+		hThreads[2] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Read, NULL, 0, (unsigned*)&dwThID3);
 
 		if (hThreads[0])
 			ResumeThread(hThreads[0]);
 		if (hThreads[1])
 			ResumeThread(hThreads[1]);
-
-		WaitForSingleObject(hThreads, INFINITE); 
+		if (hThreads[2])
+			ResumeThread(hThreads[2]);
 
 		break;
 	}
@@ -161,7 +175,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch(wParam)
 		{
 		case TIMER_START:
-			InvalidateRgn(hWnd, NULL, FALSE);
+			//InvalidateRgn(hWnd, NULL, FALSE);
 			break;
 		}
 		break;
@@ -169,44 +183,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (lParam)
 		{
 		case FD_READ:
-			ReadMessage(socket, client, uData);
-			InvalidateRgn(hWnd, NULL, FALSE);
+			ReadMessage(cSocket, client, uData);
 			break;
 		}
 		break;
-	
-	case WM_PAINT:
-		{
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(hWnd, &ps);
-
-			if (curScene == START)
-				startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView);
-			//DoubleBuffering(hdc, client);
-
-			CString t;
-
-			t.Format(_T("%d"), client[myID]->GetPos().x);
-			TextOut(hdc, 0, 0, t, t.GetLength());
-			t.Format(_T("%d"), client[myID]->GetPos().y);
-			TextOut(hdc, 50, 0, t, t.GetLength());
-
-			EndPaint(hWnd, &ps);
-		}
-		break;
 	case WM_DESTROY:
+		if (hThreads[0])CloseHandle(hThreads[0]);
+		if (hThreads[1])CloseHandle(hThreads[1]);
+		if (hThreads[2])CloseHandle(hThreads[2]);
+
+		DeleteCriticalSection(&cs);
+
 		KillTimer(hWnd, TIMER_START);
-		CloseClient(socket, client, myID);
+		CloseClient(cSocket, client, myID);
 		PostQuitMessage(0);
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
-
-	static int x, y;
-	static bool isChange = false;
-
-	static ActionData aD;
 
 	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 	{
@@ -232,24 +226,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 
 	}
-
-	DWORD newTime = GetTickCount64();
-	static DWORD oldTime = newTime;
-
-	if (newTime - oldTime < 5 || !isChange)
-		return 0;
-
-	oldTime = newTime;
-	
-	aD.id = myID;
-	aD.playerMove = { x,y };
-	aD.cursorMove = { 0,0 };
-
-	send(socket, (char*)&aD, sizeof(ActionData), NULL);
-
-	isChange = false;
-	x = 0, y = 0;
-	aD.playerMove = { x,y };
 	
 	return 0;
 }
@@ -292,7 +268,6 @@ void DoubleBuffering(HDC hdc, std::vector<Player*> client)
 	DeleteDC(memdc);
 	DeleteObject(hBit);
 	DeleteObject(mapBit);
-	//DeleteObject(hBrush);
 }
 
 void DrawCamera(HDC hdc, RECT rect)
@@ -323,20 +298,79 @@ void InitObjArr()
 	objArr = new Collider2D*[1000];
 }
 
-void Paint(void* pParam)
+unsigned __stdcall Send()
 {
-	HWND hWnd = (HWND)pParam;
-	PAINTSTRUCT ps;
-	HDC hdc = BeginPaint(hWnd, &ps);
+	while (TRUE)
+	{
+		std::unique_lock<std::mutex> lock(mtx);  // 뮤텍스 잠금
+		cv.wait(lock, [] { return turn == 0; });  // A 함수의 차례가 될 때까지 대기
 
-	DoubleBuffering(hdc, client);
+		if (isChange)
+		{
+			aD.id = myID;
+			aD.playerMove = { x,y };
+			aD.cursorMove = { 0,0 };
 
-	CString t;
+			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
 
-	t.Format(_T("%d"), client[myID]->GetPos().x);
-	TextOut(hdc, 0, 0, t, t.GetLength());
-	t.Format(_T("%d"), client[myID]->GetPos().y);
-	TextOut(hdc, 50, 0, t, t.GetLength());
+			isChange = false;
+			x = 0, y = 0;
+			aD.playerMove = { x,y };
 
-	EndPaint(hWnd, &ps);
+			turn = 1;  // B 함수에게 차례를 넘김
+			cv.notify_all();  // B 함수를 깨움
+		}
+	}
+}
+
+unsigned __stdcall Read()
+{
+	while (TRUE)
+	{
+		std::unique_lock<std::mutex> lock(mtx);  // 뮤텍스 잠금
+		cv.wait(lock, [] { return turn == 1; });  // B 함수의 차례가 될 때까지 대기
+
+		if(temp == FD_READ)
+		{
+			ReadMessage(cSocket, client, uData);
+
+			turn = 0;  // C 함수에게 차례를 넘김
+			cv.notify_all();  // C 함수를 깨움
+		}
+	}
+}
+
+unsigned __stdcall Paint(HWND pParam)
+{
+	while (TRUE)
+	{
+		//std::unique_lock<std::mutex> lock(mtx);  // 뮤텍스 잠금
+		//cv.wait(lock, [] { return turn == 2; });  // C 함수의 차례가 될 때까지 대기
+		
+		EnterCriticalSection(&cs);
+
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(pParam, &ps);
+
+		/*if (curScene == START)
+			startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView);*/
+
+		DoubleBuffering(hdc, client);
+
+		CString t;
+
+		t.Format(_T("%d"), client[myID]->GetPos().x);
+		TextOut(hdc, 0, 0, t, t.GetLength());
+		t.Format(_T("%d"), client[myID]->GetPos().y);
+		TextOut(hdc, 50, 0, t, t.GetLength());
+
+		InvalidateRgn(pParam, NULL, FALSE);
+
+		EndPaint(pParam, &ps);
+
+		LeaveCriticalSection(&cs);
+
+		//turn = 0;  // A 함수에게 차례를 넘김
+		//cv.notify_all();  // A 함수를 깨움
+	}
 }
