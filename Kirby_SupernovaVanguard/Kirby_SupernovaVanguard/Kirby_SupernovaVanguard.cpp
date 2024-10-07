@@ -42,6 +42,9 @@ LPARAM temp;
 DWORD dwThID1, dwThID2, dwThID3;
 HANDLE hThreads[3];
 
+SceneState curScene;
+StartScene startScene;
+
 unsigned long ulStackSize = 0;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -127,10 +130,6 @@ ActionData aD;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	temp = lParam;
-
-	static SceneState curScene;
-
-	static StartScene startScene;
 
 	switch (message)
 	{
@@ -347,22 +346,22 @@ unsigned __stdcall Paint(HWND pParam)
 		//std::unique_lock<std::mutex> lock(mtx);  // 뮤텍스 잠금
 		//cv.wait(lock, [] { return turn == 2; });  // C 함수의 차례가 될 때까지 대기
 		
-		EnterCriticalSection(&cs);
+		//EnterCriticalSection(&cs);
 
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(pParam, &ps);
 
-		/*if (curScene == START)
-			startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView);*/
+		if (curScene == START)
+			startScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView);
 
-		DoubleBuffering(hdc, client);
+		//DoubleBuffering(hdc, client);
 
 		CString t;
 
-		t.Format(_T("%d"), client[myID]->GetPos().x);
+		/*t.Format(_T("%d"), client[myID]->GetPos().x);
 		TextOut(hdc, 0, 0, t, t.GetLength());
 		t.Format(_T("%d"), client[myID]->GetPos().y);
-		TextOut(hdc, 50, 0, t, t.GetLength());
+		TextOut(hdc, 50, 0, t, t.GetLength());*/
 
 		InvalidateRgn(pParam, NULL, FALSE);
 
