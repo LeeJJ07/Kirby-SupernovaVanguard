@@ -8,7 +8,6 @@
 using namespace Gdiplus;
 using namespace std;
 
-enum EStartState { LOADING, WAITING };
 class StartScene
 {
 private:
@@ -20,13 +19,15 @@ private:
 
 	vector<Image*> pImg;
 	vector<int> w, h;
+
+	ULONG_PTR g_GdiPlusToken;
+	GdiplusStartupInput gpsi;
+
 public:
 	StartScene();
 	~StartScene();
 
-	void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rect);
+	void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, bool& canGoToNext);
 	void DeleteBitmap();
-
-	int GetObjectNum() { return objectNum; }
 };
 
