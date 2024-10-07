@@ -220,10 +220,8 @@ int InitServer(HWND hWnd)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-<<<<<<< HEAD
-=======
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
->>>>>>> ff5f0d777d230999282aa19395fc1b0b3522bea0
+
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
