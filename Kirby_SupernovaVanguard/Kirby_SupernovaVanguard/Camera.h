@@ -18,12 +18,12 @@ public:
 	POINT GetCameraPos() { return cameraPos; }
 	Player GetTargetObject() { return *targetObject; }
 
-	void Update();
-	void Resize();
+	void PositionUpdate();
+	void RePosition();
 
 public:
 	Camera() :cameraPos({ 0,0 }), targetObject(nullptr) {}
 	~Camera(){}
 };
 
-static Camera camera;
+extern Camera camera;

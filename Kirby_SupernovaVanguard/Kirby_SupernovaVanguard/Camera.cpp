@@ -3,17 +3,19 @@
 #include "Player.h"
 #include "Map.h"
 
-void Camera::Update()
+Camera camera;
+
+void Camera::PositionUpdate()
 {
 	if (targetObject)
 	{
 		SetCameraPos(targetObject->GetPos());
 
-		Resize();
+		RePosition();
 	}
 }
 
-void Camera::Resize()
+void Camera::RePosition()
 {
 	if (cameraPos.x < CAMERA_WIDTH / 2)
 		cameraPos.x = CAMERA_WIDTH / 2;

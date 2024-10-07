@@ -1,5 +1,6 @@
 #include "UserData.h"
 #include "Map.h"
+#include "Camera.h"
 
 void SetUserData(UserData& ud, Player* p)
 {
@@ -23,6 +24,8 @@ void SetPlayer(std::vector<Player*>& p, UserData& ud)
 	p[ud.id]->SetMoveDir(ud.moveDir);
 	p[ud.id]->SetPos(ud.pos);
 	p[ud.id]->SetRadius(ud.radius);
+
+	camera.PositionUpdate();
 }
 
 void SetPlayer(Player* &p, UserData& ud)
