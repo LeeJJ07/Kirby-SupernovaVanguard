@@ -1,8 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "StartScene.h"
 
-
-
 ULONG_PTR g_GdiPlusToken;
 
 StartScene::StartScene()
@@ -41,11 +39,23 @@ StartScene::StartScene()
 	static GdiplusStartupInput gpsi;
 	GdiplusStartup(&g_GdiPlusToken, &gpsi, NULL);
 
-	pImg = nullptr;
-	pImg = Image::FromFile((WCHAR*)L"Images/Backgrounds/ShootingStar.png");
+	pImg.resize(8);
+	w.resize(8), h.resize(8);
 
-	w = pImg->GetWidth();
-	h = pImg->GetHeight();
+	pImg[0] = Image::FromFile((WCHAR*)L"Images/Backgrounds/ShootingStar.png");
+	pImg[1] = Image::FromFile((WCHAR*)L"Images/Backgrounds/k.png");
+	pImg[2] = Image::FromFile((WCHAR*)L"Images/Backgrounds/i.png");
+	pImg[3] = Image::FromFile((WCHAR*)L"Images/Backgrounds/r.png");
+	pImg[4] = Image::FromFile((WCHAR*)L"Images/Backgrounds/b.png");
+	pImg[5] = Image::FromFile((WCHAR*)L"Images/Backgrounds/y.png");
+	pImg[6] = Image::FromFile((WCHAR*)L"Images/Backgrounds/subTitle.png");
+	pImg[7] = Image::FromFile((WCHAR*)L"Images/Backgrounds/PressButton.png");
+
+	for (int i = 0; i < 8; i++)
+	{
+		w[i] = pImg[i]->GetWidth();
+		h[i] = pImg[i]->GetHeight();
+	}
 }
 
 StartScene::~StartScene()
@@ -66,32 +76,35 @@ void StartScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT &rectView)
 	
 	if (objectNum == 0)
 	{
-		static int cccc = 0;
-		if (cccc < 3)
+		Rect destRect(objects[objectNum][idx].x, objects[objectNum][idx].y - 150, w[objectNum] / 2, h[objectNum]);
+		if ((idx / 20) % 2)
 		{
-			// 왼쪽 절반을 그립니다.
-			Rect destRect(objects[objectNum][idx].x, objects[objectNum][idx].y, w / 2, h);
-			Rect srcRect(0, 0, w / 2, h); // 이미지의 왼쪽 절반 소스 영역
-			graphics.DrawImage(pImg, destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
+			Rect srcRect(0, 0, w[objectNum] / 2, h[objectNum]); // 이미지의 왼쪽 절반 소스 영역
+			graphics.DrawImage(pImg[objectNum], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
 		}
 		else
 		{
-			if (cccc > 6) cccc = 0;
-			// 오른쪽 절반을 그립니다.
-			Rect destRect(objects[objectNum][idx].x, objects[objectNum][idx].y, w / 2, h);
-			Rect srcRect(w / 2, 0, w / 2, h); // 이미지의 오른쪽 절반 소스 영역
-			graphics.DrawImage(pImg, destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
+			Rect srcRect(w[objectNum] / 2, 0, w[objectNum] / 2, h[objectNum]); // 이미지의 오른쪽 절반 소스 영역
+			graphics.DrawImage(pImg[objectNum], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
 		}
-		cccc++;
-		
-		/*if (idx & 1)
-			graphics.DrawImage(pImg, objects[objectNum][idx].x, objects[objectNum][idx].y, w, h);
-		else
-			graphics.DrawImage(pImg, objects[objectNum][idx].x + w / 2, objects[objectNum][idx].y, w, h);*/
 	}
 	else if (objectNum < 6)
-	{
-
+	{		
+		for (int i = 1; i <= objectNum; i++)
+		{
+			if (objectNum == i)
+			{
+				Rect destRect(objects[i][idx].x - w[i] / 2, objects[i][idx].y - h[i] / 2, w[i], h[i]);
+				Rect srcRect(0, 0, w[i], h[i]);
+				graphics.DrawImage(pImg[i], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
+			}
+			else
+			{
+				Rect destRect(objects[i][objects[i].size() - 1].x - w[i] / 2, objects[i][objects[i].size() - 1].y - h[i] / 2, w[i], h[i]);
+				Rect srcRect(0, 0, w[i], h[i]);
+				graphics.DrawImage(pImg[i], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
+			}
+		}
 	}
 	else
 	{
@@ -107,6 +120,25 @@ void StartScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT &rectView)
 			SelectObject(hMemDC, hOldBitmap);
 			DeleteDC(hMemDC);
 		}
+		for (int i = 1; i < objectNum; i++)
+		{
+			Rect destRect(objects[i][objects[i].size() - 1].x - w[i] / 2, objects[i][objects[i].size() - 1].y - h[i] / 2, w[i], h[i]);
+			Rect srcRect(0, 0, w[i], h[i]);
+			graphics.DrawImage(pImg[i], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
+		}
+		Rect destRect(rectView.right / 2 - w[6] / 2, rectView.bottom - 250, w[6], h[6]);
+		Rect srcRect(0, 0, w[6], h[6]);
+		graphics.DrawImage(pImg[6], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
+
+		static int tempidx = 0;
+		tempidx++;
+		if ((tempidx / 50) % 2)
+		{
+			Rect destRect(rectView.right / 2 - w[7] / 2, - 200, w[7], h[7]);
+			Rect srcRect(0, 0, w[7], h[7]);
+			graphics.DrawImage(pImg[7], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
+		}
+		if (tempidx > 499) tempidx = 0;
 	}
 
 	BitBlt(hdc, 0, 0, rectView.right, rectView.bottom, hDoubleBufferDC, 0, 0, SRCCOPY);

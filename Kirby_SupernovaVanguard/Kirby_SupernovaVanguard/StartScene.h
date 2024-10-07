@@ -18,8 +18,8 @@ private:
 	int objectNum, idx;
 	vector<vector<POINT>> objects;
 
-	Image* pImg;
-	int w, h;
+	vector<Image*> pImg;
+	vector<int> w, h;
 public:
 	StartScene();
 	~StartScene();
