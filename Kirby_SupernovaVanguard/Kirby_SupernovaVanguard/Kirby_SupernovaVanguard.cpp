@@ -26,7 +26,6 @@ void DrawCamera(HDC, RECT);
 void InitObjArr();
 unsigned __stdcall Paint(HWND );
 unsigned __stdcall Send();
-unsigned __stdcall Read();
 
 TCHAR str[200];
 std::vector<Player*> client(4);
@@ -34,13 +33,43 @@ UserData uData, myData;
 short myID;
 static SOCKET cSocket;
 
-std::mutex mtx;  // 스레드 간 상호 배제를 위한 뮤텍스
-std::condition_variable cv;  // 스레드 간 동기화를 위한 조건 변수
-int turn;  // A(0), B(1), C(1)
-LPARAM temp;
+// >> : move
+int x, y;
+bool isChange = false;
 
-DWORD dwThID1, dwThID2, dwThID3;
-HANDLE hThreads[3];
+static std::chrono::high_resolution_clock::time_point t1_move;
+static std::chrono::high_resolution_clock::time_point t2_move;
+static std::chrono::duration<double> timeSpan_move;
+
+void DrawMousePosition(HDC);
+// <<
+
+// >> : fps
+static std::chrono::high_resolution_clock::time_point t1_fps;
+static std::chrono::high_resolution_clock::time_point t2_fps;
+static std::chrono::duration<double> timeSpan_fps;
+
+static int renderingCount = 0;
+static int textRenderingCount = 0;
+
+void CountFPS();
+void DrawFPS(HDC);
+// <<
+
+// >> : Rendering
+static std::chrono::high_resolution_clock::time_point t1_render;
+static std::chrono::high_resolution_clock::time_point t2_render;
+static std::chrono::duration<double> timeSpan_render;
+// <<
+
+// >> : Send
+static std::chrono::high_resolution_clock::time_point t1_send;
+static std::chrono::high_resolution_clock::time_point t2_send;
+static std::chrono::duration<double> timeSpan_send;
+// <<
+
+DWORD dwThID1, dwThID2;
+HANDLE hThreads[2];
 
 unsigned long ulStackSize = 0;
 
@@ -67,6 +96,45 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{
+		t2_fps = std::chrono::high_resolution_clock::now();
+		t2_render = std::chrono::high_resolution_clock::now();
+		t2_send = std::chrono::high_resolution_clock::now();
+		t2_move = std::chrono::high_resolution_clock::now();
+
+		timeSpan_fps = std::chrono::duration_cast<std::chrono::duration<double>>(t2_fps - t1_fps);
+		timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
+		timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+		timeSpan_move = std::chrono::duration_cast<std::chrono::duration<double>>(t2_move - t1_move);
+
+		if (timeSpan_move.count() >= 0.0001)
+		{
+			if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+			{
+				x -= 1;
+				isChange = true;
+			}
+			if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+			{
+				x += 1;
+				isChange = true;
+			}
+			if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+			{
+				y += 1;
+				isChange = true;
+			}
+			if (GetAsyncKeyState(VK_UP) & 0x8000)
+			{
+				y -= 1;
+				isChange = true;
+			}
+			if (GetAsyncKeyState(VK_SPACE) & 0x8000)
+			{
+
+			}
+			t1_move = std::chrono::high_resolution_clock::now();
+		}
+
 		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
 		{
 			TranslateMessage(&msg);
@@ -119,15 +187,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
-int x, y;
-bool isChange = false;
+bool isDraw = false;
 
 ActionData aD;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	temp = lParam;
-
 	static SceneState curScene;
 
 	static StartScene startScene;
@@ -144,6 +209,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SetTimer(hWnd, TIMER_START, 1, NULL);
 
 		InitObjArr();
+
 		if (InitClient(hWnd, cSocket))
 		{
 			ReadInitMessage(cSocket, myData);
@@ -156,18 +222,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			Create(client[myID]);
 
 			camera.SetTargetObject(client[myID]);
+			t1_fps = std::chrono::high_resolution_clock::now();
+			t1_render = std::chrono::high_resolution_clock::now();
+			t1_send = std::chrono::high_resolution_clock::now();
+			t1_move = std::chrono::high_resolution_clock::now();
 		}
 
 		hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
 		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
-		hThreads[2] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Read, NULL, 0, (unsigned*)&dwThID3);
 
 		if (hThreads[0])
 			ResumeThread(hThreads[0]);
 		if (hThreads[1])
 			ResumeThread(hThreads[1]);
-		if (hThreads[2])
-			ResumeThread(hThreads[2]);
 
 		break;
 	}
@@ -175,7 +242,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch(wParam)
 		{
 		case TIMER_START:
-			//InvalidateRgn(hWnd, NULL, FALSE);
+			InvalidateRgn(hWnd, NULL, FALSE);
 			break;
 		}
 		break;
@@ -183,14 +250,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (lParam)
 		{
 		case FD_READ:
+			EnterCriticalSection(&cs);
+
 			ReadMessage(cSocket, client, uData);
+
+			isDraw = true;
+
+			LeaveCriticalSection(&cs);
 			break;
 		}
 		break;
 	case WM_DESTROY:
 		if (hThreads[0])CloseHandle(hThreads[0]);
 		if (hThreads[1])CloseHandle(hThreads[1]);
-		if (hThreads[2])CloseHandle(hThreads[2]);
 
 		DeleteCriticalSection(&cs);
 
@@ -202,31 +274,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 
-	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
-	{
-		x -= 1;
-		isChange = true;
-	}
-	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
-	{
-		x += 1;
-		isChange = true;
-	}
-	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
-	{
-		y += 1;
-		isChange = true;
-	}
-	if (GetAsyncKeyState(VK_UP) & 0x8000)
-	{
-		y -= 1;
-		isChange = true;
-	}
-	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
-	{
-
-	}
-	
 	return 0;
 }
 
@@ -234,9 +281,6 @@ void DoubleBuffering(HDC hdc, std::vector<Player*> client)
 {
 	HDC memdc;
 	static HBITMAP  hBit, mapBit, oldBit;
-
-	camera.Resize();
-	camera.Update();
 
 	int cTop = camera.GetCameraPos().y - CAMERA_HEIGHT / 2;
 	int cBottom = camera.GetCameraPos().y + CAMERA_HEIGHT / 2;
@@ -302,11 +346,10 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		std::unique_lock<std::mutex> lock(mtx);  // 뮤텍스 잠금
-		cv.wait(lock, [] { return turn == 0; });  // A 함수의 차례가 될 때까지 대기
-
-		if (isChange)
+		if (isChange && timeSpan_send.count() >= 0.0075)
 		{
+			EnterCriticalSection(&cs);
+
 			aD.id = myID;
 			aD.playerMove = { x,y };
 			aD.cursorMove = { 0,0 };
@@ -314,63 +357,82 @@ unsigned __stdcall Send()
 			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
 
 			isChange = false;
+
 			x = 0, y = 0;
 			aD.playerMove = { x,y };
 
-			turn = 1;  // B 함수에게 차례를 넘김
-			cv.notify_all();  // B 함수를 깨움
+			t1_send = std::chrono::high_resolution_clock::now();
+
+			LeaveCriticalSection(&cs);
 		}
+		Sleep(0);
 	}
 }
 
-unsigned __stdcall Read()
-{
-	while (TRUE)
-	{
-		std::unique_lock<std::mutex> lock(mtx);  // 뮤텍스 잠금
-		cv.wait(lock, [] { return turn == 1; });  // B 함수의 차례가 될 때까지 대기
-
-		if(temp == FD_READ)
-		{
-			ReadMessage(cSocket, client, uData);
-
-			turn = 0;  // C 함수에게 차례를 넘김
-			cv.notify_all();  // C 함수를 깨움
-		}
-	}
-}
+#include <chrono>
 
 unsigned __stdcall Paint(HWND pParam)
 {
 	while (TRUE)
 	{
-		//std::unique_lock<std::mutex> lock(mtx);  // 뮤텍스 잠금
-		//cv.wait(lock, [] { return turn == 2; });  // C 함수의 차례가 될 때까지 대기
-		
-		EnterCriticalSection(&cs);
+		if (isDraw && timeSpan_render.count() >= 0.0075)
+		{
+			EnterCriticalSection(&cs);
 
-		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(pParam, &ps);
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(pParam, &ps);
 
-		/*if (curScene == START)
-			startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView);*/
+			/*if (curScene == START)
+				startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView);*/
 
-		DoubleBuffering(hdc, client);
+			DoubleBuffering(hdc, client);
+			renderingCount++;
 
-		CString t;
+			if (timeSpan_fps.count() >= 1)
+			{
+				CountFPS();
+			}
 
-		t.Format(_T("%d"), client[myID]->GetPos().x);
-		TextOut(hdc, 0, 0, t, t.GetLength());
-		t.Format(_T("%d"), client[myID]->GetPos().y);
-		TextOut(hdc, 50, 0, t, t.GetLength());
+			DrawMousePosition(hdc);
+			DrawFPS(hdc);
 
-		InvalidateRgn(pParam, NULL, FALSE);
+			InvalidateRgn(pParam, NULL, FALSE);
 
-		EndPaint(pParam, &ps);
+			EndPaint(pParam, &ps);
 
-		LeaveCriticalSection(&cs);
+			isDraw = false;
 
-		//turn = 0;  // A 함수에게 차례를 넘김
-		//cv.notify_all();  // A 함수를 깨움
+			t1_render = std::chrono::high_resolution_clock::now();
+
+			LeaveCriticalSection(&cs);
+		}
+		Sleep(0);
 	}
+}
+
+void CountFPS()
+{
+	textRenderingCount = renderingCount;
+
+	renderingCount = 0;
+
+	t1_fps = std::chrono::high_resolution_clock::now();
+}
+
+void DrawMousePosition(HDC hdc)
+{
+	CString t;
+
+	t.Format(_T("%d"), client[myID]->GetPos().x);
+	TextOut(hdc, 0, 0, t, t.GetLength());
+	t.Format(_T("%d"), client[myID]->GetPos().y);
+	TextOut(hdc, 50, 0, t, t.GetLength());
+}
+
+void DrawFPS(HDC hdc)
+{
+	CString t;
+
+	t.Format(_T("fps : %d"), textRenderingCount);
+	TextOut(hdc, 100, 0, t, t.GetLength());
 }
