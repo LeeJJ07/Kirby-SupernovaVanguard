@@ -1,8 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "StartScene.h"
 
-ULONG_PTR g_GdiPlusToken;
-
 StartScene::StartScene()
 {
 	objects.resize(6);
@@ -36,7 +34,6 @@ StartScene::StartScene()
 	idx = 0;
 	objectNum = 0;
 
-	static GdiplusStartupInput gpsi;
 	GdiplusStartup(&g_GdiPlusToken, &gpsi, NULL);
 
 	pImg.resize(8);
@@ -59,9 +56,11 @@ StartScene::StartScene()
 }
 
 StartScene::~StartScene()
-{}
+{
+	DeleteBitmap();
+}
 
-void StartScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT &rectView)
+void StartScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT &rectView, bool& canGoToNext)
 {
 	HDC hDoubleBufferDC;
 	HBITMAP hDoubleBufferImage = nullptr, hOldDoubleBufferBitmap;
@@ -139,6 +138,7 @@ void StartScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT &rectView)
 			graphics.DrawImage(pImg[7], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
 		}
 		if (tempidx > 499) tempidx = 0;
+		if (!canGoToNext) canGoToNext = true;
 	}
 
 	BitBlt(hdc, 0, 0, rectView.right, rectView.bottom, hDoubleBufferDC, 0, 0, SRCCOPY);

@@ -2,6 +2,7 @@
 #include "UserData.h"
 #include "ActionData.h"
 #include "StartScene.h"
+#include "SelectScene.h"
 #include "Camera.h"
 #include "Socket.h"
 #include "Map.h"
@@ -42,8 +43,11 @@ LPARAM temp;
 DWORD dwThID1, dwThID2, dwThID3;
 HANDLE hThreads[3];
 
+bool canGoToNext;
+bool pressEnterKey;
 SceneState curScene;
 StartScene startScene;
+SelectScene selectScene;
 
 unsigned long ulStackSize = 0;
 
@@ -170,6 +174,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		break;
 	}
+	case WM_CHAR:
+		if (wParam == VK_RETURN && canGoToNext)
+		{
+			canGoToNext = false;
+			switch (curScene)
+			{
+			case START:
+				curScene = SELECT;
+				break;
+			case SELECT:
+				break;
+			}
+		}
 	case WM_TIMER:
 		switch(wParam)
 		{
@@ -218,6 +235,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	if (GetAsyncKeyState(VK_UP) & 0x8000)
 	{
+		
 		y -= 1;
 		isChange = true;
 	}
@@ -351,8 +369,16 @@ unsigned __stdcall Paint(HWND pParam)
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(pParam, &ps);
 
-		if (curScene == START)
-			startScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView);
+		switch(curScene)
+		{
+		case START:
+			startScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, canGoToNext);
+			break;
+		case SELECT:
+			selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, client);
+			break;
+		}
+			
 
 		//DoubleBuffering(hdc, client);
 
@@ -367,7 +393,7 @@ unsigned __stdcall Paint(HWND pParam)
 
 		EndPaint(pParam, &ps);
 
-		LeaveCriticalSection(&cs);
+		//LeaveCriticalSection(&cs);
 
 		//turn = 0;  // A 함수에게 차례를 넘김
 		//cv.notify_all();  // A 함수를 깨움
