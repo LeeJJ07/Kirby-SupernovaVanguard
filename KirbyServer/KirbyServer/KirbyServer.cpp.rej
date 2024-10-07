@@ -1,0 +1,9 @@
+diff a/KirbyServer/KirbyServer/KirbyServer.cpp b/KirbyServer/KirbyServer/KirbyServer.cpp	(rejected hunks)
+@@ -219,7 +219,6 @@
+ 
+ 	addr.sin_family = AF_INET;
+ 	addr.sin_port = 12346;
+-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.77");
+ 	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+ 
+ 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));

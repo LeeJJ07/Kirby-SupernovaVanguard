@@ -7,6 +7,7 @@ struct UserData
 	PAIR lookingDir;
 	POINT center;
 	POINT pos;
+	POINT mousePos;
 	int radius;
 	int moveDir;
 	short id;

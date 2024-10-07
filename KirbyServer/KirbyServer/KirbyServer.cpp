@@ -21,6 +21,7 @@ typedef struct userData
 	pair<double, double> lookingDir;
 	POINT center;
 	POINT pos;
+	POINT mousePos;
 	int radius;
 	int moveDir;
 	short id;
@@ -31,6 +32,7 @@ typedef struct sendData
 
 }SendData;
 
+// 클라이언트 ActionData와 형식 같음
 typedef struct receiveData
 {
 	short id;
@@ -219,7 +221,6 @@ int InitServer(HWND hWnd)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -336,4 +337,5 @@ void SetUserData(UserData& uData, ReceiveData rData)
 	uData.pos.x += rData.playerMove.x;
 	uData.pos.y += rData.playerMove.y;
 	//마우스 위치도 설정 필요
+
 }

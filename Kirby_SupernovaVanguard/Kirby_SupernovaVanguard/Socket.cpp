@@ -1,6 +1,15 @@
 #include "Socket.h"
 #include "UserData.h"
 #include "ActionData.h"
+#include "Multithread.h"
+
+extern int readCount;
+extern int textreadCount;
+bool isDraw;
+
+extern std::chrono::duration<double> timeSpan_readCount;
+extern std::chrono::high_resolution_clock::time_point t1_readCount;
+extern std::chrono::high_resolution_clock::time_point t2_readCount;
 
 int InitClient(HWND hWnd, SOCKET &s)
 {
@@ -48,12 +57,24 @@ int SendMessageToServer(SOCKET &s, TCHAR* str)
 
 void ReadMessage(SOCKET &s, std::vector<Player*>& p, UserData &uD)
 {
+	EnterCriticalSection(&cs);
+
 	int bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0);
 
 	if (bytesReceived > 0)
 	{
+		readCount++;
 		SetPlayer(p, uD);
+
+		if (timeSpan_readCount.count() >= 1)
+		{
+			CountReadNum();
+		}
+
+		isDraw = true;
 	}
+
+	LeaveCriticalSection(&cs);
 }
 
 void ReadInitMessage(SOCKET& s, UserData& uD)
@@ -74,4 +95,13 @@ void CloseClient(SOCKET& s, std::vector<Player*>& p, int id)
 
 	closesocket(s);
 	WSACleanup();
+}
+
+void CountReadNum()
+{
+	textreadCount = readCount;
+
+	readCount = 0;
+
+	t1_readCount = std::chrono::high_resolution_clock::now();
 }

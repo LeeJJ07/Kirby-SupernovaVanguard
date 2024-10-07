@@ -33,15 +33,19 @@ UserData uData, myData;
 short myID;
 static SOCKET cSocket;
 
+// >> : Thread
+CRITICAL_SECTION cs;
+// <<
+
 // >> : move
 int x, y;
-bool isChange = false;
 
 static std::chrono::high_resolution_clock::time_point t1_move;
 static std::chrono::high_resolution_clock::time_point t2_move;
 static std::chrono::duration<double> timeSpan_move;
 
 void DrawMousePosition(HDC);
+void Update();
 // <<
 
 // >> : fps
@@ -60,12 +64,35 @@ void DrawFPS(HDC);
 static std::chrono::high_resolution_clock::time_point t1_render;
 static std::chrono::high_resolution_clock::time_point t2_render;
 static std::chrono::duration<double> timeSpan_render;
+
+//bool isDraw;
+// <<
+
+// >> : ReadCount
+std::chrono::high_resolution_clock::time_point t1_readCount;
+std::chrono::high_resolution_clock::time_point t2_readCount;
+std::chrono::duration<double> timeSpan_readCount;
+
+int readCount;
+int textreadCount;
+
+void DrawReadNum(HDC);
 // <<
 
 // >> : Send
 static std::chrono::high_resolution_clock::time_point t1_send;
 static std::chrono::high_resolution_clock::time_point t2_send;
 static std::chrono::duration<double> timeSpan_send;
+
+static std::chrono::high_resolution_clock::time_point t1_sendCount;
+static std::chrono::high_resolution_clock::time_point t2_sendCount;
+static std::chrono::duration<double> timeSpan_sendCount;
+
+static int sendCount = 0;
+static int textsendCount = 0;
+
+void CountSendNum();
+void DrawSendNum(HDC);
 // <<
 
 DWORD dwThID1, dwThID2;
@@ -94,51 +121,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	MSG msg;
 
-	while (GetMessage(&msg, nullptr, 0, 0))
+	while (true/*GetMessage(&msg, nullptr, 0, 0)*/)
 	{
-		t2_fps = std::chrono::high_resolution_clock::now();
-		t2_render = std::chrono::high_resolution_clock::now();
-		t2_send = std::chrono::high_resolution_clock::now();
-		t2_move = std::chrono::high_resolution_clock::now();
-
-		timeSpan_fps = std::chrono::duration_cast<std::chrono::duration<double>>(t2_fps - t1_fps);
-		timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
-		timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
-		timeSpan_move = std::chrono::duration_cast<std::chrono::duration<double>>(t2_move - t1_move);
-
-		if (timeSpan_move.count() >= 0.0001)
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+			if (msg.message == WM_QUIT)
+				break;
+			else
 			{
-				x -= 1;
-				isChange = true;
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
 			}
-			if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
-			{
-				x += 1;
-				isChange = true;
-			}
-			if (GetAsyncKeyState(VK_DOWN) & 0x8000)
-			{
-				y += 1;
-				isChange = true;
-			}
-			if (GetAsyncKeyState(VK_UP) & 0x8000)
-			{
-				y -= 1;
-				isChange = true;
-			}
-			if (GetAsyncKeyState(VK_SPACE) & 0x8000)
-			{
-
-			}
-			t1_move = std::chrono::high_resolution_clock::now();
 		}
-
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		else
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			Update();
 		}
 	}
 
@@ -187,8 +184,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
-bool isDraw = false;
-
 ActionData aD;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -226,6 +221,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			t1_render = std::chrono::high_resolution_clock::now();
 			t1_send = std::chrono::high_resolution_clock::now();
 			t1_move = std::chrono::high_resolution_clock::now();
+			t1_sendCount = std::chrono::high_resolution_clock::now();
+			t1_readCount = std::chrono::high_resolution_clock::now();
 		}
 
 		hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
@@ -250,19 +247,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (lParam)
 		{
 		case FD_READ:
-			EnterCriticalSection(&cs);
-
 			ReadMessage(cSocket, client, uData);
-
-			isDraw = true;
-
-			LeaveCriticalSection(&cs);
 			break;
 		}
 		break;
 	case WM_DESTROY:
-		if (hThreads[0])CloseHandle(hThreads[0]);
-		if (hThreads[1])CloseHandle(hThreads[1]);
+		if (hThreads[0])
+			CloseHandle(hThreads[0]);
+
+		if (hThreads[1])
+			CloseHandle(hThreads[1]);
 
 		DeleteCriticalSection(&cs);
 
@@ -346,39 +340,38 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		if (isChange && timeSpan_send.count() >= 0.0075)
+		if (timeSpan_send.count() >= 0.001)
 		{
-			EnterCriticalSection(&cs);
-
 			aD.id = myID;
 			aD.playerMove = { x,y };
 			aD.cursorMove = { 0,0 };
 
 			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
 
-			isChange = false;
+			sendCount++;
 
 			x = 0, y = 0;
 			aD.playerMove = { x,y };
 
-			t1_send = std::chrono::high_resolution_clock::now();
+			if (timeSpan_sendCount.count() >= 1)
+			{
+				CountSendNum();
+			}
 
-			LeaveCriticalSection(&cs);
+			t1_send = std::chrono::high_resolution_clock::now();
+			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 		}
 		Sleep(0);
 	}
 }
 
-#include <chrono>
-
 unsigned __stdcall Paint(HWND pParam)
 {
 	while (TRUE)
 	{
-		if (isDraw && timeSpan_render.count() >= 0.0075)
+		if (isDraw && timeSpan_render.count() >= 0.005)
 		{
 			EnterCriticalSection(&cs);
-
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(pParam, &ps);
 
@@ -386,6 +379,14 @@ unsigned __stdcall Paint(HWND pParam)
 				startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView);*/
 
 			DoubleBuffering(hdc, client);
+
+			DrawMousePosition(hdc);
+			DrawFPS(hdc);
+			DrawSendNum(hdc);
+			DrawReadNum(hdc);
+
+			EndPaint(pParam, &ps);
+
 			renderingCount++;
 
 			if (timeSpan_fps.count() >= 1)
@@ -393,16 +394,10 @@ unsigned __stdcall Paint(HWND pParam)
 				CountFPS();
 			}
 
-			DrawMousePosition(hdc);
-			DrawFPS(hdc);
-
-			InvalidateRgn(pParam, NULL, FALSE);
-
-			EndPaint(pParam, &ps);
-
 			isDraw = false;
 
 			t1_render = std::chrono::high_resolution_clock::now();
+			timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
 
 			LeaveCriticalSection(&cs);
 		}
@@ -419,6 +414,39 @@ void CountFPS()
 	t1_fps = std::chrono::high_resolution_clock::now();
 }
 
+void DrawFPS(HDC hdc)
+{
+	CString t;
+
+	t.Format(_T("Render fps : %d"), textRenderingCount);
+	TextOut(hdc, 100, 0, t, t.GetLength());
+}
+
+void CountSendNum()
+{
+	textsendCount = sendCount;
+
+	sendCount = 0;
+
+	t1_sendCount = std::chrono::high_resolution_clock::now();
+}
+
+void DrawSendNum(HDC hdc)
+{
+	CString t;
+
+	t.Format(_T("Send fps : %d"), textsendCount);
+	TextOut(hdc, 250, 0, t, t.GetLength());
+}
+
+void DrawReadNum(HDC hdc)
+{
+	CString t;
+
+	t.Format(_T("Read fps : %d"), textreadCount);
+	TextOut(hdc, 350, 0, t, t.GetLength());
+}
+
 void DrawMousePosition(HDC hdc)
 {
 	CString t;
@@ -429,10 +457,44 @@ void DrawMousePosition(HDC hdc)
 	TextOut(hdc, 50, 0, t, t.GetLength());
 }
 
-void DrawFPS(HDC hdc)
+void Update()
 {
-	CString t;
+	t2_fps = std::chrono::high_resolution_clock::now();
+	t2_render = std::chrono::high_resolution_clock::now();
+	t2_send = std::chrono::high_resolution_clock::now();
+	t2_move = std::chrono::high_resolution_clock::now();
+	t2_sendCount = std::chrono::high_resolution_clock::now();
+	t2_readCount = std::chrono::high_resolution_clock::now();
 
-	t.Format(_T("fps : %d"), textRenderingCount);
-	TextOut(hdc, 100, 0, t, t.GetLength());
+	timeSpan_fps = std::chrono::duration_cast<std::chrono::duration<double>>(t2_fps - t1_fps);
+	timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
+	timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+	timeSpan_move = std::chrono::duration_cast<std::chrono::duration<double>>(t2_move - t1_move);
+	timeSpan_sendCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_sendCount - t1_sendCount);
+	timeSpan_readCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_readCount - t1_readCount);
+
+	if (timeSpan_move.count() >= 0.005)
+	{
+		if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+		{
+			x -= 1;
+		}
+		if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+		{
+			x += 1;
+		}
+		if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+		{
+			y += 1;
+		}
+		if (GetAsyncKeyState(VK_UP) & 0x8000)
+		{
+			y -= 1;
+		}
+		if (GetAsyncKeyState(VK_SPACE) & 0x8000)
+		{
+
+		}
+		t1_move = std::chrono::high_resolution_clock::now();
+	}
 }
