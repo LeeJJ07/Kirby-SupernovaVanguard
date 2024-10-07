@@ -42,13 +42,12 @@ static std::chrono::high_resolution_clock::time_point t1_move;
 static std::chrono::high_resolution_clock::time_point t2_move;
 static std::chrono::duration<double> timeSpan_move;
 
-<<<<<<< HEAD
 bool canGoToNext;
 bool pressEnterKey;
 SceneState curScene;
 StartScene startScene;
 SelectScene selectScene;
-=======
+
 void DrawMousePosition(HDC);
 // <<
 
@@ -78,7 +77,6 @@ static std::chrono::duration<double> timeSpan_send;
 
 DWORD dwThID1, dwThID2;
 HANDLE hThreads[2];
->>>>>>> db09e919ad873427279bd4ff43fee80446467935
 
 unsigned long ulStackSize = 0;
 
@@ -202,10 +200,6 @@ ActionData aD;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	static SceneState curScene;
-
-	static StartScene startScene;
-
 	switch (message)
 	{
 	case WM_CREATE:
@@ -218,24 +212,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SetTimer(hWnd, TIMER_START, 1, NULL);
 
 		InitObjArr();
-
-		if (InitClient(hWnd, cSocket))
-		{
-			ReadInitMessage(cSocket, myData);
-			myID = myData.id;
-
-			client[myID] = new Player();
-
-			SetPlayer(client, myData);
-
-			Create(client[myID]);
-
-			camera.SetTargetObject(client[myID]);
-			t1_fps = std::chrono::high_resolution_clock::now();
-			t1_render = std::chrono::high_resolution_clock::now();
-			t1_send = std::chrono::high_resolution_clock::now();
-			t1_move = std::chrono::high_resolution_clock::now();
-		}
 
 		hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
 		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
@@ -255,6 +231,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 			case START:
 				curScene = SELECT;
+				if (InitClient(hWnd, cSocket))
+				{
+					ReadInitMessage(cSocket, myData);
+					myID = myData.id;
+
+					client[myID] = new Player();
+
+					SetPlayer(client, myData);
+
+					Create(client[myID]);
+
+					camera.SetTargetObject(client[myID]);
+					t1_fps = std::chrono::high_resolution_clock::now();
+					t1_render = std::chrono::high_resolution_clock::now();
+					t1_send = std::chrono::high_resolution_clock::now();
+					t1_move = std::chrono::high_resolution_clock::now();
+				}
 				break;
 			case SELECT:
 				break;
@@ -296,7 +289,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 
-<<<<<<< HEAD
 	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 	{
 		x -= 1;
@@ -322,9 +314,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 
 	}
-	
-=======
->>>>>>> db09e919ad873427279bd4ff43fee80446467935
 	return 0;
 }
 
@@ -426,14 +415,9 @@ unsigned __stdcall Paint(HWND pParam)
 {
 	while (TRUE)
 	{
-		if (isDraw && timeSpan_render.count() >= 0.0075)
-		{
-			EnterCriticalSection(&cs);
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(pParam, &ps);
 
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(pParam, &ps);
-
-<<<<<<< HEAD
 		switch(curScene)
 		{
 		case START:
@@ -442,38 +426,31 @@ unsigned __stdcall Paint(HWND pParam)
 		case SELECT:
 			selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, client);
 			break;
-		}
-			
-=======
-			/*if (curScene == START)
-				startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView);*/
->>>>>>> db09e919ad873427279bd4ff43fee80446467935
-
-			DoubleBuffering(hdc, client);
-			renderingCount++;
-
-			if (timeSpan_fps.count() >= 1)
+		case GAME:
+		{
+			if (timeSpan_render.count() >= 0.0075)
 			{
-				CountFPS();
+				EnterCriticalSection(&cs);
+				DoubleBuffering(hdc, client);
+				renderingCount++;
+
+				if (timeSpan_fps.count() >= 1)
+				{
+					CountFPS();
+				}
+
+				DrawMousePosition(hdc);
+				DrawFPS(hdc);
+
+				EndPaint(pParam, &ps);
+
+				t1_render = std::chrono::high_resolution_clock::now();
+
+				LeaveCriticalSection(&cs);
 			}
-
-			DrawMousePosition(hdc);
-			DrawFPS(hdc);
-
-			InvalidateRgn(pParam, NULL, FALSE);
-
-			EndPaint(pParam, &ps);
-
-<<<<<<< HEAD
-		//LeaveCriticalSection(&cs);
-=======
-			isDraw = false;
->>>>>>> db09e919ad873427279bd4ff43fee80446467935
-
-			t1_render = std::chrono::high_resolution_clock::now();
-
-			LeaveCriticalSection(&cs);
 		}
+			break;
+		}		
 		Sleep(0);
 	}
 }

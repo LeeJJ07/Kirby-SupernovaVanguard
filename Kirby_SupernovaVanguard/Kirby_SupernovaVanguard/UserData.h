@@ -7,6 +7,7 @@ struct UserData
 	PAIR lookingDir;
 	POINT center;
 	POINT pos;
+	POINT mousePos;
 	int radius;
 	int moveDir;
 	short id;
@@ -15,3 +16,4 @@ struct UserData
 void SetUserData(UserData&, Player*);
 void SetPlayer(std::vector<Player*>& p, UserData&);
 void SetPlayer(Player*& p, UserData& ud);
+int GetCharacterIndex(POINT mousePos);

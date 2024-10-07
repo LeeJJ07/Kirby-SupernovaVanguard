@@ -84,6 +84,10 @@ void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, 
 		int centerY = rectView.bottom - 170;
 
 		Rectangle(hDoubleBufferDC, centerX - 100, centerY - 100, centerX + 100, centerY + 100);
+
+		Rect destRect(centerX - w[i] / 2, centerY - h[i] / 2 - 50, w[i], h[i]);
+		Rect srcRect(0, 0, w[i], h[i]);
+		graphics.DrawImage(pImg[clients[i]->GetSelectNumber()], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
 	}
 
 	SelectObject(hDoubleBufferDC, hOldBrush);

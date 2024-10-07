@@ -21,6 +21,7 @@ typedef struct userData
 	pair<double, double> lookingDir;
 	POINT center;
 	POINT pos;
+	POINT mousePos;
 	int radius;
 	int moveDir;
 	short id;
@@ -57,8 +58,7 @@ WSADATA wsaData;
 SOCKET s, cs;
 SOCKADDR_IN addr = { 0 }, c_addr = { 0 };
 
-vector<pair<SOCKET, UserData>>  socketList;
-vector<SOCKET> socketList1;
+vector<SOCKET> socketList;
 vector<UserData> userList;
 
 TCHAR msg[200] = { 0 };
@@ -249,7 +249,7 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 
 	SendToClient({ cs, userData });
 
-	socketList1.push_back(cs);
+	socketList.push_back(cs);
 	userList.push_back(userData);
 
 	SendToAll();//{ cs , userData }
@@ -259,24 +259,12 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 
 void ReadData()
 {
-	for (int i = 0; i < socketList1.size(); i++) {
+	for (int i = 0; i < socketList.size(); i++) {
 		ReceiveData temp;
-		int dataLen = recv(socketList1[i], (char*)&temp, sizeof(ReceiveData), 0);
+		int dataLen = recv(socketList[i], (char*)&temp, sizeof(ReceiveData), 0);
 		if(dataLen > 0)
 			SetUserData(userList[temp.id], temp);
 	}
-	//for (vector<pair<SOCKET,UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
-	//{
-	//	pair<SOCKET,UserData> cs = (*it);
-	//	ReceiveData temp;
-	//	int msgLen = recv(cs.first, (char*)&temp, sizeof(ReceiveData), 0);
-	//	if (msgLen > 0)
-	//	{
-	//		SetUserData(userList[temp.id], temp);
-	//		
-	//		//SendToAll(socketList[temp.id]);
-	//	}
-	//}
 }
 
 // 현재 연결된 유저한테 정보를 알려줌
@@ -288,12 +276,11 @@ void SendToClient(pair<SOCKET, UserData> cs)
 // 모든 유저들에게 업데이트 된 정보를 전달
 void SendToAll()//pair<SOCKET, UserData> cs
 {
-	for (int i = 0; i < socketList1.size(); i++)
+	for (int i = 0; i < socketList.size(); i++)
 	{
-		//send(socketList[i].first, (char*)&socketList[0], sizeof(UserData) * socketList.size(), 0);
 		for (int j = 0; j < userList.size(); j++)
 		{
-			send(socketList1[i], (char*)&userList[j], sizeof(UserData), 0);
+			send(socketList[i], (char*)&userList[j], sizeof(UserData), 0);
 		}
 	}
 }
@@ -301,24 +288,13 @@ void SendToAll()//pair<SOCKET, UserData> cs
 void CloseClient(SOCKET socket)
 {
 	for (int i = 0; i < socketList.size(); i++) {
-		if (socketList1[i] == socket) {
-			closesocket(socketList1[i]);
+		if (socketList[i] == socket) {
+			closesocket(socketList[i]);
 			userList.erase(userList.begin() + i);
-			socketList1.erase(socketList1.begin() + i);
+			socketList.erase(socketList.begin() + i);
 			break;
 		}
 	}
-
-	/*for (vector<pair<SOCKET, UserData>>::iterator it = socketList.begin(); it != socketList.end(); it++)
-	{
-		pair<SOCKET, UserData> cs = (*it);
-		if (cs.first == socket)
-		{
-			closesocket(cs.first);
-			it = socketList.erase(it);
-			break;
-		}
-	}*/
 }
 
 void InitUserData(UserData& userData, int id)
