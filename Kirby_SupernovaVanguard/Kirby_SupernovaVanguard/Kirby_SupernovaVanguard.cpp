@@ -10,6 +10,7 @@
 
 #define MAX_LOADSTRING 100
 #define TIMER_START 1
+#define TIMER_SELECT 2
 
 enum SceneState { START, SELECT, GAME };
 RECT        rectView;
@@ -41,6 +42,8 @@ CRITICAL_SECTION cs;
 // >> : move
 int x, y;
 int cursorX, cursorY;
+
+ActionData aD;
 
 static std::chrono::high_resolution_clock::time_point t1_move;
 static std::chrono::high_resolution_clock::time_point t2_move;
@@ -129,24 +132,29 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	MSG msg;
 
-	while (true/*GetMessage(&msg, nullptr, 0, 0)*/)
+	/*GetMessage(&msg, nullptr, 0, 0)*/
+	while (GetMessage(&msg, nullptr, 0, 0))
 	{
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		/*if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			if (msg.message == WM_QUIT)
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+		}*/
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+			/*if (msg.message == WM_QUIT)
 				break;
 			else
 			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
 			}
-		}
 		else
 		{
 			Update();
-		}
+		}*/
 	}
-
 	return (int)msg.wParam;
 }
 
@@ -192,7 +200,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 
-ActionData aD;
+
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -206,6 +214,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		curScene = START;
 
 		SetTimer(hWnd, TIMER_START, 1, NULL);
+		SetTimer(hWnd, TIMER_SELECT, 33, NULL);
 
 		InitObjArr();
 
@@ -222,11 +231,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CHAR:
 		if (wParam == VK_RETURN && canGoToNext)
 		{
-			canGoToNext = false;
 			switch (curScene)
 			{
 			case START:
-				curScene = SELECT;
 				if (InitClient(hWnd, cSocket))
 				{
 					ReadInitMessage(cSocket, myData);
@@ -245,9 +252,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					t1_move = std::chrono::high_resolution_clock::now();
 					t1_sendCount = std::chrono::high_resolution_clock::now();
 					t1_readCount = std::chrono::high_resolution_clock::now();
+
+					curScene = SELECT;
 				}
 				break;
 			case SELECT:
+				if (!aD.isReady)
+					aD.isReady = true;
 				break;
 			}
 		}
@@ -261,8 +272,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case TIMER_START:
+			Update();
 			InvalidateRgn(hWnd, NULL, FALSE);
 			break;
+		case TIMER_SELECT:
+			if (curScene != SELECT || !aD.isReady)
+				break;
+			{
+				int i;
+				for (i = 0; i < client.size(); i++)
+				{
+					if (client[i] != NULL && !client[i]->GetIsInGame())
+						break;
+				}
+				if (i == client.size())
+					curScene = GAME;
+			}
 		}
 		break;
 	case WM_ASYNC:
@@ -276,41 +301,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		if (hThreads[0])
 			CloseHandle(hThreads[0]);
-
 		if (hThreads[1])
 			CloseHandle(hThreads[1]);
 
 		DeleteCriticalSection(&cs);
 
 		KillTimer(hWnd, TIMER_START);
+		KillTimer(hWnd, TIMER_SELECT);
 		CloseClient(cSocket, client, myID);
 		PostQuitMessage(0);
 		break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
-
-	if (GetAsyncKeyState(VK_LEFT) & 0x8000)
-	{
-		x -= 1;
-	}
-	if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
-	{
-		x += 1;
-	}
-	if (GetAsyncKeyState(VK_DOWN) & 0x8000)
-	{
-		y += 1;
-	}
-	if (GetAsyncKeyState(VK_UP) & 0x8000)
-	{
-		y -= 1;
-	}
-	if (GetAsyncKeyState(VK_SPACE) & 0x8000)
-	{
-
-	}
-	return 0;
 }
 
 void DoubleBuffering(HDC hdc, std::vector<Player*> client)
@@ -382,7 +385,7 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		if (timeSpan_send.count() >= 0.001)
+		//if (timeSpan_send.count() >= 0.001)
 		{
 			aD.id = myID;
 			aD.playerMove = { x,y };
@@ -403,7 +406,7 @@ unsigned __stdcall Send()
 			t1_send = std::chrono::high_resolution_clock::now();
 			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 		}
-		Sleep(0);
+		Sleep(1);
 	}
 }
 
@@ -437,23 +440,24 @@ unsigned __stdcall Paint(HWND pParam)
 					CountFPS();
 				}
 
+
 				DrawMousePosition(hdc);
 				DrawFPS(hdc);
 				DrawSendNum(hdc);
 				DrawReadNum(hdc);
 
-				EndPaint(pParam, &ps);
 
 				t1_render = std::chrono::high_resolution_clock::now();
 				timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
 
-				isDraw = false;
+				//isDraw = false;
 
 				LeaveCriticalSection(&cs);
 			}
 			break;
 		}
-		Sleep(0);
+		EndPaint(pParam, &ps);
+		Sleep(1);
 		}
 	}
 }
@@ -526,8 +530,8 @@ void Update()
 	timeSpan_sendCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_sendCount - t1_sendCount);
 	timeSpan_readCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_readCount - t1_readCount);
 
-	if (timeSpan_move.count() >= 0.005)
-	{
+	/*if (timeSpan_move.count() >= 0.01)
+	{*/
 		if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 		{
 			x -= 1;
@@ -549,5 +553,5 @@ void Update()
 
 		}
 		t1_move = std::chrono::high_resolution_clock::now();
-	}
+	/*}*/
 }

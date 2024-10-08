@@ -25,6 +25,7 @@ void SetPlayer(std::vector<Player*>& p, UserData& ud)
 	p[ud.id]->SetMousePosition(ud.mousePos);
 	p[ud.id]->SetPos(ud.pos);
 	p[ud.id]->SetRadius(ud.radius);
+	p[ud.id]->SetIsInGame(ud.inGameStart);
 
 	camera.PositionUpdate();
 }
@@ -42,4 +43,5 @@ void SetPlayer(Player* &p, UserData& ud)
 	p->SetMousePosition(ud.mousePos);
 	p->SetPos(temp);
 	p->SetRadius(ud.radius);
+	p->SetIsInGame(ud.inGameStart);
 }

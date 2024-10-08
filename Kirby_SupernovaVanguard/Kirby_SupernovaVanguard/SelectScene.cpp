@@ -27,10 +27,10 @@ SelectScene::SelectScene()
 	pImg[4] = Image::FromFile((WCHAR*)L"Images/Backgrounds/playerText.png");
 	pImg[5] = Image::FromFile((WCHAR*)L"Images/Backgrounds/selectText.png");
 
-	pImg[6] = Image::FromFile((WCHAR*)L"Images/Backgrounds/kirby.png");
-	pImg[7] = Image::FromFile((WCHAR*)L"Images/Backgrounds/ddd.png");
-	pImg[8] = Image::FromFile((WCHAR*)L"Images/Backgrounds/metanight.png");
-	pImg[9] = Image::FromFile((WCHAR*)L"Images/Backgrounds/maboroa.png");
+	pImg[6] = Image::FromFile((WCHAR*)L"Images/Backgrounds/kirbySelected.png");
+	pImg[7] = Image::FromFile((WCHAR*)L"Images/Backgrounds/dddSelected.png");
+	pImg[8] = Image::FromFile((WCHAR*)L"Images/Backgrounds/metanightSelected.png");
+	pImg[9] = Image::FromFile((WCHAR*)L"Images/Backgrounds/maboroaSelected.png");
 
 
 	for (int i = 0; i < 10; i++)
@@ -151,5 +151,5 @@ int SelectScene::SelectCharacter(Player* client, RECT& rectView)
 			return i + 6;
 		}
 	}
-	return 6;
+	return client->GetCharacter() + 6;
 }

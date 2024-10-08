@@ -4,6 +4,8 @@
 
 struct UserData
 {
+	bool inGameStart;
+
 	PAIR lookingDir;
 	POINT center;
 	POINT pos;

@@ -18,6 +18,8 @@ enum State { RECEIVE, SEND };
 
 typedef struct userData
 {
+	bool inGameStart;
+
 	pair<double, double> lookingDir;
 	POINT center;
 	POINT pos;
@@ -38,6 +40,7 @@ typedef struct receiveData
 	short id;
 	POINT playerMove;
 	POINT cursorMove;
+	bool isReady;
 }ReceiveData;
 
 #define MAX_LOADSTRING 100
@@ -308,6 +311,7 @@ void InitUserData(UserData& userData, int id)
 	userData.mousePos = { 0,0 };
 	userData.pos = { 50 * (id + 1), 50 * (id + 1) };
 	userData.radius = 10;
+	userData.inGameStart = false;
 }
 
 void SetUserData(UserData& uData, ReceiveData rData)
@@ -317,4 +321,6 @@ void SetUserData(UserData& uData, ReceiveData rData)
 	//마우스 위치도 설정 필요
 	uData.mousePos.x = rData.cursorMove.x;
 	uData.mousePos.y = rData.cursorMove.y;
+
+	uData.inGameStart = rData.isReady;
 }
