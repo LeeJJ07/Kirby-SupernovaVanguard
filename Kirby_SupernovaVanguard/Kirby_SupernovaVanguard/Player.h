@@ -4,24 +4,31 @@
 
 #define PAIR std::pair<double,double>
 
+enum ECharacterType {KIRBY, DDD, METANIHGT, MABOROA};
+
 class Player :public Circle2D
 {
 private:
 	PAIR lookingDir;
 	int moveDir;
+	POINT mousePos;
 
-	int selectNumber;
+	ECharacterType characterType;
 public:
 	Player(PAIR lD = { 0,0 }, int mD = 0, POINT p = { 0,0 }, POINT c = { 0,0 }, short t = PLAYER, int r = BASERADIUS)
-		:Circle2D(p, c, t, r), lookingDir(lD), moveDir(mD), selectNumber(0){}
+		:Circle2D(p, c, t, r), lookingDir(lD), moveDir(mD), mousePos({0, 0}), characterType(KIRBY)
+	{}
 	~Player() {}
 	int GetMoveDir() { return moveDir; }
 	PAIR GetLookingDir() { return lookingDir; }
 	void SetMoveDir(int d) { moveDir = d; }
 	void SetLookingDir(PAIR p) { lookingDir = p; }
 
-	int GetSelectNumber() { return selectNumber; }
-	void SetSelectNumber(int selectNumber) { this->selectNumber = selectNumber; }
+	POINT GetMousePosition() { return mousePos; }
+	void SetMousePosition(POINT mousePos) { this->mousePos = mousePos; }
+
+	ECharacterType GetCharacter() { return characterType; }
+	void SetCharacter(ECharacterType characterType) { this->characterType = characterType; }
 };
 
 void DrawPlayer(HDC, Player*);

@@ -22,10 +22,10 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
-void DoubleBuffering(HDC , std::vector<Player*>);
+void DoubleBuffering(HDC, std::vector<Player*>);
 void DrawCamera(HDC, RECT);
 void InitObjArr();
-unsigned __stdcall Paint(HWND );
+unsigned __stdcall Paint(HWND);
 unsigned __stdcall Send();
 
 TCHAR str[200];
@@ -40,6 +40,7 @@ CRITICAL_SECTION cs;
 
 // >> : move
 int x, y;
+int cursorX, cursorY;
 
 static std::chrono::high_resolution_clock::time_point t1_move;
 static std::chrono::high_resolution_clock::time_point t2_move;
@@ -108,9 +109,9 @@ HANDLE hThreads[2];
 unsigned long ulStackSize = 0;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-					 _In_opt_ HINSTANCE hPrevInstance,
-					 _In_ LPWSTR    lpCmdLine,
-					 _In_ int       nCmdShow)
+	_In_opt_ HINSTANCE hPrevInstance,
+	_In_ LPWSTR    lpCmdLine,
+	_In_ int       nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
@@ -119,7 +120,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	LoadStringW(hInstance, IDC_KIRBYSUPERNOVAVANGUARD, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 
-	if (!InitInstance (hInstance, nCmdShow))
+	if (!InitInstance(hInstance, nCmdShow))
 	{
 		return FALSE;
 	}
@@ -146,7 +147,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 	}
 
-	return (int) msg.wParam;
+	return (int)msg.wParam;
 }
 
 ATOM MyRegisterClass(HINSTANCE hInstance)
@@ -155,40 +156,40 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 	wcex.cbSize = sizeof(WNDCLASSEX);
 
-	wcex.style          = CS_HREDRAW | CS_VREDRAW;
-	wcex.lpfnWndProc    = WndProc;
-	wcex.cbClsExtra     = 0;
-	wcex.cbWndExtra     = 0;
-	wcex.hInstance      = hInstance;
-	wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_KIRBYSUPERNOVAVANGUARD));
-	wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_KIRBYSUPERNOVAVANGUARD);
-	wcex.lpszClassName  = szWindowClass;
-	wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = hInstance;
+	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_KIRBYSUPERNOVAVANGUARD));
+	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_KIRBYSUPERNOVAVANGUARD);
+	wcex.lpszClassName = szWindowClass;
+	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
 	return RegisterClassExW(&wcex);
 }
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance;
+	hInst = hInstance;
 
-   int width = GetSystemMetrics(SM_CXSCREEN);
-   int height = GetSystemMetrics(SM_CYSCREEN);
+	int width = GetSystemMetrics(SM_CXSCREEN);
+	int height = GetSystemMetrics(SM_CYSCREEN);
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-	  0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, nullptr, nullptr, hInstance, nullptr);
+	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+		0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-	  return FALSE;
-   }
+	if (!hWnd)
+	{
+		return FALSE;
+	}
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
 
-   return TRUE;
+	return TRUE;
 }
 
 ActionData aD;
@@ -202,31 +203,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		InitializeCriticalSection(&cs);
 		GetClientRect(hWnd, &rectView);
 
-		curScene = GAME;
+		curScene = START;
 
 		SetTimer(hWnd, TIMER_START, 1, NULL);
 
 		InitObjArr();
-
-		if (InitClient(hWnd, cSocket))
-		{
-			ReadInitMessage(cSocket, myData);
-			myID = myData.id;
-
-			client[myID] = new Player();
-
-			SetPlayer(client, myData);
-
-			Create(client[myID]);
-
-			camera.SetTargetObject(client[myID]);
-			t1_fps = std::chrono::high_resolution_clock::now();
-			t1_render = std::chrono::high_resolution_clock::now();
-			t1_send = std::chrono::high_resolution_clock::now();
-			t1_move = std::chrono::high_resolution_clock::now();
-			t1_sendCount = std::chrono::high_resolution_clock::now();
-			t1_readCount = std::chrono::high_resolution_clock::now();
-		}
 
 		hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
 		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
@@ -262,14 +243,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					t1_render = std::chrono::high_resolution_clock::now();
 					t1_send = std::chrono::high_resolution_clock::now();
 					t1_move = std::chrono::high_resolution_clock::now();
+					t1_sendCount = std::chrono::high_resolution_clock::now();
+					t1_readCount = std::chrono::high_resolution_clock::now();
 				}
 				break;
 			case SELECT:
 				break;
 			}
 		}
+	case WM_LBUTTONDOWN:
+	{
+		cursorX = LOWORD(lParam);
+		cursorY = HIWORD(lParam);
+	}
+		break;
 	case WM_TIMER:
-		switch(wParam)
+		switch (wParam)
 		{
 		case TIMER_START:
 			InvalidateRgn(hWnd, NULL, FALSE);
@@ -386,7 +375,7 @@ void DrawCamera(HDC hdc, RECT rect)
 
 void InitObjArr()
 {
-	objArr = new Collider2D*[1000];
+	objArr = new Collider2D * [1000];
 }
 
 unsigned __stdcall Send()
@@ -397,7 +386,7 @@ unsigned __stdcall Send()
 		{
 			aD.id = myID;
 			aD.playerMove = { x,y };
-			aD.cursorMove = { 0,0 };
+			aD.cursorMove = { cursorX, cursorY };
 
 			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
 
@@ -422,52 +411,49 @@ unsigned __stdcall Paint(HWND pParam)
 {
 	while (TRUE)
 	{
-		if (isDraw && timeSpan_render.count() >= 0.005)
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(pParam, &ps);
+
+		switch (curScene)
 		{
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(pParam, &ps);
+		case START:
+			startScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, canGoToNext);
+			break;
+		case SELECT:
+			selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, client);
+			break;
+		case GAME:
+		{
+			if (timeSpan_render.count() >= 0.0075)
+			{
+				EnterCriticalSection(&cs);
 
-			switch (curScene)
-			{
-			case START:
-				startScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, canGoToNext);
-				break;
-			case SELECT:
-				selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, client);
-				break;
-			case GAME:
-			{
-				if (timeSpan_render.count() >= 0.0075)
+				DoubleBuffering(hdc, client);
+
+				renderingCount++;
+
+				if (timeSpan_fps.count() >= 1)
 				{
-					EnterCriticalSection(&cs);
-
-					DoubleBuffering(hdc, client);
-
-					renderingCount++;
-					
-					if (timeSpan_fps.count() >= 1)
-					{
-						CountFPS();
-					}
-
-					DrawMousePosition(hdc);
-					DrawFPS(hdc);
-					DrawSendNum(hdc);
-					DrawReadNum(hdc);
-
-					EndPaint(pParam, &ps);
-
-					t1_render = std::chrono::high_resolution_clock::now();
-					timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
-
-					isDraw = false;
-
-					LeaveCriticalSection(&cs);
+					CountFPS();
 				}
-				break;
+
+				DrawMousePosition(hdc);
+				DrawFPS(hdc);
+				DrawSendNum(hdc);
+				DrawReadNum(hdc);
+
+				EndPaint(pParam, &ps);
+
+				t1_render = std::chrono::high_resolution_clock::now();
+				timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
+
+				isDraw = false;
+
+				LeaveCriticalSection(&cs);
 			}
-			Sleep(0);
-			}
+			break;
+		}
+		Sleep(0);
 		}
 	}
 }

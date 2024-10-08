@@ -16,4 +16,3 @@ struct UserData
 void SetUserData(UserData&, Player*);
 void SetPlayer(std::vector<Player*>& p, UserData&);
 void SetPlayer(Player*& p, UserData& ud);
-int GetCharacterIndex(POINT mousePos);

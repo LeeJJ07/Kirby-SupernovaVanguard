@@ -28,5 +28,7 @@ public:
 
 	void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Player*>& clients);
 	void DeleteBitmap();
+
+	int SelectCharacter(Player* client, RECT& rectView);
 };
 
