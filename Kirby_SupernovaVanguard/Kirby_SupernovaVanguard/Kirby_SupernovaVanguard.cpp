@@ -387,7 +387,7 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		if (timeSpan_send.count() >= 0.01)
+		if (timeSpan_send.count() >= 0.01 && cs.DebugInfo != NULL)
 		{
 			aD.id = myID;
 			aD.playerMove = { x,y };
@@ -422,7 +422,7 @@ unsigned __stdcall Paint(HWND pParam)
 			Sleep(0);
 			continue;
 		}
-		if (timeSpan_render.count() >= 0.0075)
+		if (timeSpan_render.count() >= 0.0075 && cs.DebugInfo != NULL)
 		{
 			EnterCriticalSection(&cs);
 

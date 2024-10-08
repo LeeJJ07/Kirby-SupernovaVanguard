@@ -4,7 +4,8 @@
 StartScene::StartScene()
 {
 	objects.resize(6);
-	FILE* file = fopen("Datas/PosData.txt", "r");
+	FILE* file;
+	fopen_s(&file, "Datas/PosData.txt", "r");
 	if (file != NULL)
 	{
 		int x, y;
