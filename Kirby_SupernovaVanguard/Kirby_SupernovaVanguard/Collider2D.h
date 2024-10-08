@@ -32,7 +32,7 @@ public:
 	void MoveCenter(POINT m) { center.x += m.x; center.y += m.y; }
 };
 
-static Collider2D** objArr;
+extern Collider2D** objArr;
 static int objnum = 0;
 
 template<class T>
