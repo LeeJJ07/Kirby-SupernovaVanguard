@@ -221,7 +221,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -305,6 +305,7 @@ void InitUserData(UserData& userData, int id)
 	userData.center = { 50 * (id + 1), 50 * (id + 1)};
 	userData.lookingDir = { 1.0, 1.0 };
 	userData.moveDir = 0;
+	userData.mousePos = { 0,0 };
 	userData.pos = { 50 * (id + 1), 50 * (id + 1) };
 	userData.radius = 10;
 }
@@ -314,5 +315,6 @@ void SetUserData(UserData& uData, ReceiveData rData)
 	uData.pos.x += rData.playerMove.x;
 	uData.pos.y += rData.playerMove.y;
 	//마우스 위치도 설정 필요
-
+	uData.mousePos.x = rData.cursorMove.x;
+	uData.mousePos.y = rData.cursorMove.y;
 }

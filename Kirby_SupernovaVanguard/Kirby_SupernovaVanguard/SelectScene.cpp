@@ -16,8 +16,8 @@ SelectScene::SelectScene()
 
 	GdiplusStartup(&g_GdiPlusToken, &gpsi, NULL);
 
-	pImg.resize(6);
-	w.resize(6), h.resize(6);
+	pImg.resize(10);
+	w.resize(10), h.resize(10);
 
 	pImg[0] = Image::FromFile((WCHAR*)L"Images/Backgrounds/kirby.png");
 	pImg[1] = Image::FromFile((WCHAR*)L"Images/Backgrounds/ddd.png");
@@ -27,7 +27,13 @@ SelectScene::SelectScene()
 	pImg[4] = Image::FromFile((WCHAR*)L"Images/Backgrounds/playerText.png");
 	pImg[5] = Image::FromFile((WCHAR*)L"Images/Backgrounds/selectText.png");
 
-	for (int i = 0; i < 6; i++)
+	pImg[6] = Image::FromFile((WCHAR*)L"Images/Backgrounds/kirby.png");
+	pImg[7] = Image::FromFile((WCHAR*)L"Images/Backgrounds/ddd.png");
+	pImg[8] = Image::FromFile((WCHAR*)L"Images/Backgrounds/metanight.png");
+	pImg[9] = Image::FromFile((WCHAR*)L"Images/Backgrounds/maboroa.png");
+
+
+	for (int i = 0; i < 10; i++)
 	{
 		w[i] = pImg[i]->GetWidth();
 		h[i] = pImg[i]->GetHeight();
@@ -69,13 +75,20 @@ void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, 
 
 	hOldBrush = (HBRUSH)SelectObject(hDoubleBufferDC, blackBrush);
 
+	// 가운데 캐릭터 선택 박스 및 해당 캐릭터
 	for (int i = 0; i < 4; i++)
 	{
 		int centerX = rectView.right / 4 * ((i % 2) * 2 + 1) + (i % 2 - 0.5) * -250;
 		int centerY = rectView.bottom / 4 * ((i / 2) * 2 + 1) - (i / 2) * 150;
 
 		Rectangle(hDoubleBufferDC, centerX - 300, centerY - 250, centerX + 300, centerY + 150);
+
+		Rect destRect(centerX - w[i] / 2, centerY - h[i] / 2 - 50, w[i], h[i]);
+		Rect srcRect(0, 0, w[i], h[i]);
+		graphics.DrawImage(pImg[i], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
 	}
+
+	// select scene 맨 아래 네모 박스 및 캐릭터
 	for (int i = 0; i < 4; i++)
 	{
 		if (clients[i] == NULL) continue;
@@ -85,23 +98,17 @@ void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, 
 
 		Rectangle(hDoubleBufferDC, centerX - 100, centerY - 100, centerX + 100, centerY + 100);
 
-		Rect destRect(centerX - w[i] / 2, centerY - h[i] / 2 - 50, w[i], h[i]);
-		Rect srcRect(0, 0, w[i], h[i]);
-		graphics.DrawImage(pImg[clients[i]->GetSelectNumber()], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
+		int index = SelectCharacter(clients[i], rectView);
+		Rect destRect(centerX - w[index] / 2, centerY - h[index] / 2, w[index], h[index]);
+		Rect srcRect(0, 0, w[index], h[index]);
+		graphics.DrawImage(pImg[index],
+			destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
 	}
 
 	SelectObject(hDoubleBufferDC, hOldBrush);
 	DeleteObject(blackBrush);
-	for (int i = 0; i < 4; i++)
-	{
-		int centerX = rectView.right / 4 * ((i % 2) * 2 + 1) + (i % 2 - 0.5) * -250;
-		int centerY = rectView.bottom / 4 * ((i / 2) * 2 + 1) - (i / 2) * 150;
 
-		Rect destRect(centerX - w[i] / 2, centerY - h[i] / 2 - 50, w[i], h[i]);
-		Rect srcRect(0, 0, w[i], h[i]);
-		graphics.DrawImage(pImg[i], destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
-	}
-
+	// 양 옆 PLAYER & SELECT
 	for (int i = 4; i < 6; i++)
 	{
 		int centerX = (i - 4) *1600 + 150;
@@ -126,4 +133,23 @@ void SelectScene::DeleteBitmap()
 {
 	DeleteObject(hBackImage);
 	GdiplusShutdown(g_GdiPlusToken);
+}
+
+int SelectScene::SelectCharacter(Player* client, RECT& rectView)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		int centerX = rectView.right / 4 * ((i % 2) * 2 + 1) + (i % 2 - 0.5) * -250;
+		int centerY = rectView.bottom / 4 * ((i / 2) * 2 + 1) - (i / 2) * 150;
+
+		if (client->GetMousePosition().x > centerX - 300
+			&& client->GetMousePosition().x < centerX + 300
+			&& client->GetMousePosition().y > centerY - 250
+			&& client->GetMousePosition().y < centerY + 150)
+		{
+			client->SetCharacter((ECharacterType)i);
+			return i + 6;
+		}
+	}
+	return 6;
 }
