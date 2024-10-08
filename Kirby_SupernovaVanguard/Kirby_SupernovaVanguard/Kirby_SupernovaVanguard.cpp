@@ -32,6 +32,7 @@ unsigned __stdcall Send();
 TCHAR str[200];
 std::vector<Player*> client(4);
 UserData uData, myData;
+Collider2D** objArr;
 short myID;
 static SOCKET cSocket;
 
@@ -132,6 +133,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	MSG msg;
 
+<<<<<<< HEAD
 	/*GetMessage(&msg, nullptr, 0, 0)*/
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{
@@ -154,6 +156,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		{
 			Update();
 		}*/
+=======
+	while (GetMessage(&msg, nullptr, 0, 0))
+	{
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+
+		if(curScene == GAME)
+			Update();
+>>>>>>> 4da8531fc3832d3765ac91319f1fb966953e3641
 	}
 	return (int)msg.wParam;
 }
@@ -226,6 +240,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (hThreads[1])
 			ResumeThread(hThreads[1]);
 
+		if (InitClient(hWnd, cSocket))
+		{
+			//curScene = SELECT;
+
+			ReadInitMessage(cSocket, myData);
+			myID = myData.id;
+
+			client[myID] = new Player();
+
+			SetPlayer(client, myData);
+
+			Create(client[myID]);
+
+			camera.SetTargetObject(client[myID]);
+		}
+
+		t1_fps = std::chrono::high_resolution_clock::now();
+		t1_render = std::chrono::high_resolution_clock::now();
+		t1_send = std::chrono::high_resolution_clock::now();
+		t1_move = std::chrono::high_resolution_clock::now();
+		t1_sendCount = std::chrono::high_resolution_clock::now();
+		t1_readCount = std::chrono::high_resolution_clock::now();
+
 		break;
 	}
 	case WM_CHAR:
@@ -236,6 +273,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case START:
 				if (InitClient(hWnd, cSocket))
 				{
+					curScene = SELECT;
+
 					ReadInitMessage(cSocket, myData);
 					myID = myData.id;
 
@@ -246,6 +285,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					Create(client[myID]);
 
 					camera.SetTargetObject(client[myID]);
+<<<<<<< HEAD
 					t1_fps = std::chrono::high_resolution_clock::now();
 					t1_render = std::chrono::high_resolution_clock::now();
 					t1_send = std::chrono::high_resolution_clock::now();
@@ -254,6 +294,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					t1_readCount = std::chrono::high_resolution_clock::now();
 
 					curScene = SELECT;
+=======
+>>>>>>> 4da8531fc3832d3765ac91319f1fb966953e3641
 				}
 				break;
 			case SELECT:
@@ -267,6 +309,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		cursorX = LOWORD(lParam);
 		cursorY = HIWORD(lParam);
 	}
+		break;
+	case WM_PAINT:
+		if (curScene == START)
+		{
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(hWnd, &ps);
+			startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView, canGoToNext);
+			EndPaint(hWnd, &ps);
+		}
 		break;
 	case WM_TIMER:
 		switch (wParam)
@@ -295,6 +346,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case FD_READ:
 			ReadMessage(cSocket, client, uData);
+
+			isDraw = true;
 			break;
 		}
 		break;
@@ -314,6 +367,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
+<<<<<<< HEAD
+=======
+	return 0;
+>>>>>>> 4da8531fc3832d3765ac91319f1fb966953e3641
 }
 
 void DoubleBuffering(HDC hdc, std::vector<Player*> client)
@@ -385,7 +442,11 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
+<<<<<<< HEAD
 		//if (timeSpan_send.count() >= 0.001)
+=======
+		if (timeSpan_send.count() >= 0.01)
+>>>>>>> 4da8531fc3832d3765ac91319f1fb966953e3641
 		{
 			aD.id = myID;
 			aD.playerMove = { x,y };
@@ -406,7 +467,10 @@ unsigned __stdcall Send()
 			t1_send = std::chrono::high_resolution_clock::now();
 			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 		}
+<<<<<<< HEAD
 		Sleep(1);
+=======
+>>>>>>> 4da8531fc3832d3765ac91319f1fb966953e3641
 	}
 }
 
@@ -415,21 +479,28 @@ unsigned __stdcall Paint(HWND pParam)
 	while (TRUE)
 	{
 		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(pParam, &ps);
 
 		switch (curScene)
 		{
-		case START:
-			startScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, canGoToNext);
-			break;
 		case SELECT:
+		{
+			EnterCriticalSection(&cs);
+
+			HDC hdc = BeginPaint(pParam, &ps);
+
 			selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, client);
+
+			EndPaint(pParam, &ps);
+
+			LeaveCriticalSection(&cs);
+		}
 			break;
 		case GAME:
-		{
-			if (timeSpan_render.count() >= 0.0075)
+			if (isDraw && timeSpan_render.count() >= 0.0075)
 			{
 				EnterCriticalSection(&cs);
+
+				HDC hdc = BeginPaint(pParam, &ps);
 
 				DoubleBuffering(hdc, client);
 
@@ -446,19 +517,29 @@ unsigned __stdcall Paint(HWND pParam)
 				DrawSendNum(hdc);
 				DrawReadNum(hdc);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4da8531fc3832d3765ac91319f1fb966953e3641
 				t1_render = std::chrono::high_resolution_clock::now();
 				timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
 
 				//isDraw = false;
 
+				EndPaint(pParam, &ps);
+
 				LeaveCriticalSection(&cs);
 			}
+			Sleep(0);
+
 			break;
 		}
+<<<<<<< HEAD
 		EndPaint(pParam, &ps);
 		Sleep(1);
 		}
+=======
+>>>>>>> 4da8531fc3832d3765ac91319f1fb966953e3641
 	}
 }
 
@@ -529,9 +610,15 @@ void Update()
 	timeSpan_move = std::chrono::duration_cast<std::chrono::duration<double>>(t2_move - t1_move);
 	timeSpan_sendCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_sendCount - t1_sendCount);
 	timeSpan_readCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_readCount - t1_readCount);
+<<<<<<< HEAD
 
 	/*if (timeSpan_move.count() >= 0.01)
 	{*/
+=======
+	
+	if (timeSpan_move.count() >= 0.005)
+	{
+>>>>>>> 4da8531fc3832d3765ac91319f1fb966953e3641
 		if (GetAsyncKeyState(VK_LEFT) & 0x8000)
 		{
 			x -= 1;
@@ -550,7 +637,6 @@ void Update()
 		}
 		if (GetAsyncKeyState(VK_SPACE) & 0x8000)
 		{
-
 		}
 		t1_move = std::chrono::high_resolution_clock::now();
 	/*}*/
