@@ -5,7 +5,6 @@
 
 extern int readCount;
 extern int textreadCount;
-bool isDraw;
 
 extern std::chrono::duration<double> timeSpan_readCount;
 extern std::chrono::high_resolution_clock::time_point t1_readCount;
@@ -24,7 +23,7 @@ int InitClient(HWND hWnd, SOCKET &s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{

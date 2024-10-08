@@ -29,7 +29,6 @@ static TCHAR msg[200];
 static char buffer[100];
 static int msgLen;
 static int msgCount;
-extern bool isDraw;
 
 int InitClient(HWND hWnd, SOCKET&);
 int SendMessageToServer(SOCKET &, TCHAR*);

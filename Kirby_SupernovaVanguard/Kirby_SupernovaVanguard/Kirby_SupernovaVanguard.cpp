@@ -58,6 +58,7 @@ SelectScene selectScene;
 
 void DrawMousePosition(HDC);
 void Update();
+void UpdateSelect();
 // <<
 
 // >> : fps
@@ -76,8 +77,6 @@ void DrawFPS(HDC);
 static std::chrono::high_resolution_clock::time_point t1_render;
 static std::chrono::high_resolution_clock::time_point t2_render;
 static std::chrono::duration<double> timeSpan_render;
-
-//bool isDraw;
 // <<
 
 // >> : ReadCount
@@ -140,6 +139,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 
+		if (curScene == SELECT)
+			UpdateSelect();
 		if (curScene == GAME)
 			Update();
 	}
@@ -202,7 +203,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		curScene = START;
 
 		SetTimer(hWnd, TIMER_START, 1, NULL);
-		SetTimer(hWnd, TIMER_SELECT, 33, NULL);
+		SetTimer(hWnd, TIMER_SELECT, 1, NULL);
 
 		InitObjArr();
 
@@ -274,7 +275,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case TIMER_SELECT:
 			if (curScene != SELECT || !aD.isReady)
+			{
+				InvalidateRgn(hWnd, NULL, FALSE);
 				break;
+			}
 			{
 				int i;
 				for (i = 0; i < client.size(); i++)
@@ -292,8 +296,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case FD_READ:
 			ReadMessage(cSocket, client, uData);
-
-			isDraw = true;
 			break;
 		}
 		break;
@@ -415,60 +417,57 @@ unsigned __stdcall Paint(HWND pParam)
 	while (TRUE)
 	{
 		PAINTSTRUCT ps;
-
-		switch (curScene)
+		if (curScene == START)
 		{
-		case SELECT:
+			Sleep(0);
+			continue;
+		}
+		if (timeSpan_render.count() >= 0.0075)
 		{
 			EnterCriticalSection(&cs);
 
 			HDC hdc = BeginPaint(pParam, &ps);
 
-			selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, client);
+			switch (curScene)
+			{
+			case SELECT:
+			{
+				{
+					selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, client);
+
+					t1_render = std::chrono::high_resolution_clock::now();
+					timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
+				}
+			}
+			break;
+			case GAME:
+				{
+					DoubleBuffering(hdc, client);
+
+					renderingCount++;
+
+					if (timeSpan_fps.count() >= 1)
+					{
+						CountFPS();
+					}
+
+					DrawMousePosition(hdc);
+					DrawFPS(hdc);
+					DrawSendNum(hdc);
+					DrawReadNum(hdc);
+
+					t1_render = std::chrono::high_resolution_clock::now();
+					timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
+				}
+				break;
+			}
 
 			EndPaint(pParam, &ps);
 
 			LeaveCriticalSection(&cs);
 		}
 		Sleep(0);
-		break;
-		case GAME:
-			if (isDraw && timeSpan_render.count() >= 0.0075)
-			{
-				EnterCriticalSection(&cs);
-
-				HDC hdc = BeginPaint(pParam, &ps);
-
-				DoubleBuffering(hdc, client);
-
-				renderingCount++;
-
-				if (timeSpan_fps.count() >= 1)
-				{
-					CountFPS();
-				}
-
-
-				DrawMousePosition(hdc);
-				DrawFPS(hdc);
-				DrawSendNum(hdc);
-				DrawReadNum(hdc);
-
-				t1_render = std::chrono::high_resolution_clock::now();
-				timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
-
-				//isDraw = false;
-
-				EndPaint(pParam, &ps);
-
-				LeaveCriticalSection(&cs);
-			}
-			Sleep(0);
-
-			break;
-		}
 	}
-
 }
 
 void CountFPS()
@@ -563,4 +562,10 @@ void Update()
 		}
 		t1_move = std::chrono::high_resolution_clock::now();
 	}
+}
+
+void UpdateSelect()
+{
+	t2_render = std::chrono::high_resolution_clock::now();
+	timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
 }
