@@ -145,6 +145,8 @@
     <ClInclude Include="UserData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Circle2D.cpp" />
+    <ClCompile Include="Collider2D.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Kirby_SupernovaVanguard.cpp" />

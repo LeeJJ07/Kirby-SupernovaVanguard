@@ -14,22 +14,28 @@ enum ColliderType
 class Collider2D
 {
 private:
-	POINT pos;
 	POINT center;
+	POINT offset;
 	short type;
+	bool isTrigger;
+
+
+
 public:
-	Collider2D(POINT p = { 0,0 }, POINT c = { 0,0 }, short t = 0) :pos(p), center(c), type(t) {}
+	Collider2D() : center({ 0,0 }), offset({ 0,0 }), type(0), isTrigger(false) {}
+	Collider2D(bool trigger, short _type) : center({ 0,0 }), offset({ 0,0 }), type(_type), isTrigger(trigger) {}
+	Collider2D(POINT c, POINT _offset = { 0,0 }, short t = 0, bool trigger = false) : center(c), offset(_offset), type(t), isTrigger(trigger) {}
 	~Collider2D() {}
 
-	POINT GetPos() { return pos; }
 	POINT GetCenter()const { return center; }
 	short GetType()const { return type; }
+	bool GetisTrigger()const { return isTrigger; }
 
-	void SetCenter(POINT p) { center.x = p.x; center.y = p.y; }
-	void SetType(short t) { type = t; }
-	void SetPos(POINT p) { pos = p; }
+	void MoveCenter(POINT target) { center.x = target.x + offset.x; center.y = target.y + offset.y; }
+	void SetOffset(POINT newoffset) { offset = newoffset; }
 
-	void MoveCenter(POINT m) { center.x += m.x; center.y += m.y; }
+	virtual void DrawCollider(HDC) = 0;
+	void Update();
 };
 
 extern Collider2D** objArr;

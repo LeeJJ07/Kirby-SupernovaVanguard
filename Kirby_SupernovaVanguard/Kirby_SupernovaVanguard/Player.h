@@ -6,34 +6,40 @@
 
 enum ECharacterType {KIRBY, DDD, METANIHGT, MABOROA};
 
-class Player :public Circle2D
+class Object
 {
 private:
-	PAIR lookingDir;
-	int moveDir;
-	POINT mousePos;
+	POINT position;
+	PAIR lookingDirection;
+	POINT mousePosition;
 
 	ECharacterType characterType;
 
 	bool isInGame;
+
+	Collider2D* collider;
 public:
-	Player(PAIR lD = { 0,0 }, int mD = 0, POINT p = { 0,0 }, POINT c = { 0,0 }, short t = PLAYER, int r = BASERADIUS)
-		:Circle2D(p, c, t, r), lookingDir(lD), moveDir(mD), mousePos({0, 0}), characterType(KIRBY), isInGame(false)
-	{}
-	~Player() {}
-	int GetMoveDir() { return moveDir; }
-	PAIR GetLookingDir() { return lookingDir; }
-	void SetMoveDir(int d) { moveDir = d; }
-	void SetLookingDir(PAIR p) { lookingDir = p; }
+	Object() :position({ 0,0 }), lookingDirection({ 1,0 }), mousePosition({ 0,0 }), characterType(KIRBY), isInGame(false)
+	{
+		collider = nullptr;
+	}
+	Object(POINT pos = { 0,0 }, PAIR lookDir = { 1,0 }, POINT p = { 0,0 })
+		: position(pos), lookingDirection(lookDir), mousePosition({ 0, 0 }), characterType(KIRBY), isInGame(false)
+	{
+		collider = new Circle2D(true, PLAYER);
+	}
+	~Object() { delete collider; }
 
-	POINT GetMousePosition() { return mousePos; }
-	void SetMousePosition(POINT mousePos) { this->mousePos = mousePos; }
+	PAIR			GetLookingDir() { return lookingDirection; }
+	POINT			GetMousePosition() { return mousePosition; }
+	ECharacterType	GetCharacter() { return characterType; }
+	bool			GetIsInGame() { return isInGame; }
+	Collider2D*		GetCollider() { return collider; }
 
-	ECharacterType GetCharacter() { return characterType; }
-	void SetCharacter(ECharacterType characterType) { this->characterType = characterType; }
-
-	bool GetIsInGame() { return isInGame; }
-	void SetIsInGame(bool isInGame) { this->isInGame = isInGame; }
+	void			SetLookingDir(PAIR p) { lookingDirection = p; }
+	void			SetMousePosition(POINT mousePos) { this->mousePosition = mousePos; }
+	void			SetCharacter(ECharacterType characterType) { this->characterType = characterType; }
+	void			SetIsInGame(bool isInGame) { this->isInGame = isInGame; }
 };
 
 void DrawPlayer(HDC, Player*);

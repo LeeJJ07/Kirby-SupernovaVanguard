@@ -8,8 +8,13 @@ class Circle2D : public Collider2D
 private:
 	int radius;
 public:
-	Circle2D(POINT p = { 0,0 }, POINT c = {0,0}, short t = 0, int r = BASERADIUS) :Collider2D(p, c, t), radius(r) {}
+	Circle2D(int r = BASERADIUS) : Collider2D(), radius(r) {}
+	Circle2D(bool isTrigger, short type) : Collider2D(isTrigger, type), radius(BASERADIUS) {}
 	~Circle2D() {};
+
 	void SetRadius(int r) { radius = r; }
+
 	int GetRadius() { return radius; }
+
+	void DrawCollider(HDC);
 };

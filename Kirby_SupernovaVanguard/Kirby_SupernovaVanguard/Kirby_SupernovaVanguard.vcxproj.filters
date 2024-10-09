@@ -31,6 +31,8 @@
     <ClCompile Include="Multithread.h">
       <Filter>헤더 파일</Filter>
     </ClCompile>
+    <ClCompile Include="Circle2D.cpp" />
+    <ClCompile Include="Collider2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionData.h">
