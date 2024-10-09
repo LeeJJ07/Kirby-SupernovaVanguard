@@ -70,8 +70,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return (int) msg.wParam;
 }
 
-
-
 //
 //  함수: MyRegisterClass()
 //
@@ -113,7 +111,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, 1500, 1000, nullptr, nullptr, hInstance, nullptr);
+      200, 100, 1500, 1000, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
