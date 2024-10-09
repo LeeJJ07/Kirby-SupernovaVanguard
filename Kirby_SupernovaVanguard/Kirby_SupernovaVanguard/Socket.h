@@ -5,7 +5,7 @@
 
 #include <WinSock2.h>
 #include "framework.h"
-#include "Player.h"
+#include "Object.h"
 
 #pragma comment(lib, "ws2_32.lib")
 

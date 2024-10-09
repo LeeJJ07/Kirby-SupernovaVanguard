@@ -135,7 +135,7 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Kirby_SupernovaVanguard.h" />
     <ClInclude Include="Map.h" />
-    <ClInclude Include="Player.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="Rectangle2D.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SelectScene.h" />
@@ -152,7 +152,7 @@
     <ClCompile Include="Kirby_SupernovaVanguard.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Multithread.h" />
-    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="SelectScene.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="StartScene.cpp" />

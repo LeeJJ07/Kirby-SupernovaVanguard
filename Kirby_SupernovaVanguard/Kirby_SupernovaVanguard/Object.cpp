@@ -1,4 +1,4 @@
-#include "Player.h"
+#include "Object.h"
 
 void DrawPlayer(HDC hdc, Player* p)
 {
