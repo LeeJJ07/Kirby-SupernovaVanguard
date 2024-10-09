@@ -135,14 +135,16 @@
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Kirby_SupernovaVanguard.h" />
     <ClInclude Include="Map.h" />
+    <ClInclude Include="Monster.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Rectangle2D.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SelectScene.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="StartScene.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="UserData.h" />
+    <ClInclude Include="PlayerData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Circle2D.cpp" />
@@ -151,12 +153,13 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Kirby_SupernovaVanguard.cpp" />
     <ClCompile Include="Map.cpp" />
+    <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Multithread.h" />
-    <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="SelectScene.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="StartScene.cpp" />
-    <ClCompile Include="UserData.cpp" />
+    <ClCompile Include="PlayerData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Kirby_SupernovaVanguard.rc" />

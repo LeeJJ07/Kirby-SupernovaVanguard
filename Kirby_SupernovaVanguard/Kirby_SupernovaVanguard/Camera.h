@@ -1,7 +1,5 @@
 #pragma once
-#include "Object.h"
-
-class Player;
+#include "Player.h"
 
 #define CAMERA_WIDTH 1920
 #define CAMERA_HEIGHT 1200
@@ -10,13 +8,13 @@ class Camera
 {
 private:
 	POINT cameraPos;
-	Object* targetObject;
+	Player* targetObject;
 public:
 	void SetCameraPos(POINT pos) { cameraPos = pos; }
-	void SetTargetObject(Object* p) { targetObject = p; }
+	void SetTargetObject(Player* p) { targetObject = p; }
 
 	POINT GetCameraPos() { return cameraPos; }
-	Object GetTargetObject() { return *targetObject; }
+	Player GetTargetObject() { return *targetObject; }
 
 	void PositionUpdate();
 	void RePosition();

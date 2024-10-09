@@ -13,3 +13,12 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <atlstr.h>
+#include <condition_variable>
+#include <chrono>
+#include <iostream>
+
+#define PAIR std::pair<double,double>

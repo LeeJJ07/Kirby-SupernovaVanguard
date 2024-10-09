@@ -5,29 +5,28 @@
 #include "framework.h"
 #include "KirbyServer.h"
 #include <WinSock2.h>
+#include "Object.h"
+#include "UserData.h"
 
 #pragma comment(lib, "ws2_32.lib")
-
-#include <iostream>
-#include <string>
-#include <vector>
 
 using namespace std;
 
 enum State { RECEIVE, SEND };
 
-typedef struct userData
-{
-	bool inGameStart;
+Object** objArr;
 
-	pair<double, double> lookingDir;
-	POINT center;
-	POINT pos;
-	POINT mousePos;
-	int radius;
-	int moveDir;
-	short id;
-}UserData;
+//typedef struct userData
+//{
+//	bool inGameStart;
+//
+//	pair<double, double> lookingDir;
+//	POINT pos;
+//	POINT offset;
+//	POINT mousePos;
+//	int radius;
+//	short id;
+//}UserData;
 
 typedef struct sendData
 {
@@ -60,13 +59,9 @@ void SetUserData(UserData& uData, ReceiveData rData);
 
 WSADATA wsaData;
 SOCKET s, cs;
-SOCKADDR_IN addr = { 0 }, c_addr = { 0 };
 
 vector<SOCKET> socketList;
 vector<UserData> userList;
-
-TCHAR msg[200] = { 0 };
-char buffer[100];
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -184,7 +179,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_CREATE:
-		SetTimer(hWnd, TIMER_01, 5, NULL);
+		SetTimer(hWnd, TIMER_01, 1, NULL);
 		return InitServer(hWnd);
 	case WM_ASYNC:
 		switch (lParam)
@@ -307,11 +302,10 @@ void CloseClient(SOCKET socket)
 void InitUserData(UserData& userData, int id)
 {
 	userData.id = id;
-	userData.center = { 50 * (id + 1), 50 * (id + 1)};
+	userData.pos = { 50 * (id + 1), 50 * (id + 1)};
 	userData.lookingDir = { 1.0, 1.0 };
-	userData.moveDir = 0;
-	userData.mousePos = { 0,0 };
-	userData.pos = { 50 * (id + 1), 50 * (id + 1) };
+	userData.mousePos = { 0, 0 };
+	userData.offset = { 0, 0 };
 	userData.radius = 10;
 	userData.inGameStart = false;
 }

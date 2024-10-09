@@ -12,7 +12,7 @@
 extern int readCount;
 extern int textreadCount;
 
-struct PlayerData;
+struct UserData;
 
 class Player;
 
@@ -25,16 +25,16 @@ struct USER
 
 // >> :
 static WSADATA wsadata;
-static SOCKADDR_IN addr = { 0 };
+static SOCKADDR_IN addr = { 0 }, c_addr = { 0 };
 static TCHAR msg[200];
-static char buffer;
+static char buffer[100];
 static int msgLen;
 static int msgCount;
 
 int InitClient(HWND hWnd, SOCKET&);
 int SendMessageToServer(SOCKET &, TCHAR*);
-void ReadMessage(SOCKET&, std::vector<Player*>&, PlayerData& );
+void ReadMessage(SOCKET&, std::vector<Player*>&, UserData&);
 void CloseClient(SOCKET&, std::vector<Player*>&, int);
-void ReadInitMessage(SOCKET&, PlayerData&);
+void ReadInitMessage(SOCKET&, UserData&);
 extern void CountReadNum();
 // <<

@@ -1,36 +1,109 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="리소스 파일">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="클래스 파일">
+      <UniqueIdentifier>{d66e7225-5bb9-4122-8dfe-00f55d5ba7a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스 파일\Main">
+      <UniqueIdentifier>{c71ee7b3-c1b0-4b8f-8e12-68ce9005e217}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스 파일\Collider">
+      <UniqueIdentifier>{b624d9ea-5abc-47de-a65a-915ac7da5614}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스 파일\Object">
+      <UniqueIdentifier>{274f9d68-8a2f-4653-b25b-d6bafa722dfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스 파일\Data">
+      <UniqueIdentifier>{e7586e14-d90f-4b6f-992f-129362236e02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스 파일\Communication">
+      <UniqueIdentifier>{b3a87d7f-74fc-4367-b6f4-f415a1a8663d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스 파일\Object\Monster">
+      <UniqueIdentifier>{dd1775ac-e500-4be4-8400-a64267546ac2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스 파일\Object\Player">
+      <UniqueIdentifier>{6dbaac2f-bdc6-4713-8654-6374d76a3678}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스 파일\Collider\Circle">
+      <UniqueIdentifier>{6b5e6df2-dba5-4e07-a39c-13782d830b6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스 파일\Collider\Rectangle">
+      <UniqueIdentifier>{7ef1cb3f-85c6-40ab-8979-7f649c7d6dbc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>클래스 파일\Main</Filter>
     </ClInclude>
     <ClInclude Include="KirbyServer.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>클래스 파일\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>클래스 파일\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>클래스 파일\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider2D.h">
+      <Filter>클래스 파일\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>클래스 파일\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionData.h">
+      <Filter>클래스 파일\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="UserData.h">
+      <Filter>클래스 파일\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Multithread.h">
+      <Filter>클래스 파일\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="Socket.h">
+      <Filter>클래스 파일\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster.h">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>클래스 파일\Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Circle2D.h">
+      <Filter>클래스 파일\Collider\Circle</Filter>
+    </ClInclude>
+    <ClInclude Include="Rectangle2D.h">
+      <Filter>클래스 파일\Collider\Rectangle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KirbyServer.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>클래스 파일\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider2D.cpp">
+      <Filter>클래스 파일\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>클래스 파일\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="UserData.cpp">
+      <Filter>클래스 파일\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Socket.cpp">
+      <Filter>클래스 파일\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="Monster.cpp">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>클래스 파일\Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Circle2D.cpp">
+      <Filter>클래스 파일\Collider\Circle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

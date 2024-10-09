@@ -1,5 +1,5 @@
 ﻿#include "Kirby_SupernovaVanguard.h"
-#include "UserData.h"
+#include "PlayerData.h"
 #include "ActionData.h"
 #include "StartScene.h"
 #include "SelectScene.h"
@@ -24,15 +24,18 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void DoubleBuffering(HDC, std::vector<Object*>);
-void DrawCamera(HDC, RECT);
+void DrawCamera(HDC);
+void DrawCollider(HDC&);
 void InitObjArr();
 unsigned __stdcall Paint(HWND);
 unsigned __stdcall Send();
 
 TCHAR str[200];
-std::vector<Object*> client(4);
-UserData uData, myData;
-Collider2D** objArr;
+std::vector<Player*> vClient(4);
+//std::vector<Monster*> vMonster(100);
+PlayerData uData;
+PlayerData myData;
+Object** objArr;
 short myID;
 static SOCKET cSocket;
 
@@ -77,6 +80,8 @@ void DrawFPS(HDC);
 static std::chrono::high_resolution_clock::time_point t1_render;
 static std::chrono::high_resolution_clock::time_point t2_render;
 static std::chrono::duration<double> timeSpan_render;
+
+bool isDrawCollider;
 // <<
 
 // >> : ReadCount
@@ -189,8 +194,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 
-
-
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -228,13 +231,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					ReadInitMessage(cSocket, myData);
 					myID = myData.id;
 
-					client[myID] = new Object();
+					vClient[myID] = new Player();
 
-					SetPlayer(client, myData);
+					if (!vClient[myID])
+					{
+						vClient[myID] = new Player();
+						Create(vClient[myID]);
+					}
 
-					Create(client[myID]);
+					vClient[myID]->ObjectUpdate(myData);
+					vClient[myID]->GetCollider()->MovePosition(vClient[myID]->GetPosition());
 
-					camera.SetTargetObject(client[myID]);
+					Create(vClient[myID]);
+
+					camera.SetTargetObject(vClient[myID]);
 					t1_fps = std::chrono::high_resolution_clock::now();
 					t1_render = std::chrono::high_resolution_clock::now();
 					t1_send = std::chrono::high_resolution_clock::now();
@@ -262,7 +272,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
+
 			startScene.DrawBitmapDoubleBuffering(hWnd, hdc, rectView, canGoToNext);
+
 			EndPaint(hWnd, &ps);
 		}
 		break;
@@ -281,12 +293,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			{
 				int i;
-				for (i = 0; i < client.size(); i++)
+				for (i = 0; i < vClient.size(); i++)
 				{
-					if (client[i] != NULL && !client[i]->GetIsInGame())
+					if (vClient[i] != NULL && !vClient[i]->GetIsInGame())
 						break;
 				}
-				if (i == client.size())
+				if (i == vClient.size())
 					curScene = GAME;
 			}
 		}
@@ -295,7 +307,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (lParam)
 		{
 		case FD_READ:
-			ReadMessage(cSocket, client, uData);
+			ReadMessage(cSocket, vClient, uData);
 			break;
 		}
 		break;
@@ -309,7 +321,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		KillTimer(hWnd, TIMER_START);
 		KillTimer(hWnd, TIMER_SELECT);
-		CloseClient(cSocket, client, myID);
+		CloseClient(cSocket, vClient, myID);
 		PostQuitMessage(0);
 		break;
 	default:
@@ -318,15 +330,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void DoubleBuffering(HDC hdc, std::vector<Object*> client)
+void DoubleBuffering(HDC hdc)
 {
 	HDC memdc;
 	static HBITMAP  hBit, mapBit, oldBit;
 
 	int cTop = camera.GetCameraPos().y - CAMERA_HEIGHT / 2;
-	int cBottom = camera.GetCameraPos().y + CAMERA_HEIGHT / 2;
 	int cLeft = camera.GetCameraPos().x - CAMERA_WIDTH / 2;
-	int cRight = camera.GetCameraPos().x + CAMERA_WIDTH / 2;
 
 	memdc = CreateCompatibleDC(hdc);
 	hBit = CreateCompatibleBitmap(hdc, CAMERA_WIDTH, CAMERA_HEIGHT);
@@ -336,16 +346,12 @@ void DoubleBuffering(HDC hdc, std::vector<Object*> client)
 	HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
 	RECT rect = { 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y };
 
-	RECT cameraFrame = { cLeft ,cTop, cRight, cBottom };
-
-	cameraFrame.top;
-	cameraFrame.left;
-	cameraFrame.right;
-	cameraFrame.bottom;
-
 	FillRect(memdc, &rect, hBrush);
 
-	DrawCamera(memdc, cameraFrame);
+	DrawCamera(memdc);
+
+	if (isDrawCollider)
+		DrawCollider(memdc);
 
 	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, memdc, cLeft, cTop, SRCCOPY);
 
@@ -355,18 +361,18 @@ void DoubleBuffering(HDC hdc, std::vector<Object*> client)
 	DeleteObject(mapBit);
 }
 
-void DrawCamera(HDC hdc, RECT rect)
+void DrawCamera(HDC hdc)
 {
 	for (int i = 0; i < objnum; i++)
 	{
-		switch (objArr[i]->GetType())
+		switch (objArr[i]->GetCollider()->GetType())
 		{
 		case TERRAIN:
 			break;
 		case PLAYER:
-			DrawPlayer(hdc, (Object*)objArr[i]);
+			((Player*)objArr[i])->DrawPlayer(hdc);
 			break;
-		case ENEMY:
+		case MONSTER:
 			break;
 		case PMISSILE:
 			break;
@@ -378,9 +384,17 @@ void DrawCamera(HDC hdc, RECT rect)
 	}
 }
 
+void DrawCollider(HDC& hdc)
+{
+	for (int i = 0; i < objnum; i++)
+	{
+		objArr[i]->GetCollider()->DrawCollider(hdc);
+	}
+}
+
 void InitObjArr()
 {
-	objArr = new Collider2D * [1000];
+	objArr = new Object * [1000];
 }
 
 unsigned __stdcall Send()
@@ -433,7 +447,7 @@ unsigned __stdcall Paint(HWND pParam)
 			case SELECT:
 			{
 				{
-					selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, client);
+					selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, vClient);
 
 					t1_render = std::chrono::high_resolution_clock::now();
 					timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
@@ -442,7 +456,7 @@ unsigned __stdcall Paint(HWND pParam)
 			break;
 			case GAME:
 				{
-					DoubleBuffering(hdc, client);
+					DoubleBuffering(hdc);
 
 					renderingCount++;
 
@@ -516,9 +530,9 @@ void DrawMousePosition(HDC hdc)
 {
 	CString t;
 
-	t.Format(_T("%d"), client[myID]->GetPos().x);
+	t.Format(_T("%d"), vClient[myID]->GetPosition().x);
 	TextOut(hdc, 0, 0, t, t.GetLength());
-	t.Format(_T("%d"), client[myID]->GetPos().y);
+	t.Format(_T("%d"), vClient[myID]->GetPosition().y);
 	TextOut(hdc, 50, 0, t, t.GetLength());
 }
 
@@ -537,7 +551,6 @@ void Update()
 	timeSpan_move = std::chrono::duration_cast<std::chrono::duration<double>>(t2_move - t1_move);
 	timeSpan_sendCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_sendCount - t1_sendCount);
 	timeSpan_readCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_readCount - t1_readCount);
-
 
 	if (timeSpan_move.count() >= 0.005)
 	{
@@ -562,6 +575,12 @@ void Update()
 		}
 		t1_move = std::chrono::high_resolution_clock::now();
 	}
+	if (GetAsyncKeyState('C') & 0x8000)
+	{
+		isDrawCollider = true;
+	}
+	else
+		isDrawCollider = false;
 }
 
 void UpdateSelect()

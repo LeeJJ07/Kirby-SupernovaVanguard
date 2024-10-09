@@ -1,12 +1,14 @@
 #include "Socket.h"
-#include "PlayerData.h"
+#include "UserData.h"
 #include "ActionData.h"
 #include "Multithread.h"
-#include "Camera.h"
 
-extern std::chrono::duration<double> timeSpan_readCount;
-extern std::chrono::high_resolution_clock::time_point t1_readCount;
-extern std::chrono::high_resolution_clock::time_point t2_readCount;
+static std::chrono::duration<double> timeSpan_readCount;
+static std::chrono::high_resolution_clock::time_point t1_readCount;
+static std::chrono::high_resolution_clock::time_point t2_readCount;
+
+int readCount;
+int textreadCount;
 
 int InitClient(HWND hWnd, SOCKET &s)
 {
@@ -52,25 +54,25 @@ int SendMessageToServer(SOCKET &s, TCHAR* str)
 	return 1;
 }
 
-void ReadMessage(SOCKET &s, std::vector<Player*>& p, PlayerData& pD)
+void ReadMessage(SOCKET &s, std::vector<Player*>& p, UserData &uD)
 {
-	EnterCriticalSection(&cs);
+	EnterCriticalSection(&criticalSection);
 
-	int bytesReceived = recv(s, (char*)&pD, sizeof(PlayerData), 0);
+	int bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0);
 
 	if (bytesReceived > 0)
 	{
 		readCount++;
 
-		if (!p[pD.id])
+		if (!p[uD.id])
 		{
-			p[pD.id] = new Player();
-			Create(p[pD.id]);
+			p[uD.id] = new Player();
+			Create(p[uD.id]);
 		}
-		p[pD.id]->ObjectUpdate(pD);
-		p[pD.id]->GetCollider()->MovePosition(p[pD.id]->GetPosition());
+		p[uD.id]->ObjectUpdate(uD);
+		p[uD.id]->GetCollider()->MovePosition(p[uD.id]->GetPosition());
 
-		camera.PositionUpdate();
+		//camera.PositionUpdate();
 
 		if (timeSpan_readCount.count() >= 1)
 		{
@@ -78,15 +80,15 @@ void ReadMessage(SOCKET &s, std::vector<Player*>& p, PlayerData& pD)
 		}
 	}
 
-	LeaveCriticalSection(&cs);
+	LeaveCriticalSection(&criticalSection);
 }
 
-void ReadInitMessage(SOCKET& s, PlayerData& uD)
+void ReadInitMessage(SOCKET& s, UserData& uD)
 {
 	int bytesReceived;
-	while ((bytesReceived = recv(s, (char*)&uD, sizeof(PlayerData), 0)) == -1);
+	while ((bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0)) == -1);
 
-	if (bytesReceived != sizeof(PlayerData))
+	if (bytesReceived != sizeof(UserData))
 	{
 		MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
 		return;

@@ -9,7 +9,7 @@ void Camera::PositionUpdate()
 {
 	if (targetObject)
 	{
-		SetCameraPos(targetObject->GetPos());
+		SetCameraPos(targetObject->GetPosition());
 
 		RePosition();
 	}
