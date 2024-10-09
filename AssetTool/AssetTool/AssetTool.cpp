@@ -30,7 +30,6 @@ POINT g_CharPos = { 0, 0 };
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -69,6 +68,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     return (int) msg.wParam;
 }
+
+
 
 //
 //  함수: MyRegisterClass()
@@ -203,6 +204,34 @@ void GameEnd()
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
+
+BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case WM_INITDIALOG:
+        return TRUE; // 초기화 완료
+
+    case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        switch (wmId)
+        {
+            // 다른 명령 처리 가능
+        }
+    }
+    break;
+
+    case WM_CLOSE:  // 'X' 버튼을 눌렀을 때 처리
+        EndDialog(hDlg, 0);  // 다이얼로그를 종료하고 0을 반환
+        return TRUE;
+
+    default:
+        return FALSE;  // 기본 메시지 처리
+    }
+    return TRUE;
+}
+
 #define MAX_FILENAME_SIZE 100   
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -221,9 +250,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // 메뉴 선택을 구문 분석합니다:
             switch (wmId)
             {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
             case ID_OpenFile:
                 memset(&Ofn, 0, sizeof(OPENFILENAME));
                 Ofn.lStructSize = sizeof(OPENFILENAME);
@@ -240,9 +266,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     GameEnd();
                     GameInit(sFilePathName);
+                    InvalidateRect(hWnd, NULL, FALSE);
                 }
                 break;
-
+            case ID_MENU_Set:
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_Setup), hWnd, Dialog1_Proc);
+                break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;
@@ -301,24 +330,4 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
     return 0;
-}
-
-// 정보 대화 상자의 메시지 처리기입니다.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        return (INT_PTR)TRUE;
-
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        break;
-    }
-    return (INT_PTR)FALSE;
 }
