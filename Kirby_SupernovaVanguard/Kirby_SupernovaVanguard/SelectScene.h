@@ -2,7 +2,7 @@
 
 #include <vector>
 #include "framework.h"
-#include "Player.h"
+#include "Object.h"
 
 #include <objidl.h>
 #include <gdiplus.h>
@@ -26,9 +26,9 @@ public:
 	SelectScene();
 	~SelectScene();
 
-	void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Player*>& clients);
+	void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Object*>& clients);
 	void DeleteBitmap();
 
-	int SelectCharacter(Player* client, RECT& rectView);
+	int SelectCharacter(Object* client, RECT& rectView);
 };
 

@@ -42,4 +42,4 @@ public:
 	void			SetIsInGame(bool isInGame) { this->isInGame = isInGame; }
 };
 
-void DrawPlayer(HDC, Player*);
+void DrawPlayer(HDC, Object*);

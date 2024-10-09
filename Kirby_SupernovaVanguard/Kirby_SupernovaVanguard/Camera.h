@@ -1,5 +1,5 @@
 #pragma once
-#include "Player.h"
+#include "Object.h"
 
 class Player;
 
@@ -10,13 +10,13 @@ class Camera
 {
 private:
 	POINT cameraPos;
-	Player* targetObject;
+	Object* targetObject;
 public:
 	void SetCameraPos(POINT pos) { cameraPos = pos; }
-	void SetTargetObject(Player* p) { targetObject = p; }
+	void SetTargetObject(Object* p) { targetObject = p; }
 
 	POINT GetCameraPos() { return cameraPos; }
-	Player GetTargetObject() { return *targetObject; }
+	Object GetTargetObject() { return *targetObject; }
 
 	void PositionUpdate();
 	void RePosition();

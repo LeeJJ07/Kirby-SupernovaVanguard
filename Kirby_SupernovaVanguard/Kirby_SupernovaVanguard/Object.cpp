@@ -1,6 +1,6 @@
 #include "Object.h"
 
-void DrawPlayer(HDC hdc, Player* p)
+void DrawPlayer(HDC hdc, Object* p)
 {
 	int left = p->GetPos().x - p->GetRadius();
 	int right = p->GetPos().x + p->GetRadius();

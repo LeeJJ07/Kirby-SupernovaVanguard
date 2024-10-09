@@ -2,86 +2,90 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Camera.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="GameScene.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Kirby_SupernovaVanguard.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>클래스파일\Camera</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>클래스파일\Objects</Filter>
     </ClCompile>
     <ClCompile Include="SelectScene.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Socket.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>클래스파일\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="StartScene.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>클래스파일\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="UserData.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>클래스파일\Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>클래스파일\Maps</Filter>
+    </ClCompile>
+    <ClCompile Include="Kirby_SupernovaVanguard.cpp">
+      <Filter>클래스파일\Main</Filter>
     </ClCompile>
     <ClCompile Include="Multithread.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>클래스파일\Thread</Filter>
     </ClCompile>
-    <ClCompile Include="Circle2D.cpp" />
-    <ClCompile Include="Collider2D.cpp" />
+    <ClCompile Include="Socket.cpp">
+      <Filter>클래스파일\Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="Circle2D.cpp">
+      <Filter>클래스파일\Colliders</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider2D.cpp">
+      <Filter>클래스파일\Colliders</Filter>
+    </ClCompile>
+    <ClCompile Include="UserData.cpp">
+      <Filter>클래스파일\Datas</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ActionData.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Circle2D.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Collider2D.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GameScene.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Kirby_SupernovaVanguard.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>클래스파일\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Rectangle2D.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>클래스파일\Colliders</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Collider2D.h">
+      <Filter>클래스파일\Colliders</Filter>
     </ClInclude>
-    <ClInclude Include="SelectScene.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Circle2D.h">
+      <Filter>클래스파일\Colliders</Filter>
     </ClInclude>
-    <ClInclude Include="Socket.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Object.h">
+      <Filter>클래스파일\Objects</Filter>
     </ClInclude>
     <ClInclude Include="StartScene.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>클래스파일\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectScene.h">
+      <Filter>클래스파일\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>클래스파일\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>클래스파일\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="Kirby_SupernovaVanguard.h">
+      <Filter>클래스파일\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>클래스파일\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Socket.h">
+      <Filter>클래스파일\Socket</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>클래스파일\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>클래스파일\FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionData.h">
+      <Filter>클래스파일\Datas</Filter>
     </ClInclude>
     <ClInclude Include="UserData.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>클래스파일\Datas</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -93,14 +97,41 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{ceda6ab4-13bc-448b-a0d6-580f5d2b3b48}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{d6bc7342-a4b5-4188-8dfd-efeb031177bf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="리소스 파일">
       <UniqueIdentifier>{727fec7f-68a9-43ac-91d2-60403eabd342}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일">
+      <UniqueIdentifier>{061cd5c4-39f0-4f91-8caa-ec8f136e0d77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Camera">
+      <UniqueIdentifier>{a2c2f9c3-6dcb-44c7-9b62-6c82f7427584}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Objects">
+      <UniqueIdentifier>{f10875f5-f1fe-4d11-b0d2-f56ce52dd932}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Scenes">
+      <UniqueIdentifier>{50713c9e-7853-4cc3-b4d2-5a7db138cf61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Colliders">
+      <UniqueIdentifier>{dd69e3ee-b3fb-4404-9ad5-d7634536e947}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Maps">
+      <UniqueIdentifier>{6a061287-d02b-4b95-af82-16494df0a7ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Main">
+      <UniqueIdentifier>{379e11b4-5b6a-4abe-9f07-9e3171b4be30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\FrameWork">
+      <UniqueIdentifier>{ee39b205-9765-4ac7-adec-446310f6a3e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Socket">
+      <UniqueIdentifier>{8e6bb875-253a-49f3-a42e-0da5fd908d18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Thread">
+      <UniqueIdentifier>{a4ab6e69-f9a0-481d-9b8a-a6180783a872}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Datas">
+      <UniqueIdentifier>{3e4d9098-e034-4cb2-90e8-52882527efba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
