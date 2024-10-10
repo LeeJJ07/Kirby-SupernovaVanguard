@@ -1,26 +1,38 @@
 #include "PlayerData.h"
 
-void SetPlayerData(PlayerData& ud, Player* p)
+void SetObjectData(ObjectData*& ud, Object* p)
 {
-	ud.pos = p->GetPosition();
-	ud.offset = p->GetCollider()->GetOffset();
-	ud.lookingDir = p->GetLookingDir();
-	ud.mousePos = p->GetMousePosition();
+	PlayerData* pData = (PlayerData*)ud;
+	Player* player = (Player*)p;
+
+	pData->pos = player->GetPosition();
+	pData->offset = player->GetCollider()->GetOffset();
+	pData->lookingDir = player->GetLookingDir();
+	pData->mousePos = player->GetMousePosition();
 
 	int nRadius = ((Circle2D*)((Player*)p->GetCollider()))->GetRadius();
 
 	if (nRadius > 0)
-		ud.radius = nRadius;
+		pData->radius = nRadius;
+
+	ud = pData;
+	p = player;
 }
 
-void SetObject(Player* &p, PlayerData& ud)
+void SetObject(Object* &p, ObjectData*& ud)
 {
-	if (!p)
-		p = new Player();
+	PlayerData* pData = (PlayerData*)ud;
+	Player* player = (Player*)p;
 
-	p->SetPosition(ud.pos);
-	p->SetLookingDir(ud.lookingDir);
-	p->SetMousePosition(ud.mousePos);
-	p->GetCollider()->SetOffset(ud.offset);
-	p->SetIsInGame(ud.inGameStart);
+	if (!player)
+		player = new Player();
+
+	player->SetPosition(pData->pos);
+	player->SetLookingDir(pData->lookingDir);
+	player->SetMousePosition(pData->mousePos);
+	player->GetCollider()->SetOffset(pData->offset);
+	player->SetIsInGame(pData->inGameStart);
+
+	ud = pData;
+	p = player;
 }
