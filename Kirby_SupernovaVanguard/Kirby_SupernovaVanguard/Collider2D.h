@@ -2,6 +2,7 @@
 
 #include "Socket.h"
 
+class Player;
 class Object;
 
 enum ColliderType
@@ -42,7 +43,7 @@ extern Object** objArr;
 static int objnum = 0;
 
 template<class T>
-void Create(T* t)
+void CreateObject(T* t)
 {
 	objArr[objnum] = new T();
 	objArr[objnum] = t;

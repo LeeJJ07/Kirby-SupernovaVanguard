@@ -28,4 +28,4 @@ public:
 	void			DrawPlayer(HDC&);
 };
 
-extern std::vector<Player*> vClient;
+extern std::vector<Object*> vClient;

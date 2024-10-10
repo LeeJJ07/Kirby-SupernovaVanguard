@@ -31,7 +31,7 @@ unsigned __stdcall Paint(HWND);
 unsigned __stdcall Send();
 
 TCHAR str[200];
-std::vector<Player*> vClient(4);
+std::vector<Object*> vClient(4);
 //std::vector<Monster*> vMonster(100);
 PlayerData uData;
 PlayerData myData;
@@ -233,18 +233,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 					vClient[myID] = new Player();
 
-					if (!vClient[myID])
-					{
-						vClient[myID] = new Player();
-						Create(vClient[myID]);
-					}
-
 					vClient[myID]->ObjectUpdate(myData);
 					vClient[myID]->GetCollider()->MovePosition(vClient[myID]->GetPosition());
 
-					Create(vClient[myID]);
+					CreateObject((Player*)vClient[myID]);
 
-					camera.SetTargetObject(vClient[myID]);
+					camera.SetTargetObject((Player*)vClient[myID]);
 					t1_fps = std::chrono::high_resolution_clock::now();
 					t1_render = std::chrono::high_resolution_clock::now();
 					t1_send = std::chrono::high_resolution_clock::now();

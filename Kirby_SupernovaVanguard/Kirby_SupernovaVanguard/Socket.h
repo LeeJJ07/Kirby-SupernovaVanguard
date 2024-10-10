@@ -4,6 +4,7 @@
 
 #include <WinSock2.h>
 #include "framework.h"
+//#include "Object.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -14,7 +15,7 @@ extern int textreadCount;
 
 struct PlayerData;
 
-class Player;
+class Object;
 
 struct USER
 {
@@ -33,8 +34,8 @@ static int msgCount;
 
 int InitClient(HWND hWnd, SOCKET&);
 int SendMessageToServer(SOCKET &, TCHAR*);
-void ReadMessage(SOCKET&, std::vector<Player*>&, PlayerData& );
-void CloseClient(SOCKET&, std::vector<Player*>&, int);
+void ReadMessage(SOCKET&, std::vector<Object*>&, PlayerData& );
+void CloseClient(SOCKET&, std::vector<Object*>&, int);
 void ReadInitMessage(SOCKET&, PlayerData&);
 extern void CountReadNum();
 // <<

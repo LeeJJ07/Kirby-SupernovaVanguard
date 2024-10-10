@@ -4,6 +4,11 @@
 #include "Multithread.h"
 #include "Camera.h"
 
+enum DATASIZE {
+	PLAYERDATA = sizeof(PlayerData),
+	//MONSTERDATA = sizeof(MonsterData),
+};
+
 extern std::chrono::duration<double> timeSpan_readCount;
 extern std::chrono::high_resolution_clock::time_point t1_readCount;
 extern std::chrono::high_resolution_clock::time_point t2_readCount;
@@ -52,7 +57,7 @@ int SendMessageToServer(SOCKET &s, TCHAR* str)
 	return 1;
 }
 
-void ReadMessage(SOCKET &s, std::vector<Player*>& p, PlayerData& pD)
+void ReadMessage(SOCKET &s, std::vector<Object*>& p, PlayerData& pD)
 {
 	EnterCriticalSection(&cs);
 
@@ -62,19 +67,27 @@ void ReadMessage(SOCKET &s, std::vector<Player*>& p, PlayerData& pD)
 	{
 		readCount++;
 
-		if (!p[pD.id])
+		switch(bytesReceived)
 		{
-			p[pD.id] = new Player();
-			Create(p[pD.id]);
+		case PLAYERDATA:
+		{
+			Player* pData = dynamic_cast<Player*>(p[pD.id]);
+			if (!pData)
+			{
+				pData = new Player();
+				CreateObject(pData);
+			}
+			pData->ObjectUpdate(pD);
+			pData->GetCollider()->MovePosition(pData->GetPosition());
+
+			camera.PositionUpdate();
+
+			if (timeSpan_readCount.count() >= 1)
+			{
+				CountReadNum();
+			}
 		}
-		p[pD.id]->ObjectUpdate(pD);
-		p[pD.id]->GetCollider()->MovePosition(p[pD.id]->GetPosition());
-
-		camera.PositionUpdate();
-
-		if (timeSpan_readCount.count() >= 1)
-		{
-			CountReadNum();
+		break;
 		}
 	}
 
@@ -93,7 +106,7 @@ void ReadInitMessage(SOCKET& s, PlayerData& uD)
 	}
 }
 
-void CloseClient(SOCKET& s, std::vector<Player*>& p, int id)
+void CloseClient(SOCKET& s, std::vector<Object*>& p, int id)
 {
 	p[id] = NULL;
 

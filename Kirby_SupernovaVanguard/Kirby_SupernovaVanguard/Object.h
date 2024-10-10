@@ -3,6 +3,7 @@
 
 class PlayerData;
 class MonsterData;
+class Collider2D;
 
 class Object
 {
