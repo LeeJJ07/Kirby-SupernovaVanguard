@@ -238,7 +238,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 					CreateObject((Player*)vClient[myID]);
 
-					camera.SetTargetObject((Player*)vClient[myID]);
+					camera.SetTargetObject(vClient[myID]);
 					t1_fps = std::chrono::high_resolution_clock::now();
 					t1_render = std::chrono::high_resolution_clock::now();
 					t1_send = std::chrono::high_resolution_clock::now();

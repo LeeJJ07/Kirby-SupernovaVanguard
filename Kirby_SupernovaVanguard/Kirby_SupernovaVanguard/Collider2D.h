@@ -3,7 +3,6 @@
 #include "Socket.h"
 
 class Player;
-class Object;
 
 enum ColliderType
 {

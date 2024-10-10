@@ -1,5 +1,6 @@
 #pragma once
 #include "Player.h"
+#include "Monster.h"
 
 #define CAMERA_WIDTH 1920
 #define CAMERA_HEIGHT 1200
@@ -8,13 +9,16 @@ class Camera
 {
 private:
 	POINT cameraPos;
-	Player* targetObject;
+	Object* targetObject;
 public:
 	void SetCameraPos(POINT pos) { cameraPos = pos; }
-	void SetTargetObject(Player* p) { targetObject = p; }
+	template<class T>
+	void SetTargetObject(T* target);
 
 	POINT GetCameraPos() { return cameraPos; }
-	Player GetTargetObject() { return *targetObject; }
+
+	template<class T>
+	T GetTargetObject();
 
 	void PositionUpdate();
 	void RePosition();
@@ -25,3 +29,41 @@ public:
 };
 
 extern Camera camera;
+
+template<class T>
+inline void Camera::SetTargetObject(T* target)
+{
+	// >> : Monster
+	{
+		Monster* tObject = dynamic_cast<Monster*>(target);
+		if (tObject != NULL)
+		{
+			targetObject = tObject;
+			return;
+		}
+		delete tObject;
+	}
+	// <<
+
+	// >> : Player
+	{
+		Player* tObject = dynamic_cast<Player*>(target);
+		if (tObject != NULL)
+		{
+			targetObject = tObject;
+			return;
+		}
+
+		delete targetObject;
+	}
+	// <<
+}
+
+template<class T>
+inline T Camera::GetTargetObject()
+{
+	Player* tObject = dynamic_cast<Player*>(targetObject);
+
+	if (tObject != NULL)
+		return tObject;
+}

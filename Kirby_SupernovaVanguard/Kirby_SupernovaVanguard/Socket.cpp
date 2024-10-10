@@ -80,6 +80,8 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, PlayerData& pD)
 			pData->ObjectUpdate(pD);
 			pData->GetCollider()->MovePosition(pData->GetPosition());
 
+			p[pD.id] = pData;
+
 			camera.PositionUpdate();
 
 			if (timeSpan_readCount.count() >= 1)
