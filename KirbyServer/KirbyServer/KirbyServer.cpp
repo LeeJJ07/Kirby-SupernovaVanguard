@@ -262,7 +262,7 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 void ReadData()
 {
 	for (int i = 0; i < socketList.size(); i++) {
-		ReceiveData temp;
+		ReceiveData temp = {};
 		int dataLen = recv(socketList[i], (char*)&temp, sizeof(ReceiveData), 0);
 		if(dataLen > 0)
 			SetUserData(userList[temp.id], temp);
@@ -301,6 +301,7 @@ void CloseClient(SOCKET socket)
 
 void InitUserData(UserData& userData, int id)
 {
+	userData.dataType = PLAYERDATA;
 	userData.id = id;
 	userData.pos = { 50 * (id + 1), 50 * (id + 1)};
 	userData.lookingDir = { 1.0, 1.0 };

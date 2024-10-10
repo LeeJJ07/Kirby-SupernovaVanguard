@@ -4,6 +4,7 @@
 
 struct ObjectData
 {
+	char dataType;
 	PAIR lookingDir;
 	POINT pos;
 	POINT offset;
@@ -24,6 +25,12 @@ struct MonsterData :public ObjectData
 	std::chrono::high_resolution_clock::time_point t1_targeting;
 	std::chrono::high_resolution_clock::time_point t2_targeting;
 	std::chrono::duration<double> timeSpan_targeting;
+};
+
+struct UnionData
+{
+	PlayerData	pd;
+	MonsterData	md;
 };
 
 void SetObjectData(ObjectData*&, Object*);

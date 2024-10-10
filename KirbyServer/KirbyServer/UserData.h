@@ -2,8 +2,15 @@
 
 #include "Player.h"
 
+enum DATATYPE {
+	PLAYERDATA = 'p',
+	MONSTERDATA = 'm',
+	ITEMDATA = 'i'
+};
+
 struct ObjectData
 {
+	char dataType;
 	PAIR lookingDir;
 	POINT pos;
 	POINT offset;

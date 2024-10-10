@@ -4,9 +4,10 @@
 #include "Multithread.h"
 #include "Camera.h"
 
-enum DATASIZE {
-	PLAYERDATA = sizeof(PlayerData),
-	//MONSTERDATA = sizeof(MonsterData),
+enum DATATYPE {
+	PLAYERDATA = 'p',
+	MONSTERDATA = 'm',
+	ITEMDATA = 'i'
 };
 
 extern std::chrono::duration<double> timeSpan_readCount;
@@ -67,7 +68,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, PlayerData& pD)
 	{
 		readCount++;
 
-		switch(bytesReceived)
+		switch (pD.dataType)
 		{
 		case PLAYERDATA:
 		{
