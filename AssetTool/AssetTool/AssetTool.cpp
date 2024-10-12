@@ -13,12 +13,15 @@
 using namespace std;
 
 #define MAX_LOADSTRING 100
+#define MAX_FILENAME_SIZE 100   
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 HWND g_hWnd;
+
+TCHAR filter[] = L"모든 파일\0*.*\0텍스트 파일\0*.txt\0비트맵 파일\0*.bmp";
 
 RECT rectView;
 
@@ -28,7 +31,6 @@ int g_TextImgWidth;
 int g_TextImgHeight;
 int g_StartImgX;
 int g_StartImgY;
-
 
 bool g_bNowDrow = false;
 POINT g_MarginPos = { 0, 0 };
@@ -42,13 +44,12 @@ vector<POINT> pos;
 HWND hDlg = NULL;
 
 COLORREF GetPixelColorAtMouseClick();
-void SaveCroppedBitmap(HDC hdc, HWND hWnd, const TCHAR* filename);
-void SaveBitmapToFile(HDC hdc, HBITMAP hBitmap, int width, int height, const TCHAR* filename);
 void DrawArea(HDC hdc);
 void GameInit(TCHAR filename[]);
 void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc);
 void SetDlgItemTextFromAnsi(HWND hDlg, int nIDDlgItem, const std::string& str);
 void GameEnd();
+void SaveBitmap(HWND hWnd, LPCTSTR filePath);
 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -184,6 +185,26 @@ void DrawArea(HDC hdc)
     DeleteObject(hBrush);
 }
 
+//void GameInit(TCHAR filename[])
+//{
+//    HDC hdc = GetDC(g_hWnd);
+//
+//    g_hTextImgDC = CreateCompatibleDC(hdc);
+//    g_hTextImgBMP = (HBITMAP)LoadImage(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+//    SelectObject(g_hTextImgDC, g_hTextImgBMP);
+//    ReleaseDC(g_hWnd, hdc);
+//
+//    BITMAP bm;
+//    GetObject(g_hTextImgBMP, sizeof(BITMAP), &bm);
+//    g_TextImgWidth = bm.bmWidth;
+//    g_TextImgHeight = bm.bmHeight;
+//
+//    if (g_hTextImgBMP != NULL)
+//    {
+//        DeleteObject(g_hTextImgBMP);
+//        g_hTextImgBMP = NULL;   
+//    }
+//}
 void GameInit(TCHAR filename[])
 {
     HDC hdc = GetDC(g_hWnd);
@@ -198,12 +219,103 @@ void GameInit(TCHAR filename[])
     g_TextImgWidth = bm.bmWidth;
     g_TextImgHeight = bm.bmHeight;
 
+    // 비트맵의 테두리 색을 빨간색으로 변경
+    HDC hdcMem = CreateCompatibleDC(hdc);
+    HBITMAP hbmOld = (HBITMAP)SelectObject(hdcMem, g_hTextImgBMP);
+
+    HPEN hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0)); // 빨간색 펜 생성
+    HBRUSH hBrush = (HBRUSH)GetStockObject(NULL_BRUSH); // 내부는 채우지 않음
+    SelectObject(hdcMem, hPen);
+    SelectObject(hdcMem, hBrush);
+
+    // 테두리 사각형을 그림
+    Rectangle(hdcMem, 0, 0, g_TextImgWidth, g_TextImgHeight);
+
+    // 리소스 해제
+    SelectObject(hdcMem, hbmOld);
+    DeleteDC(hdcMem);
+    DeleteObject(hPen);
+
+    // 기존 이미지 객체 삭제
     if (g_hTextImgBMP != NULL)
     {
         DeleteObject(g_hTextImgBMP);
-        g_hTextImgBMP = NULL;   
+        g_hTextImgBMP = NULL;
     }
 }
+//void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc)
+//{
+//    HDC hDoubleBufferDC = CreateCompatibleDC(hdc);
+//    HBITMAP hDoubleBufferImage = CreateCompatibleBitmap(hdc, rectView.right, rectView.bottom);
+//    HBITMAP hOldDoubleBufferBitmap = (HBITMAP)SelectObject(hDoubleBufferDC, hDoubleBufferImage);
+//
+//    // 비트맵을 그리기 위한 메모리 DC 생성
+//    HDC hMemDC = CreateCompatibleDC(hDoubleBufferDC);
+//    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, g_hTextImgBMP);
+//
+//    // 비트맵 이동 처리
+//    if (g_bNowDrow)
+//    {
+//        POINT MPos;
+//        GetCursorPos(&MPos);
+//        ScreenToClient(hWnd, &MPos);
+//
+//        g_CharPos.x = MPos.x - g_MarginPos.x;
+//        g_CharPos.y = MPos.y - g_MarginPos.y;
+//    }
+//
+//    // 비트맵을 더블 버퍼에 그리기
+//    if (g_hTextImgDC != NULL)
+//    {
+//        BitBlt(hDoubleBufferDC, g_CharPos.x, g_CharPos.y, g_TextImgWidth, g_TextImgHeight, g_hTextImgDC, g_StartImgX, g_StartImgY, SRCCOPY);
+//    }
+//    if (pos.size())
+//    {
+//        // 텍스트 색상 및 브러시 설정
+//        SetBkMode(hDoubleBufferDC, TRANSPARENT);
+//        SetTextColor(hDoubleBufferDC, RGB(255, 255, 255)); // 흰색 텍스트
+//        HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
+//        HPEN hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255)); // 흰색 펜
+//        SelectObject(hDoubleBufferDC, hPen);
+//
+//        int offsetY = 0; // Y축 오프셋 초기화
+//
+//        for (const POINT& p : pos)
+//        {
+//            // 점 찍기
+//            SetPixel(hDoubleBufferDC, p.x, p.y, RGB(255, 255, 255)); // 흰색 점
+//
+//            // 좌표 텍스트 생성
+//            std::string text = "(" + std::to_string(p.x) + ", " + std::to_string(p.y) + ")";
+//
+//            // 텍스트 위치를 오른쪽 위에 맞추기 위해 좌표 조정
+//            int textWidth = text.length() * 8; // 대략적인 텍스트 폭 계산
+//            int textX = rectView.right - textWidth - 5; // 오른쪽 여백 설정
+//            int textY = 5 + offsetY; // 위쪽 여백 설정
+//
+//            // 텍스트 출력
+//            TextOutA(hDoubleBufferDC, textX, textY, text.c_str(), text.length());  // 오른쪽 위에 출력
+//            offsetY += 20; // 다음 텍스트의 Y축 위치를 아래로 이동
+//        }
+//
+//        DeleteObject(hPen);  // 펜 자원 해제
+//    }
+//
+//
+//    //사각형 그리기
+//    DrawArea(hDoubleBufferDC);
+//
+//    // 더블 버퍼의 내용을 실제 화면에 복사
+//    BitBlt(hdc, 0, 0, rectView.right, rectView.bottom, hDoubleBufferDC, 0, 0, SRCCOPY);
+//
+//    // 자원 해제
+//    SelectObject(hMemDC, hOldBitmap);
+//    DeleteDC(hMemDC);
+//
+//    SelectObject(hDoubleBufferDC, hOldDoubleBufferBitmap);
+//    DeleteObject(hDoubleBufferImage);  // 자원 해제
+//    DeleteDC(hDoubleBufferDC);
+//}
 
 void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc)
 {
@@ -230,41 +342,50 @@ void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc)
     if (g_hTextImgDC != NULL)
     {
         BitBlt(hDoubleBufferDC, g_CharPos.x, g_CharPos.y, g_TextImgWidth, g_TextImgHeight, g_hTextImgDC, g_StartImgX, g_StartImgY, SRCCOPY);
+
+        // 빨간색 테두리를 그리기 위한 설정
+        HPEN hRedPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0)); // 빨간색 펜 생성
+        HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH); // 내부는 채우지 않음
+        SelectObject(hDoubleBufferDC, hRedPen);
+        SelectObject(hDoubleBufferDC, hNullBrush);
+
+        // 이미지 테두리에 빨간색 직사각형 그리기
+        Rectangle(hDoubleBufferDC, g_CharPos.x, g_CharPos.y, g_CharPos.x + g_TextImgWidth, g_CharPos.y + g_TextImgHeight);
+
+        // 리소스 해제
+        DeleteObject(hRedPen);
     }
+
+    // 점과 텍스트 그리기
     if (pos.size())
     {
-        // 텍스트 색상 및 브러시 설정
         SetBkMode(hDoubleBufferDC, TRANSPARENT);
         SetTextColor(hDoubleBufferDC, RGB(255, 255, 255)); // 흰색 텍스트
         HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
         HPEN hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255)); // 흰색 펜
         SelectObject(hDoubleBufferDC, hPen);
 
-        int offsetY = 0; // Y축 오프셋 초기화
+        int offsetY = 0;
 
         for (const POINT& p : pos)
         {
-            // 점 찍기
-            SetPixel(hDoubleBufferDC, p.x, p.y, RGB(255, 255, 255)); // 흰색 점
+            // 흰색 점 찍기
+            SetPixel(hDoubleBufferDC, p.x, p.y, RGB(255, 255, 255));
 
-            // 좌표 텍스트 생성
+            // 좌표 텍스트 생성 및 출력
             std::string text = "(" + std::to_string(p.x) + ", " + std::to_string(p.y) + ")";
+            int textWidth = text.length() * 8;
+            int textX = rectView.right - textWidth - 5;
+            int textY = 5 + offsetY;
 
-            // 텍스트 위치를 오른쪽 위에 맞추기 위해 좌표 조정
-            int textWidth = text.length() * 8; // 대략적인 텍스트 폭 계산
-            int textX = rectView.right - textWidth - 5; // 오른쪽 여백 설정
-            int textY = 5 + offsetY; // 위쪽 여백 설정
-
-            // 텍스트 출력
-            TextOutA(hDoubleBufferDC, textX, textY, text.c_str(), text.length());  // 오른쪽 위에 출력
-            offsetY += 20; // 다음 텍스트의 Y축 위치를 아래로 이동
+            TextOutA(hDoubleBufferDC, textX, textY, text.c_str(), text.length());
+            offsetY += 20;
         }
 
         DeleteObject(hPen);  // 펜 자원 해제
     }
 
-
-    //사각형 그리기
+    // 사각형 그리기
     DrawArea(hDoubleBufferDC);
 
     // 더블 버퍼의 내용을 실제 화면에 복사
@@ -275,9 +396,10 @@ void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc)
     DeleteDC(hMemDC);
 
     SelectObject(hDoubleBufferDC, hOldDoubleBufferBitmap);
-    DeleteObject(hDoubleBufferImage);  // 자원 해제
+    DeleteObject(hDoubleBufferImage);
     DeleteDC(hDoubleBufferDC);
 }
+
 
 void GameEnd()
 {
@@ -288,77 +410,130 @@ void GameEnd()
     }
 }
 
-void SaveBitmapToFile(HBITMAP hBitmap, const TCHAR* filePath)
+void SaveBitmap(HWND hWnd, LPCTSTR filePath)
 {
-    BITMAP bmp;
-    GetObject(hBitmap, sizeof(BITMAP), &bmp); // 비트맵 정보 가져오기
+    HDC hdcWindow;
+    HDC hdcMemDC = NULL;
+    HBITMAP hBitmap = NULL;
+    BITMAP bitmap;
+    BITMAPFILEHEADER bmpFileHeader;
+    BITMAPINFOHEADER bmpInfoHeader;
+    HANDLE hFile;
+    DWORD dwBytesWritten = 0;
+    BYTE* lpBitmapData = NULL;
 
-    // BMP 파일 헤더 크기
-    DWORD bmpFileHeaderSize = sizeof(BITMAPFILEHEADER);
-    DWORD bmpInfoHeaderSize = sizeof(BITMAPINFOHEADER);
-    DWORD bmpSize = bmp.bmWidthBytes * bmp.bmHeight; // 비트맵 데이터 크기
+    // 윈도우 DC와 메모리 DC 생성
+    hdcWindow = GetDC(hWnd);
+    hdcMemDC = CreateCompatibleDC(hdcWindow);
 
-    // BMP 파일 헤더
-    BITMAPFILEHEADER bfh;
-    bfh.bfType = 0x4D42; // 'BM'
-    bfh.bfSize = bmpFileHeaderSize + bmpInfoHeaderSize + bmpSize; // 전체 파일 크기
-    bfh.bfReserved1 = 0;
-    bfh.bfReserved2 = 0;
-    bfh.bfOffBits = bmpFileHeaderSize + bmpInfoHeaderSize; // 비트맵 데이터 시작 위치
+    // 클라이언트 영역 크기 가져오기
+    RECT rcClient;
+    GetClientRect(hWnd, &rcClient);
+    int width = rcClient.right - rcClient.left;
+    int height = rcClient.bottom - rcClient.top;
 
-    // BMP 정보 헤더
-    BITMAPINFOHEADER bih;
-    bih.biSize = bmpInfoHeaderSize;
-    bih.biWidth = bmp.bmWidth;
-    bih.biHeight = bmp.bmHeight;
-    bih.biPlanes = 1;
-    bih.biBitCount = 32; // RGBA 형식
-    bih.biCompression = BI_RGB;
-    bih.biSizeImage = 0; // 비트맵 데이터 크기 (0으로 설정하면 크기를 자동으로 계산)
-    bih.biXPelsPerMeter = 0;
-    bih.biYPelsPerMeter = 0;
-    bih.biClrUsed = 0;
-    bih.biClrImportant = 0;
+    // 비트맵 생성
+    hBitmap = CreateCompatibleBitmap(hdcWindow, width, height);
+    SelectObject(hdcMemDC, hBitmap);
+
+    // 윈도우의 내용을 메모리 DC로 복사
+    BitBlt(hdcMemDC, 0, 0, width, height, hdcWindow, 0, 0, SRCCOPY);
+
+    // 비트맵 정보 가져오기
+    GetObject(hBitmap, sizeof(BITMAP), &bitmap);
+
+    // 비트맵 데이터 저장을 위한 BITMAPINFO 구조체 설정
+    BITMAPINFO bmpInfo;
+    memset(&bmpInfo, 0, sizeof(BITMAPINFO));
+    bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmpInfo.bmiHeader.biWidth = bitmap.bmWidth;
+    bmpInfo.bmiHeader.biHeight = bitmap.bmHeight;
+    bmpInfo.bmiHeader.biPlanes = 1;
+    bmpInfo.bmiHeader.biBitCount = 32; // 32비트 비트맵
+    bmpInfo.bmiHeader.biCompression = BI_RGB;
+
+    // 비트맵 데이터 크기 계산
+    int bitmapDataSize = bitmap.bmWidthBytes * bitmap.bmHeight;
+    lpBitmapData = (BYTE*)malloc(bitmapDataSize);
+
+    // 비트맵 데이터를 가져옴
+    GetDIBits(hdcMemDC, hBitmap, 0, (UINT)bitmap.bmHeight, lpBitmapData, &bmpInfo, DIB_RGB_COLORS);
+
+    // 검은색 배경을 투명하게 처리
+    for (int i = 0; i < bitmapDataSize; i += 4)
+    {
+        BYTE blue = lpBitmapData[i];
+        BYTE green = lpBitmapData[i + 1];
+        BYTE red = lpBitmapData[i + 2];
+
+        // RGB 값이 (0, 0, 0)인 경우 알파값을 0으로 설정
+        if (red == 0 && green == 0 && blue == 0)
+        {
+            lpBitmapData[i + 3] = 0; // 알파값을 0으로 설정 (투명하게 처리)
+        }
+        else
+        {
+            lpBitmapData[i + 3] = 255; // 알파값을 255로 설정 (불투명)
+        }
+    }
+
+    // 비트맵 파일 헤더 설정
+    bmpFileHeader.bfType = 0x4D42;  // "BM"
+    bmpFileHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
+    bmpFileHeader.bfSize = bmpFileHeader.bfOffBits + bitmapDataSize;
+    bmpFileHeader.bfReserved1 = 0;
+    bmpFileHeader.bfReserved2 = 0;
+
+    // 비트맵 정보 헤더 설정
+    bmpInfoHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmpInfoHeader.biWidth = bitmap.bmWidth;
+    bmpInfoHeader.biHeight = bitmap.bmHeight;
+    bmpInfoHeader.biPlanes = 1;
+    bmpInfoHeader.biBitCount = 32;  // 32비트
+    bmpInfoHeader.biCompression = BI_RGB;
+    bmpInfoHeader.biSizeImage = bitmapDataSize;
+    bmpInfoHeader.biXPelsPerMeter = 0;
+    bmpInfoHeader.biYPelsPerMeter = 0;
+    bmpInfoHeader.biClrUsed = 0;
+    bmpInfoHeader.biClrImportant = 0;
 
     // 파일 열기
-    HANDLE hFile = CreateFile(filePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    hFile = CreateFile(filePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (hFile == INVALID_HANDLE_VALUE)
     {
-        MessageBox(NULL, L"파일을 열 수 없습니다.", L"오류", MB_OK);
-        return;
+        MessageBox(hWnd, _T("파일을 저장할 수 없습니다."), _T("오류"), MB_OK);
+        goto Cleanup;
     }
 
-    DWORD written;
+    // 파일에 비트맵 파일 헤더 쓰기
+    WriteFile(hFile, &bmpFileHeader, sizeof(BITMAPFILEHEADER), &dwBytesWritten, NULL);
 
-    // BMP 파일 헤더 쓰기
-    WriteFile(hFile, &bfh, bmpFileHeaderSize, &written, NULL);
-    // BMP 정보 헤더 쓰기
-    WriteFile(hFile, &bih, bmpInfoHeaderSize, &written, NULL);
+    // 파일에 비트맵 정보 헤더 쓰기
+    WriteFile(hFile, &bmpInfoHeader, sizeof(BITMAPINFOHEADER), &dwBytesWritten, NULL);
 
-    // 비트맵 데이터 가져오기
-    HDC hdc = CreateCompatibleDC(NULL);
-    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hdc, hBitmap);
+    // 파일에 비트맵 데이터 쓰기
+    WriteFile(hFile, lpBitmapData, bitmapDataSize, &dwBytesWritten, NULL);
 
-    // 비트맵 데이터를 파일에 쓰기
-    BYTE* pBits = new BYTE[bmpSize];
-    GetDIBits(hdc, hBitmap, 0, bmp.bmHeight, pBits, (BITMAPINFO*)&bih, DIB_RGB_COLORS);
-
-    // 비트맵 데이터는 32비트로 저장하므로 패딩을 고려해야 합니다.
-    for (int i = 0; i < bmp.bmHeight; i++)
-    {
-        WriteFile(hFile, pBits + (bmp.bmHeight - 1 - i) * bmp.bmWidthBytes, bmp.bmWidthBytes, &written, NULL);
-    }
-
-    // 자원 해제
-    delete[] pBits;
-    SelectObject(hdc, hOldBitmap);
-    DeleteDC(hdc);
+    // 파일 닫기
     CloseHandle(hFile);
+
+    MessageBox(hWnd, _T("비트맵 저장 완료"), _T("성공"), MB_OK);
+
+Cleanup:
+    // 메모리 정리
+    if (lpBitmapData)
+        free(lpBitmapData);
+    DeleteObject(hBitmap);
+    DeleteDC(hdcMemDC);
+    ReleaseDC(hWnd, hdcWindow);
 }
 
 BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    OPENFILENAME sfn;
     static HWND targetHwnd = FindWindow(NULL, L"AssetTool");
+
+    TCHAR sFilePathName[MAX_FILENAME_SIZE] = _T("");
     switch (uMsg)
     {
     case WM_INITDIALOG:
@@ -419,7 +594,23 @@ BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             break;
         case IDC_BUTTON_save:
         {
-            SaveBitmapToFile(g_hTextImgBMP, L"output.bmp");
+            memset(&sfn, 0, sizeof(OPENFILENAME));
+            sfn.lStructSize = sizeof(OPENFILENAME);
+            sfn.hwndOwner = targetHwnd;
+            sfn.lpstrFilter = filter;
+            sfn.lpstrFile = sFilePathName;
+            sfn.nMaxFile = MAX_FILENAME_SIZE;
+            sfn.lpstrInitialDir = _T(".");
+            if (GetSaveFileName(&sfn) != 0)
+            {
+                // 사용자에게 파일 저장 여부 확인 메시지
+                TCHAR str[MAX_PATH];
+                _stprintf_s(str, _T("%s 파일로 저장하겠습니까?"), sfn.lpstrFile);
+                MessageBox(targetHwnd, str, _T("저장하기 선택"), MB_OK);
+
+                // 더블 버퍼에 그려진 부분을 비트맵 파일로 저장하는 함수 호출
+                SaveBitmap(targetHwnd, sfn.lpstrFile);
+            }
         }
             break;
         }
@@ -435,16 +626,15 @@ BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return TRUE;
 }
 
-#define MAX_FILENAME_SIZE 100   
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static int sx = 0;
     static int sy = 0;
 
-    OPENFILENAME Ofn;
+    OPENFILENAME ofn;
     TCHAR sFilePathName[MAX_FILENAME_SIZE] = _T("");
-    static TCHAR sFilter[] = L"모든 파일\0*.*\0텍스트 파일\0*.txt\0비트맵 파일\0*.bmp";
-
+    
     switch (message)
     {
     case WM_CREATE:
@@ -457,18 +647,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             switch (wmId)
             {
             case ID_OpenFile:
-                memset(&Ofn, 0, sizeof(OPENFILENAME));
-                Ofn.lStructSize = sizeof(OPENFILENAME);
-                Ofn.hwndOwner = hWnd;
-                Ofn.lpstrFilter = sFilter;
-                Ofn.lpstrFile = sFilePathName;
-                Ofn.nMaxFile = MAX_FILENAME_SIZE;
-                Ofn.lpstrFile[0] = '\0'; // 파일 경로 버퍼 초기화
-                Ofn.lpstrInitialDir = L"C:\\Users\\inha\\OneDrive\\문서\\Kirby-SupernovaVanguard\\AssetTool\\AssetTool\\Images\\bmp"; // 초기 디렉토리 설정
-                Ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+                memset(&ofn, 0, sizeof(OPENFILENAME));
+                ofn.lStructSize = sizeof(OPENFILENAME);
+                ofn.hwndOwner = hWnd;
+                ofn.lpstrFilter = filter;
+                ofn.lpstrFile = sFilePathName;
+                ofn.nMaxFile = MAX_FILENAME_SIZE;
+                ofn.lpstrFile[0] = '\0'; // 파일 경로 버퍼 초기화
+                ofn.lpstrInitialDir = L"C:\\Users\\inha\\OneDrive\\문서\\Kirby-SupernovaVanguard\\AssetTool\\AssetTool\\Images\\bmp"; // 초기 디렉토리 설정
+                ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 
                 // OFN_ENABLEHOOK 플래그를 사용하지 않도록 단순화
-                if (GetOpenFileName(&Ofn) != 0)
+                if (GetOpenFileName(&ofn) != 0)
                 {
                     GameEnd();
                     GameInit(sFilePathName);
