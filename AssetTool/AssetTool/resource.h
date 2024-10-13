@@ -20,6 +20,8 @@
 #define IDC_BUTTON_pickPosAgain         1005
 #define IDC_BUTTON_save                 1006
 #define IDC_BUTTON_check                1007
+#define IDC_BUTTON_rectOn               1008
+#define IDC_BUTTON_rectOff              1009
 #define IDC_EDIT_readR                  1010
 #define IDC_EDIT_readG                  1011
 #define IDC_EDIT_readB                  1012
