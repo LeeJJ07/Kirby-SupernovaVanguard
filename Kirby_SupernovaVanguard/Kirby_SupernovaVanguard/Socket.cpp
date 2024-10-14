@@ -22,6 +22,24 @@ int InitClient(HWND hWnd, SOCKET &s)
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 
+	int sendBufSize = 8192 * 2;  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = 8192 * 2;  // 수신 버퍼 크기 (예: 8KB)
+	
+	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
+		std::cerr << "Setting send buffer size failed.\n";
+		closesocket(s);
+		WSACleanup();
+		return 1;
+	}
+
+	// 수신 버퍼 크기 설정
+	if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (char*)&recvBufSize, sizeof(recvBufSize)) == SOCKET_ERROR) {
+		std::cerr << "Setting recv buffer size failed.\n";
+		closesocket(s);
+		WSACleanup();
+		return 1;
+	}
+
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");

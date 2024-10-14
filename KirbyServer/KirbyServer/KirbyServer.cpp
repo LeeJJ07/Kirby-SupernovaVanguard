@@ -213,6 +213,24 @@ int InitServer(HWND hWnd)
 {
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	s = socket(AF_INET, SOCK_STREAM, 0);
+	
+	int sendBufSize = 8192 * 2;  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = 8192 * 2;  // 수신 버퍼 크기 (예: 8KB)
+
+	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
+		std::cerr << "Setting send buffer size failed.\n";
+		closesocket(s);
+		WSACleanup();
+		return 1;
+	}
+
+	// 수신 버퍼 크기 설정
+	if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (char*)&recvBufSize, sizeof(recvBufSize)) == SOCKET_ERROR) {
+		std::cerr << "Setting recv buffer size failed.\n";
+		closesocket(s);
+		WSACleanup();
+		return 1;
+	}
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
@@ -331,6 +349,8 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData)
 		int newdistance = pow(mData.pos.x - tData.udata[i].pos.x, 2) + pow(mData.pos.y - tData.udata[i].pos.y, 2);
 		if (newdistance < distance)
 		{
+			distance = newdistance;
+
 			mData.targetnum = i;
 		}
 	}
