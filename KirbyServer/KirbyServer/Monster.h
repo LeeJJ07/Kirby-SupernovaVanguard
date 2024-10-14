@@ -34,6 +34,5 @@ public:
 
 	void			SetMosterType(EMonsterType _monsterType) { this->monsterType = _monsterType; }
 
-	void			Generate();
 	void			DrawMonster(HDC&);
 };

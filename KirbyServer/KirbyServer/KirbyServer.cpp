@@ -171,7 +171,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 		}
 			break;
-		}
+		} 
 		break;
 	case WM_CREATE:
 		SetTimer(hWnd, TIMER_01, 1, NULL);

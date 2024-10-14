@@ -32,13 +32,17 @@ unsigned __stdcall Send();
 
 std::vector<Object*> vClient(PLAYERNUM);
 std::vector<Object*> vMonster(MONSTERNUM);
-TOTALDATA uData; 
+TOTALDATA uData;
 Object** objArr;
 static SOCKET cSocket;
 int objnum;
 
 // >> : Thread
 CRITICAL_SECTION cs;
+// <<
+
+// >> : Map
+HBITMAP hImage;
 // <<
 
 // >> : move
@@ -172,6 +176,9 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	hInst = hInstance;
+
+	hImage = (HBITMAP)LoadImage(NULL, TEXT("Images/Backgrounds/spacebackground.bmp"), IMAGE_BITMAP, 0, 0,
+		LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 
 	int width = GetSystemMetrics(SM_CXSCREEN);
 	int height = GetSystemMetrics(SM_CYSCREEN);
@@ -321,32 +328,38 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 void DoubleBuffering(HDC hdc)
 {
-	HDC memdc;
-	static HBITMAP  hBit, mapBit, oldBit;
+	HDC memdc, bufferdc;
+	static HBITMAP  mapBit, oldBit;
 
 	int cTop = camera.GetCameraPos().y - CAMERA_HEIGHT / 2;
 	int cLeft = camera.GetCameraPos().x - CAMERA_WIDTH / 2;
 
 	memdc = CreateCompatibleDC(hdc);
-	hBit = CreateCompatibleBitmap(hdc, CAMERA_WIDTH, CAMERA_HEIGHT);
-	mapBit = CreateCompatibleBitmap(memdc, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y);
+	bufferdc = CreateCompatibleDC(hdc);
+	//hBit = CreateCompatibleBitmap(hdc, CAMERA_WIDTH, CAMERA_HEIGHT);
+	mapBit = CreateCompatibleBitmap(hdc, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y);
 
-	oldBit = (HBITMAP)SelectObject(memdc, mapBit);
+	oldBit = (HBITMAP)SelectObject(bufferdc, mapBit);
 	HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
 	RECT rect = { 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y };
 
-	FillRect(memdc, &rect, hBrush);
+	//FillRect(memdc, &rect, hBrush);
 
-	DrawCamera(memdc);
+	SelectObject(memdc, hImage);
+	//BitBlt(hdc, 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y, memdc, 0, 0, SRCCOPY);
+	BitBlt(bufferdc, 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y, memdc, 0, 0, SRCCOPY);
+
+	DrawCamera(bufferdc);
 
 	if (isDrawCollider)
-		DrawCollider(memdc);
+		DrawCollider(bufferdc);
 
-	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, memdc, cLeft, cTop, SRCCOPY);
+	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, bufferdc, cLeft, cTop, SRCCOPY);
 
-	SelectObject(memdc, oldBit);
+	SelectObject(bufferdc, oldBit);
 	DeleteDC(memdc);
-	DeleteObject(hBit);
+	DeleteDC(bufferdc);
+	//DeleteObject(hBit);
 	DeleteObject(mapBit);
 }
 
