@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <CommCtrl.h>
+#include <sstream>
 #pragma comment(lib, "msimg32.lib")
 //#include <objidl.h>
 //#include <gdiplus.h>
@@ -44,9 +45,10 @@ POINT g_MarginPos = { 0, 0 };
 POINT g_CharPos = { 0, 0 };
 
 int startCenterX, startCenterY;
-int width, height, length, spacingX;
+int height, length, spacingX;
 int R, G, B;
 vector<POINT> pos;
+vector<int> widths;
 
 HWND hDlg = NULL;
 
@@ -57,6 +59,7 @@ void GameInit(TCHAR filename[]);
 void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc);
 void SetDlgItemTextFromAnsi(HWND hDlg, int nIDDlgItem, const std::string& str);
 string TCHARToString(const TCHAR* tcharStr);
+void ParseWidthsFromEditControl(HWND hDlg, int length);
 
 void GameEnd();
 void SaveImageDataToFile(const TCHAR* imageName);
@@ -66,6 +69,8 @@ void SaveBitmap(HWND hWnd, LPCTSTR filePath, RECT rectToSave);
 bool isDrawRect;
 bool isPlayAnimation;
 int curFrame;
+
+bool isWhiteBox;
 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -168,26 +173,38 @@ COLORREF GetPixelColorAtMouseClick()
 
 void DrawArea(HDC hdc)
 {
-    if (!width || !height || !length) 
+    if (widths.empty() || !height || !length || length != widths.size()) 
         return;
 
-    startCenterX = (rectView.right - (length - 1) * (width + spacingX)) / 2;
+    int tempWidth = 0;
+    for (int i = 0; i < length; i++)
+        tempWidth += widths[i] + spacingX;
+    tempWidth -= spacingX;
+    tempWidth = tempWidth - widths[0];
+    
+    startCenterX = (rectView.right - tempWidth) / 2;
     startCenterY = rectView.bottom / 2;
 
     // 빨간색 테두리 설정
-    HPEN hPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));  // 빨간색 테두리 펜 생성
+    HPEN hPen;
+    if (isWhiteBox)
+        hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
+    else
+        hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
     HBRUSH hBrush = (HBRUSH)GetStockObject(NULL_BRUSH);  // 투명한 내부를 위한 브러시
 
     HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);  // 기존 펜 저장 및 새 펜 선택
     HBRUSH hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);  // 기존 브러시 저장 및 새 브러시 선택
 
+    int stackWidth = 0;
     for (int idx = 0; idx < length; idx++)
     {
-        int left = startCenterX + (width + spacingX) * idx - width / 2;
-        int right = startCenterX + (width + spacingX) * idx + width / 2;
+        int left = startCenterX + spacingX * idx - widths[idx] / 2 + stackWidth;
+        int right = startCenterX + spacingX * idx + widths[idx] / 2 + stackWidth;
         int top = startCenterY - height / 2;
         int bottom = startCenterY + height / 2;
-
+        if (idx != length - 1)
+            stackWidth += widths[idx] / 2 + widths[idx + 1] / 2;
         // 사각형 그리기
         Rectangle(hdc, left, top, right, bottom);
     }
@@ -213,15 +230,18 @@ void DrawAnimation(HDC hdc)
     HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, g_hTextImgBMP);
 
     // 현재 프레임에 따라 비트맵의 시작 위치 계산
-    int xStart = curFrame * (width + spacingX);
+    int xStart = curFrame + spacingX;
+    for (int i = 0; i < curFrame; i++)
+        xStart += widths[i];
     int yStart = 0;
 
-    int diffX = xStart + width / 2 - pos[curFrame].x;
+    int diffX = xStart + widths[curFrame] / 2 - pos[curFrame].x;
     int diffY = yStart + height / 2 - pos[curFrame].y;
 
     // 비트맵을 창에 그리기
     // TransparentBlt를 사용하여 투명한 색상으로 비트맵 그리기
-    TransparentBlt(hdc, rectView.right/2 + diffX, 200 + diffY, width, height, g_hTextImgDC, aniStartX + xStart, aniStartY + yStart, width, height, RGB(R, G, B));
+    TransparentBlt(hdc, rectView.right/2 + diffX, 200 + diffY, widths[curFrame], height,
+        g_hTextImgDC, aniStartX + xStart, aniStartY + yStart, widths[curFrame], height, RGB(R, G, B));
 
     // 메모리 DC 정리
     SelectObject(hMemDC, hOldBitmap);
@@ -296,7 +316,7 @@ void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc)
             SetPixel(hDoubleBufferDC, p.x, p.y, RGB(255, 255, 255)); // 흰색 점
 
             // 좌표 텍스트 생성
-            std::string text = "(" + std::to_string(p.x) + ", " + std::to_string(p.y) + ")";
+            string text = "(" + std::to_string(p.x) + ", " + std::to_string(p.y) + ")";
 
             // 텍스트 위치를 오른쪽 위에 맞추기 위해 좌표 조정
             int textWidth = text.length() * 8; // 대략적인 텍스트 폭 계산
@@ -361,7 +381,7 @@ void GameEnd()
 void SaveImageDataToFile(const TCHAR* imageName)
 {
     // 텍스트 파일 열기
-    std::ofstream outFile("imageDatas.txt", std::ios::app); // append 모드로 열기
+    ofstream outFile("imageDatas.txt", std::ios::app); // append 모드로 열기
     if (!outFile)
     {
         MessageBox(NULL, _T("파일을 열 수 없습니다."), _T("오류"), MB_OK);
@@ -369,22 +389,24 @@ void SaveImageDataToFile(const TCHAR* imageName)
     }
 
     // TCHAR를 std::string으로 변환
-    std::string imageNameStr = TCHARToString(imageName);
+    string imageNameStr = TCHARToString(imageName);
 
     // 이미지 이름과 전역 변수 기록
     outFile << imageNameStr << " "      // 이미지 이름
-        << length << " "             // length
-        << spacingX << " "          // spacingX
-        << R << " "                 // R
-        << G << " "                 // G
-        << B << " ";                // B
+            << length << " "             // length
+            << spacingX << " "          // spacingX
+            << R << " "                 // R
+            << G << " "                 // G
+            << B << " ";                // B
 
     // pos 벡터의 좌표 저장
     for (const POINT& p : pos)
     {
         outFile << p.x << " " << p.y << " "; // x, y 좌표 저장
     }
-
+    for(const int& i : widths)
+        outFile << i << " "; // x, y 좌표 저장
+    outFile << height;
     outFile << std::endl; // 줄 바꿈
 
     // 파일 닫기
@@ -619,16 +641,16 @@ BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
         case IDC_BUTTON_check:
         {
-            TCHAR buffer[64];  
-
-            GetDlgItemText(hDlg, IDC_EDIT_width, buffer, 64);
-            width = _ttoi(buffer); 
-            GetDlgItemText(hDlg, IDC_EDIT_height, buffer, 64);
+            TCHAR buffer[128];  
+            GetDlgItemText(hDlg, IDC_EDIT_height, buffer, 128);
             height = _ttoi(buffer);
-            GetDlgItemText(hDlg, IDC_EDIT_length, buffer, 64);
+            GetDlgItemText(hDlg, IDC_EDIT_length, buffer, 128);
             length = _ttoi(buffer);  
-            GetDlgItemText(hDlg, IDC_EDIT_spacingX, buffer, 64);
+            GetDlgItemText(hDlg, IDC_EDIT_spacingX, buffer, 128);
             spacingX = _ttoi(buffer); 
+
+            GetDlgItemText(hDlg, IDC_EDIT_width, buffer, 128);
+            ParseWidthsFromEditControl(hDlg, length);
 
             if (targetHwnd)
                 InvalidateRect(targetHwnd, NULL, TRUE);
@@ -636,7 +658,10 @@ BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             break;
         case IDC_BUTTON_cut:
         {
-            g_TextImgWidth = width * length + spacingX * (length - 1);
+            g_TextImgWidth = 0;
+            for (int i = 0; i < length; i++)
+                g_TextImgWidth += widths[i] + spacingX;
+            g_TextImgWidth -= spacingX;
             g_TextImgHeight = height;
 
             g_StartImgX = rectView.right / 2 - g_CharPos.x - g_TextImgWidth / 2;
@@ -673,6 +698,11 @@ BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             if (targetHwnd)
                 InvalidateRect(targetHwnd, NULL, TRUE);
             break;
+        case IDC_BUTTON_changeBoxColor:
+            isWhiteBox = !isWhiteBox;
+            if (targetHwnd)
+                InvalidateRect(targetHwnd, NULL, TRUE);
+            break;
         case IDC_BUTTON_save:
         {
             memset(&sfn, 0, sizeof(OPENFILENAME));
@@ -690,8 +720,12 @@ BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 MessageBox(targetHwnd, str, _T("저장하기 선택"), MB_OK);
 
                 // 더블 버퍼에 그려진 부분을 비트맵 파일로 저장하는 함수 호출
-                int left = startCenterX - width / 2 + 1;
-                int right = startCenterX + (width + spacingX) * (length - 1) + width / 2 - 1;
+                int left = startCenterX - widths[0] / 2 + 1;
+                int right = startCenterX;
+                for (int i = 0; i < length - 1; i++)
+                    right += (widths[i] + widths[i + 1]) / 2 + spacingX;
+                right += widths[length - 1] / 2;
+
                 int top = startCenterY - height / 2 + 1;
                 int bottom = startCenterY + height / 2 - 1 ;
                 RECT rectToSave = { left, top, right, bottom }; // 저장할 영역 설정
@@ -727,6 +761,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
         isDrawRect = true;
         isPlayAnimation = false;
+        isWhiteBox = false;
         GetClientRect(hWnd, &rectView);
         SetTimer(hWnd, TIMER_ANI, 100, NULL);
         break;
@@ -904,4 +939,22 @@ string TCHARToString(const TCHAR* tcharStr)
 #else
     return std::string(tcharStr);
 #endif
+}
+void ParseWidthsFromEditControl(HWND hDlg, int length)
+{
+    TCHAR buffer[128];
+    GetDlgItemText(hDlg, IDC_EDIT_width, buffer, sizeof(buffer) / sizeof(TCHAR));
+
+    // 문자열을 std::wstring으로 변환
+    wstring wstr(buffer);
+
+    // std::wistringstream을 사용하여 공백으로 구분된 정수 파싱
+    wistringstream wss(wstr);
+    widths.clear(); // 벡터 초기화
+
+    int value;
+    while (wss >> value)
+    {
+        widths.push_back(value);
+    }
 }
