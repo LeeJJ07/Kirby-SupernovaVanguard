@@ -1,10 +1,17 @@
 #include "Socket.h"
-#include "UserData.h"
+#include "PlayerData.h"
 #include "ActionData.h"
 #include "Multithread.h"
+#include "Camera.h"
 
-extern int readCount;
-extern int textreadCount;
+short myID;
+int textreadCount;
+
+enum DATATYPE {
+	PLAYERTYPE = 'p',
+	MONSTERTYPE = 'm',
+	ITEMTYPE = 'i'
+};
 
 extern std::chrono::duration<double> timeSpan_readCount;
 extern std::chrono::high_resolution_clock::time_point t1_readCount;
@@ -35,35 +42,49 @@ int InitClient(HWND hWnd, SOCKET &s)
 	return 1;
 }
 
-int SendMessageToServer(SOCKET &s, TCHAR* str)
-{
-	if (s == INVALID_SOCKET)return 0;
-
-#ifdef _UNICODE
-	msgLen = WideCharToMultiByte(CP_ACP, 0, str, -1, NULL, 0, NULL, NULL);
-	WideCharToMultiByte(CP_ACP, 0, str, -1, buffer, msgLen, NULL, NULL);
-	msg[msgLen] = NULL;
-#else
-	strcpy_s(buffer, str);
-	msgLen = strlen(buffer);
-#endif
-
-	send(s, (LPSTR)buffer, msgLen + 1, 0);
-	msgCount = 0;
-
-	return 1;
-}
-
-void ReadMessage(SOCKET &s, std::vector<Player*>& p, UserData &uD)
+void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 {
 	EnterCriticalSection(&cs);
 
-	int bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0);
+	int bytesReceived = recv(s, (char*)&pD, sizeof(TOTALDATA), 0);
 
 	if (bytesReceived > 0)
 	{
 		readCount++;
-		SetPlayer(p, uD);
+
+		for (int i = 0; i < PLAYERNUM; i++)
+		{
+			if (pD.udata[i].dataType == 0)
+				break;
+
+			Player* pData = dynamic_cast<Player*>(p[i]);
+			if (!pData)
+			{
+				pData = new Player();
+				CreateObject(pData);
+			}
+			pData->ObjectUpdate(pD, i);
+			pData->GetCollider()->MovePosition(pData->GetPosition());
+
+			p[i] = pData;
+
+			camera.PositionUpdate();
+		}
+
+		for (int i = 0; i < MONSTERNUM; i++)
+		{
+			if (pD.mdata[i].dataType == 0)
+				continue;
+
+			if (!vMonster[i])
+			{
+				vMonster[i] = new Monster;
+				CreateObject((Monster*)vMonster[i]);
+			}
+
+			vMonster[i]->ObjectUpdate(pD, i);
+			vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
+		}
 
 		if (timeSpan_readCount.count() >= 1)
 		{
@@ -74,19 +95,31 @@ void ReadMessage(SOCKET &s, std::vector<Player*>& p, UserData &uD)
 	LeaveCriticalSection(&cs);
 }
 
-void ReadInitMessage(SOCKET& s, UserData& uD)
+void ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 {
 	int bytesReceived;
-	while ((bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0)) == -1);
+	while ((bytesReceived = recv(s, (char*)&uD, sizeof(TOTALDATA), 0)) == -1);
 
-	if (bytesReceived != sizeof(UserData))
+
+	if (bytesReceived != sizeof(TOTALDATA))
 	{
 		MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
 		return;
 	}
+
+	short num = -1;
+
+	for (int i = 0; i < PLAYERNUM; i++)
+	{
+		if (uD.udata[i].dataType == 0)
+			break;
+		num++;
+	}
+
+	myID = num;
 }
 
-void CloseClient(SOCKET& s, std::vector<Player*>& p, int id)
+void CloseClient(SOCKET& s, std::vector<Object*>& p, int id)
 {
 	p[id] = NULL;
 
@@ -96,6 +129,7 @@ void CloseClient(SOCKET& s, std::vector<Player*>& p, int id)
 
 void CountReadNum()
 {
+
 	textreadCount = readCount;
 
 	readCount = 0;

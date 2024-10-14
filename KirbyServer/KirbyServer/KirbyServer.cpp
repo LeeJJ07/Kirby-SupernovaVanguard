@@ -5,29 +5,16 @@
 #include "framework.h"
 #include "KirbyServer.h"
 #include <WinSock2.h>
+#include "Object.h"
+#include "TotalData.h"
 
 #pragma comment(lib, "ws2_32.lib")
-
-#include <iostream>
-#include <string>
-#include <vector>
 
 using namespace std;
 
 enum State { RECEIVE, SEND };
 
-typedef struct userData
-{
-	bool inGameStart;
-
-	pair<double, double> lookingDir;
-	POINT center;
-	POINT pos;
-	POINT mousePos;
-	int radius;
-	int moveDir;
-	short id;
-}UserData;
+Object** objArr;
 
 typedef struct sendData
 {
@@ -45,28 +32,28 @@ typedef struct receiveData
 
 #define MAX_LOADSTRING 100
 #define WM_ASYNC WM_USER + 1
-#define TIMER_01 1  
+#define TIMER_01 1
+#define TIMER_GENERATEMONSTER 2
+
+static int readyclientnum = 0;
 
 int InitServer(HWND hWnd);
 int CloseServer();
 SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
-
-void SendToClient(pair<SOCKET, UserData> cs);
 void SendToAll();
 void ReadData();
+void UpdateMonster();
+void GenerateMonster();
 void CloseClient(SOCKET socket);
-void InitUserData(UserData& userData, int id);
-void SetUserData(UserData& uData, ReceiveData rData);
+void SetMonsterData(MONSTERDATA& mData);
+void InitUserData(PLAYERDATA& userData, int id);
+void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 
 WSADATA wsaData;
 SOCKET s, cs;
-SOCKADDR_IN addr = { 0 }, c_addr = { 0 };
 
 vector<SOCKET> socketList;
-vector<UserData> userList;
-
-TCHAR msg[200] = { 0 };
-char buffer[100];
+TOTALDATA totalData;
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -158,19 +145,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
-//
-//  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  용도: 주 창의 메시지를 처리합니다.
-//
-//  WM_COMMAND  - 애플리케이션 메뉴를 처리합니다.
-//  WM_PAINT    - 주 창을 그립니다.
-//  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
-//
-//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static short userID = 0;
+
 	switch (message)
 	{
 	case WM_COMMAND:
@@ -179,13 +157,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case TIMER_01:
+			UpdateMonster();
 			SendToAll();
+			break;
+		case TIMER_GENERATEMONSTER:
+		{
+			if (readyclientnum == userID && userID)
+			{
+				GenerateMonster();
+
+				SendToAll();
+			}
+		}
 			break;
 		}
 		break;
 	case WM_CREATE:
-		SetTimer(hWnd, TIMER_01, 5, NULL);
+		SetTimer(hWnd, TIMER_01, 1, NULL);
+		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
 		return InitServer(hWnd);
+		break;
 	case WM_ASYNC:
 		switch (lParam)
 		{
@@ -203,8 +194,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
-
-
 
 			EndPaint(hWnd, &ps);
 		}
@@ -251,13 +240,11 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 	cs = accept(s, (LPSOCKADDR)&c_addr, &_size);
 	WSAAsyncSelect(cs, hWnd, WM_ASYNC, FD_READ | FD_CLOSE);
 
-	UserData userData;
+	PLAYERDATA userData;
 	InitUserData(userData, userID);
 
-	SendToClient({ cs, userData });
-
 	socketList.push_back(cs);
-	userList.push_back(userData);
+	totalData.udata[userID] = userData;
 
 	SendToAll();//{ cs , userData }
 
@@ -266,29 +253,28 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 
 void ReadData()
 {
+	readyclientnum = 0;
 	for (int i = 0; i < socketList.size(); i++) {
-		ReceiveData temp;
+		ReceiveData temp = {};
 		int dataLen = recv(socketList[i], (char*)&temp, sizeof(ReceiveData), 0);
 		if(dataLen > 0)
-			SetUserData(userList[temp.id], temp);
-	}
-}
+		{
+			SetUserData(totalData.udata[temp.id], temp);
+			if (totalData.udata[temp.id].inGameStart)
+				readyclientnum++;
+		}
 
-// 현재 연결된 유저한테 정보를 알려줌
-void SendToClient(pair<SOCKET, UserData> cs)
-{
-	send(cs.first, (char*)&cs.second, sizeof(UserData), 0);
+	}	
 }
 
 // 모든 유저들에게 업데이트 된 정보를 전달
 void SendToAll()//pair<SOCKET, UserData> cs
 {
-	for (int i = 0; i < socketList.size(); i++)
+	for (int i = 0; i < PLAYERNUM; i++)
 	{
-		for (int j = 0; j < userList.size(); j++)
-		{
-			send(socketList[i], (char*)&userList[j], sizeof(UserData), 0);
-		}
+		if (totalData.udata[i].dataType == NULL)
+			break;
+		send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
 	}
 }
 
@@ -297,32 +283,98 @@ void CloseClient(SOCKET socket)
 	for (int i = 0; i < socketList.size(); i++) {
 		if (socketList[i] == socket) {
 			closesocket(socketList[i]);
-			userList.erase(userList.begin() + i);
+			//totalData.udata.erase(totalData.udata.begin() + i);
 			socketList.erase(socketList.begin() + i);
 			break;
 		}
 	}
 }
 
-void InitUserData(UserData& userData, int id)
+void InitUserData(PLAYERDATA& userData, int id)
 {
+	userData.dataType = PLAYERTYPE;
 	userData.id = id;
-	userData.center = { 50 * (id + 1), 50 * (id + 1)};
+	userData.pos = { 50 * (id + 1), 50 * (id + 1)};
 	userData.lookingDir = { 1.0, 1.0 };
-	userData.moveDir = 0;
-	userData.mousePos = { 0,0 };
-	userData.pos = { 50 * (id + 1), 50 * (id + 1) };
+	userData.mousePos = { 0, 0 };
+	userData.offset = { 0, 0 };
 	userData.radius = 10;
 	userData.inGameStart = false;
 }
 
-void SetUserData(UserData& uData, ReceiveData rData)
+void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 {
 	uData.pos.x += rData.playerMove.x;
 	uData.pos.y += rData.playerMove.y;
-	//마우스 위치도 설정 필요
+
 	uData.mousePos.x = rData.cursorMove.x;
 	uData.mousePos.y = rData.cursorMove.y;
 
 	uData.inGameStart = rData.isReady;
+}
+
+void SetMonsterData(MONSTERDATA& mData)
+{
+	Monster* nMonster = new Monster({ rand() % 200,rand() % 400 });
+	monsterCount++;
+
+	//nMonster->Generate();
+
+	mData.pos = nMonster->GetPosition();
+	mData.dataType = MONSTERTYPE;
+}
+
+void GenerateMonster()
+{
+	for (int i = 0; i < MONSTERNUM; i++)
+	{
+		if (totalData.mdata[i].dataType == 0)
+		{
+			SetMonsterData(totalData.mdata[i]);
+			return;
+		}
+	}
+}
+
+#include <cmath>
+
+void UpdateMonster()
+{
+	for (int i = 0; i < MONSTERNUM; i++)
+	{
+		if (totalData.mdata[i].dataType == 0)
+			continue;
+
+		int mindistance = 1000000;
+		int targetindex = 0;
+		for (int j = 0; j < PLAYERNUM; j++)
+		{
+			if (totalData.udata[j].dataType == 0)
+				continue;
+
+			int temp = 0;
+			temp += sqrt(totalData.mdata[i].pos.x - totalData.udata[j].pos.x);
+			temp += sqrt(totalData.mdata[i].pos.y - totalData.udata[j].pos.y);
+			if (temp < mindistance)
+			{
+				mindistance = temp;
+				targetindex = j;
+			}
+		}
+		int monsterx = 0;
+		int monstery = 0;
+
+		if (totalData.mdata[i].pos.x > totalData.udata[targetindex].pos.x)
+			monsterx = -1;
+		else if (totalData.mdata[i].pos.x < totalData.udata[targetindex].pos.x)
+			monsterx = 1;
+		
+		if (totalData.mdata[i].pos.y > totalData.udata[targetindex].pos.y)
+			monstery = -1;
+		else if (totalData.mdata[i].pos.y < totalData.udata[targetindex].pos.y)
+			monstery = 1;
+
+		totalData.mdata[i].pos.x += monsterx;
+		totalData.mdata[i].pos.y += monstery;
+	}
 }

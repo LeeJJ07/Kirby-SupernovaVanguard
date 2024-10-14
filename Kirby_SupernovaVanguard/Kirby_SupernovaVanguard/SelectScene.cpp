@@ -45,7 +45,7 @@ SelectScene::~SelectScene()
 	DeleteBitmap();
 }
 
-void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Player*>& clients)
+void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Object*>& clients)
 {
 	HDC hDoubleBufferDC;
 	HBITMAP hDoubleBufferImage = nullptr, hOldDoubleBufferBitmap;
@@ -91,14 +91,14 @@ void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, 
 	// select scene 맨 아래 네모 박스 및 캐릭터
 	for (int i = 0; i < 4; i++)
 	{
-		if (clients[i] == NULL) continue;
+		if ((Player*)(clients[i]) == NULL) continue;
 
 		int centerX = rectView.right / 5 * (i + 1);
 		int centerY = rectView.bottom - 170;
 
 		Rectangle(hDoubleBufferDC, centerX - 100, centerY - 100, centerX + 100, centerY + 100);
 
-		int index = SelectCharacter(clients[i], rectView);
+		int index = SelectCharacter((Player*)(clients[i]), rectView);
 		Rect destRect(centerX - w[index] / 2, centerY - h[index] / 2, w[index], h[index]);
 		Rect srcRect(0, 0, w[index], h[index]);
 		graphics.DrawImage(pImg[index],
@@ -147,9 +147,9 @@ int SelectScene::SelectCharacter(Player* client, RECT& rectView)
 			&& client->GetMousePosition().y > centerY - 250
 			&& client->GetMousePosition().y < centerY + 150)
 		{
-			client->SetCharacter((ECharacterType)i);
+			client->SetCharacterType((ECharacterType)i);
 			return i + 6;
 		}
 	}
-	return client->GetCharacter() + 6;
+	return client->GetCharacterType() + 6;
 }

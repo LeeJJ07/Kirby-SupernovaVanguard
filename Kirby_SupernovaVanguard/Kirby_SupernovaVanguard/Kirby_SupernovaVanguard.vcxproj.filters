@@ -4,9 +4,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>클래스파일\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>클래스파일\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="SelectScene.cpp">
       <Filter>클래스파일\Scenes</Filter>
     </ClCompile>
@@ -28,27 +25,27 @@
     <ClCompile Include="Socket.cpp">
       <Filter>클래스파일\Socket</Filter>
     </ClCompile>
-    <ClCompile Include="Circle2D.cpp">
-      <Filter>클래스파일\Colliders</Filter>
-    </ClCompile>
     <ClCompile Include="Collider2D.cpp">
       <Filter>클래스파일\Colliders</Filter>
     </ClCompile>
-    <ClCompile Include="UserData.cpp">
-      <Filter>클래스파일\Datas</Filter>
+    <ClCompile Include="PlayerData.cpp">
+      <Filter>클래스파일\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>클래스파일\Objects\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Monster.cpp">
+      <Filter>클래스파일\Objects\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="Circle2D.cpp">
+      <Filter>클래스파일\Colliders\Circle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
       <Filter>클래스파일\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Rectangle2D.h">
-      <Filter>클래스파일\Colliders</Filter>
-    </ClInclude>
     <ClInclude Include="Collider2D.h">
-      <Filter>클래스파일\Colliders</Filter>
-    </ClInclude>
-    <ClInclude Include="Circle2D.h">
       <Filter>클래스파일\Colliders</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
@@ -82,10 +79,22 @@
       <Filter>클래스파일\FrameWork</Filter>
     </ClInclude>
     <ClInclude Include="ActionData.h">
-      <Filter>클래스파일\Datas</Filter>
+      <Filter>클래스파일\Data</Filter>
     </ClInclude>
-    <ClInclude Include="UserData.h">
-      <Filter>클래스파일\Datas</Filter>
+    <ClInclude Include="PlayerData.h">
+      <Filter>클래스파일\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>클래스파일\Objects\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster.h">
+      <Filter>클래스파일\Objects\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="Circle2D.h">
+      <Filter>클래스파일\Colliders\Circle</Filter>
+    </ClInclude>
+    <ClInclude Include="Rectangle2D.h">
+      <Filter>클래스파일\Colliders\Rectangle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -130,8 +139,20 @@
     <Filter Include="클래스파일\Thread">
       <UniqueIdentifier>{a4ab6e69-f9a0-481d-9b8a-a6180783a872}</UniqueIdentifier>
     </Filter>
-    <Filter Include="클래스파일\Datas">
+    <Filter Include="클래스파일\Objects\Player">
+      <UniqueIdentifier>{80d69283-a0a0-47c0-b80f-b60a0ac68231}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Objects\Monster">
+      <UniqueIdentifier>{f56c6962-676e-4ecd-b540-53c06ded0557}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Data">
       <UniqueIdentifier>{3e4d9098-e034-4cb2-90e8-52882527efba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Colliders\Circle">
+      <UniqueIdentifier>{8e4ccfaf-72b8-4d26-8b57-893b5e3e223f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\Colliders\Rectangle">
+      <UniqueIdentifier>{e8349358-f465-40e7-a760-56fce2d35f7e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
