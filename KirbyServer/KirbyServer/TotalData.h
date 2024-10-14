@@ -43,4 +43,4 @@ struct TOTALDATA
 
 void SetUserData(PLAYERDATA&, Object*);
 void SetObject(Object*& p, PLAYERDATA& ud);
-void SetTarget(MONSTERDATA mData, TOTALDATA tData);
+void SetTarget(MONSTERDATA& mData, TOTALDATA& tData);
