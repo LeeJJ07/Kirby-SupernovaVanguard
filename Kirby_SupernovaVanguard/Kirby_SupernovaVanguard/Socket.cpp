@@ -22,12 +22,6 @@ int InitClient(HWND hWnd, SOCKET &s)
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 
-	if (s == INVALID_SOCKET)
-	{
-		MessageBox(NULL, _T("socket() failed"), _T("Error"), MB_OK);
-		return 0;
-	}
-
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
@@ -97,18 +91,32 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 void ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 {
+	int totalBytesReceived = 0; // 총 수신한 바이트 수
+	int bytesToReceive = sizeof(TOTALDATA); // 수신할 데이터 크기
 	int bytesReceived;
-	while ((bytesReceived = recv(s, (char*)&uD, sizeof(TOTALDATA), 0)) == -1);
 
-
-	if (bytesReceived != sizeof(TOTALDATA))
+	Sleep(1);
+	// 모든 데이터를 받을 때까지 반복
+	while (totalBytesReceived < bytesToReceive)
 	{
-		MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
-		return;
+		bytesReceived = recv(s, (char*)&uD + totalBytesReceived, bytesToReceive - totalBytesReceived, 0);
+		if (bytesReceived == SOCKET_ERROR)
+		{
+			MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
+			return;
+		}
+		if (bytesReceived == 0)
+		{
+			// 연결이 종료된 경우
+			MessageBox(NULL, _T("Connection closed"), _T("Error"), MB_OK);
+			return;
+		}
+
+		totalBytesReceived += bytesReceived; // 수신한 바이트 수를 업데이트
 	}
 
+	// uD에서 데이터 처리
 	short num = -1;
-
 	for (int i = 0; i < PLAYERNUM; i++)
 	{
 		if (uD.udata[i].dataType == 0)
