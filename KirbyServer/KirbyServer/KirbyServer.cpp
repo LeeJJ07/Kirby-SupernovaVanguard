@@ -315,7 +315,7 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 
 void SetTarget(MONSTERDATA mData, TOTALDATA tData)
 {
-	int distance = sqrt(pow(mData.pos.x - tData.udata[0].pos.x, 2) + pow(mData.pos.y - tData.udata[0].pos.y, 2));
+	int distance = pow(mData.pos.x - tData.udata[0].pos.x, 2) + pow(mData.pos.y - tData.udata[0].pos.y, 2);
 
 	mData.targetnum = 0;
 
@@ -324,7 +324,7 @@ void SetTarget(MONSTERDATA mData, TOTALDATA tData)
 		if (tData.udata[i].dataType == 0)
 			continue;
 
-		int newdistance = sqrt(pow(mData.pos.x - tData.udata[i].pos.x, 2) + pow(mData.pos.y - tData.udata[i].pos.y, 2));
+		int newdistance = pow(mData.pos.x - tData.udata[i].pos.x, 2) + pow(mData.pos.y - tData.udata[i].pos.y, 2);
 		if (newdistance < distance)
 		{
 			mData.targetnum = i;
