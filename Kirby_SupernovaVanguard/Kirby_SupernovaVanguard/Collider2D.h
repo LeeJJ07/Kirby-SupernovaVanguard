@@ -19,8 +19,6 @@ private:
 	short type;
 	bool isTrigger;
 
-
-
 public:
 	Collider2D() : center({ 0,0 }), offset({ 0,0 }), type(0), isTrigger(false) {}
 	Collider2D(bool trigger, short _type) : center({ 0,0 }), offset({ 0,0 }), type(_type), isTrigger(trigger) {}

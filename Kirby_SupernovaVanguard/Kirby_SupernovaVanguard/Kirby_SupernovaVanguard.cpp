@@ -23,14 +23,14 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
-void DoubleBuffering(HDC, std::vector<Player*>);
+void DoubleBuffering(HDC, std::vector<Object*>);
 void DrawCamera(HDC, RECT);
 void InitObjArr();
 unsigned __stdcall Paint(HWND);
 unsigned __stdcall Send();
 
 TCHAR str[200];
-std::vector<Player*> client(4);
+std::vector<Object*> client(4);
 UserData uData, myData;
 Collider2D** objArr;
 short myID;
@@ -228,7 +228,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					ReadInitMessage(cSocket, myData);
 					myID = myData.id;
 
-					client[myID] = new Player();
+					client[myID] = new Object();
 
 					SetPlayer(client, myData);
 
@@ -318,7 +318,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void DoubleBuffering(HDC hdc, std::vector<Player*> client)
+void DoubleBuffering(HDC hdc, std::vector<Object*> client)
 {
 	HDC memdc;
 	static HBITMAP  hBit, mapBit, oldBit;
@@ -364,7 +364,7 @@ void DrawCamera(HDC hdc, RECT rect)
 		case TERRAIN:
 			break;
 		case PLAYER:
-			DrawPlayer(hdc, (Player*)objArr[i]);
+			DrawPlayer(hdc, (Object*)objArr[i]);
 			break;
 		case ENEMY:
 			break;
