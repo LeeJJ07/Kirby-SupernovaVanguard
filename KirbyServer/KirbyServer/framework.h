@@ -20,6 +20,7 @@
 #include <condition_variable>
 #include <chrono>
 #include <iostream>
+#include <cmath>
 
 #define PAIR std::pair<double,double>
 #define PLAYERNUM 4

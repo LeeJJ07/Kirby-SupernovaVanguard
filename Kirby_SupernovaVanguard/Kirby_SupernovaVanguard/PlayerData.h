@@ -21,7 +21,7 @@ struct PLAYERDATA :public OBJECTDATA
 
 struct MONSTERDATA :public OBJECTDATA
 {
-	Player* target;
+	int targetnum;
 	enum EMonsterType monstertype;
 
 	std::chrono::high_resolution_clock::time_point t1_targeting;

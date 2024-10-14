@@ -27,7 +27,7 @@ struct PLAYERDATA : public OBJECTDATA
 
 struct MONSTERDATA :public OBJECTDATA
 {
-	Player* target;
+	int targetnum;
 	EMonsterType monstertype;
 
 	std::chrono::high_resolution_clock::time_point t1_targeting;
@@ -43,3 +43,4 @@ struct TOTALDATA
 
 void SetUserData(PLAYERDATA&, Object*);
 void SetObject(Object*& p, PLAYERDATA& ud);
+void SetTarget(MONSTERDATA mData, TOTALDATA tData);

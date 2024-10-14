@@ -215,7 +215,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -313,15 +313,32 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 	uData.inGameStart = rData.isReady;
 }
 
+void SetTarget(MONSTERDATA mData, TOTALDATA tData)
+{
+	int distance = sqrt(pow(mData.pos.x - tData.udata[0].pos.x, 2) + pow(mData.pos.y - tData.udata[0].pos.y, 2));
+
+	mData.targetnum = 0;
+
+	for (int i = 1; i < 4; i++)
+	{
+		if (tData.udata[i].dataType == 0)
+			continue;
+
+		int newdistance = sqrt(pow(mData.pos.x - tData.udata[i].pos.x, 2) + pow(mData.pos.y - tData.udata[i].pos.y, 2));
+		if (newdistance < distance)
+		{
+			mData.targetnum = i;
+		}
+	}
+}
+
 void SetMonsterData(MONSTERDATA& mData)
 {
 	Monster* nMonster = new Monster({ rand() % 200,rand() % 400 });
 	monsterCount++;
 
-	//nMonster->Generate();
-
-	mData.pos = nMonster->GetPosition();
 	mData.dataType = MONSTERTYPE;
+	mData.pos = nMonster->GetPosition();
 }
 
 void GenerateMonster()
@@ -336,8 +353,6 @@ void GenerateMonster()
 	}
 }
 
-#include <cmath>
-
 void UpdateMonster()
 {
 	for (int i = 0; i < MONSTERNUM; i++)
@@ -345,36 +360,30 @@ void UpdateMonster()
 		if (totalData.mdata[i].dataType == 0)
 			continue;
 
-		int mindistance = 1000000;
-		int targetindex = 0;
-		for (int j = 0; j < PLAYERNUM; j++)
+		totalData.mdata[i].t2_targeting = std::chrono::high_resolution_clock::now();
+
+		totalData.mdata[i].timeSpan_targeting = std::chrono::duration_cast<std::chrono::duration<double>>(totalData.mdata[i].t2_targeting - totalData.mdata[i].t1_targeting);
+
+		if(totalData.mdata[i].timeSpan_targeting.count() > 5)
 		{
-			if (totalData.udata[j].dataType == 0)
-				continue;
+			SetTarget(totalData.mdata[i], totalData);
 
-			int temp = 0;
-			temp += sqrt(totalData.mdata[i].pos.x - totalData.udata[j].pos.x);
-			temp += sqrt(totalData.mdata[i].pos.y - totalData.udata[j].pos.y);
-			if (temp < mindistance)
-			{
-				mindistance = temp;
-				targetindex = j;
-			}
+			totalData.mdata[i].t1_targeting = std::chrono::high_resolution_clock::now();
 		}
-		int monsterx = 0;
-		int monstery = 0;
 
-		if (totalData.mdata[i].pos.x > totalData.udata[targetindex].pos.x)
-			monsterx = -1;
-		else if (totalData.mdata[i].pos.x < totalData.udata[targetindex].pos.x)
-			monsterx = 1;
-		
-		if (totalData.mdata[i].pos.y > totalData.udata[targetindex].pos.y)
-			monstery = -1;
-		else if (totalData.mdata[i].pos.y < totalData.udata[targetindex].pos.y)
-			monstery = 1;
+		int x = 0, y = 0;
 
-		totalData.mdata[i].pos.x += monsterx;
-		totalData.mdata[i].pos.y += monstery;
+		if (totalData.mdata[i].pos.x > totalData.udata[totalData.mdata[i].targetnum].pos.x)
+			x = -1;
+		else
+			x = 1;
+
+		if (totalData.mdata[i].pos.y > totalData.udata[totalData.mdata[i].targetnum].pos.y)
+			y = -1;
+		else
+			y = 1;
+
+		totalData.mdata[i].pos.x += x;
+		totalData.mdata[i].pos.y += y;
 	}
 }
