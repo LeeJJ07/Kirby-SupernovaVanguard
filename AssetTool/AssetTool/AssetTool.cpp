@@ -230,9 +230,11 @@ void DrawAnimation(HDC hdc)
     HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, g_hTextImgBMP);
 
     // 현재 프레임에 따라 비트맵의 시작 위치 계산
-    int xStart = curFrame + spacingX;
+    int xStart = 0;
     for (int i = 0; i < curFrame; i++)
-        xStart += widths[i];
+        xStart += widths[i] + spacingX;
+    if(curFrame != 0)
+        xStart -= spacingX;
     int yStart = 0;
 
     int diffX = xStart + widths[curFrame] / 2 - pos[curFrame].x;
