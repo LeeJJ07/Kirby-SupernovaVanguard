@@ -9,11 +9,18 @@
 #include <commdlg.h>
 #include <string>
 #include <vector>
+#include <CommCtrl.h>
+#pragma comment(lib, "msimg32.lib")
+//#include <objidl.h>
+//#include <gdiplus.h>
+//#pragma comment(lib, "Gdiplus.lib")
+//using namespace Gdiplus;
 
 using namespace std;
 
 #define MAX_LOADSTRING 100
 #define MAX_FILENAME_SIZE 100   
+#define TIMER_ANI 1
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -45,14 +52,20 @@ HWND hDlg = NULL;
 
 COLORREF GetPixelColorAtMouseClick();
 void DrawArea(HDC hdc);
+void DrawAnimation(HDC hdc);
 void GameInit(TCHAR filename[]);
 void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc);
 void SetDlgItemTextFromAnsi(HWND hDlg, int nIDDlgItem, const std::string& str);
+string TCHARToString(const TCHAR* tcharStr);
+
 void GameEnd();
+void SaveImageDataToFile(const TCHAR* imageName);
 void SaveBitmap(HWND hWnd, LPCTSTR filePath);
 void SaveBitmap(HWND hWnd, LPCTSTR filePath, RECT rectToSave);
 
 bool isDrawRect;
+bool isPlayAnimation;
+int curFrame;
 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -187,6 +200,36 @@ void DrawArea(HDC hdc)
     DeleteObject(hPen);
     DeleteObject(hBrush);
 }
+void DrawAnimation(HDC hdc)
+{
+    if (length != pos.size())
+        return;
+
+    int aniStartX = g_StartImgX;
+    int aniStartY = g_StartImgY;
+
+    // 메모리 DC 생성
+    HDC hMemDC = CreateCompatibleDC(hdc);
+    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, g_hTextImgBMP);
+
+    // 현재 프레임에 따라 비트맵의 시작 위치 계산
+    int xStart = curFrame * (width + spacingX);
+    int yStart = 0;
+
+    int diffX = xStart + width / 2 - pos[curFrame].x;
+    int diffY = yStart + height / 2 - pos[curFrame].y;
+
+    // 비트맵을 창에 그리기
+    // TransparentBlt를 사용하여 투명한 색상으로 비트맵 그리기
+    TransparentBlt(hdc, rectView.right/2 + diffX, 200 + diffY, width, height, g_hTextImgDC, aniStartX + xStart, aniStartY + yStart, width, height, RGB(R, G, B));
+
+    // 메모리 DC 정리
+    SelectObject(hMemDC, hOldBitmap);
+    DeleteDC(hMemDC);
+
+    // 현재 프레임 업데이트
+    curFrame = (curFrame + 1) % length;
+}
 
 void GameInit(TCHAR filename[])
 {
@@ -202,11 +245,6 @@ void GameInit(TCHAR filename[])
     g_TextImgWidth = bm.bmWidth;
     g_TextImgHeight = bm.bmHeight;
 
-    if (g_hTextImgBMP != NULL)
-    {
-        DeleteObject(g_hTextImgBMP);
-        g_hTextImgBMP = NULL;   
-    }
 }
 void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc)
 {
@@ -228,6 +266,13 @@ void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc)
         g_CharPos.x = MPos.x - g_MarginPos.x;
         g_CharPos.y = MPos.y - g_MarginPos.y;
     }
+
+    // g_CharPos를 중심으로 반지름 3인 원 그리기
+    HBRUSH hBrush = CreateSolidBrush(RGB(255, 0, 0)); // 빨간색 브러시
+    SelectObject(hDoubleBufferDC, hBrush);
+    int radius = 3;
+    Ellipse(hDoubleBufferDC, g_CharPos.x - radius, g_CharPos.y - radius, g_CharPos.x + radius, g_CharPos.y + radius);
+    DeleteObject(hBrush); // 브러시 자원 해제
 
     // 비트맵을 더블 버퍼에 그리기
     if (g_hTextImgDC != NULL)
@@ -270,7 +315,9 @@ void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc)
     if(isDrawRect)
         DrawArea(hDoubleBufferDC);
 
-   
+    // 애니메이션
+    if (isPlayAnimation)
+        DrawAnimation(hDoubleBufferDC);
 
     // 박스의 크기와 위치 설정 (오른쪽 중간에 위치하도록)
     int boxWidth = 100;
@@ -299,11 +346,49 @@ void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc)
 
 void GameEnd()
 {
+    if (g_hTextImgBMP != NULL)
+    {
+        DeleteObject(g_hTextImgBMP);
+        g_hTextImgBMP = NULL;
+    }
     if (g_hTextImgDC != NULL)
     {
         DeleteDC(g_hTextImgDC);
         g_hTextImgDC = NULL;
     }
+}
+
+void SaveImageDataToFile(const TCHAR* imageName)
+{
+    // 텍스트 파일 열기
+    std::ofstream outFile("imageDatas.txt", std::ios::app); // append 모드로 열기
+    if (!outFile)
+    {
+        MessageBox(NULL, _T("파일을 열 수 없습니다."), _T("오류"), MB_OK);
+        return;
+    }
+
+    // TCHAR를 std::string으로 변환
+    std::string imageNameStr = TCHARToString(imageName);
+
+    // 이미지 이름과 전역 변수 기록
+    outFile << imageNameStr << " "      // 이미지 이름
+        << length << " "             // length
+        << spacingX << " "          // spacingX
+        << R << " "                 // R
+        << G << " "                 // G
+        << B << " ";                // B
+
+    // pos 벡터의 좌표 저장
+    for (const POINT& p : pos)
+    {
+        outFile << p.x << " " << p.y << " "; // x, y 좌표 저장
+    }
+
+    outFile << std::endl; // 줄 바꿈
+
+    // 파일 닫기
+    outFile.close();
 }
 
 void SaveBitmap(HWND hWnd, LPCTSTR filePath, RECT rectToSave)
@@ -343,7 +428,7 @@ void SaveBitmap(HWND hWnd, LPCTSTR filePath, RECT rectToSave)
     bmpInfo.bmiHeader.biWidth = width; // 저장할 비트맵의 너비
     bmpInfo.bmiHeader.biHeight = height; // 저장할 비트맵의 높이
     bmpInfo.bmiHeader.biPlanes = 1;
-    bmpInfo.bmiHeader.biBitCount = 32; // 32비트 비트맵
+    bmpInfo.bmiHeader.biBitCount = 24; // 32비트 비트맵
     bmpInfo.bmiHeader.biCompression = BI_RGB;
 
     // 비트맵 데이터 크기 계산
@@ -365,7 +450,7 @@ void SaveBitmap(HWND hWnd, LPCTSTR filePath, RECT rectToSave)
     bmpInfoHeader.biWidth = width;
     bmpInfoHeader.biHeight = height;
     bmpInfoHeader.biPlanes = 1;
-    bmpInfoHeader.biBitCount = 32;  // 32비트
+    bmpInfoHeader.biBitCount = 24;  // 32비트
     bmpInfoHeader.biCompression = BI_RGB;
     bmpInfoHeader.biSizeImage = bitmapDataSize;
     bmpInfoHeader.biXPelsPerMeter = 0;
@@ -453,16 +538,6 @@ void SaveBitmap(HWND hWnd, LPCTSTR filePath)
 
     // 비트맵 데이터를 가져옴
     GetDIBits(hdcMemDC, hBitmap, 0, (UINT)bitmap.bmHeight, lpBitmapData, &bmpInfo, DIB_RGB_COLORS);
-
-    // 검은색 배경을 투명하게 처리
-    for (int i = 0; i < bitmapDataSize; i += 4)
-    {
-        BYTE blue = lpBitmapData[i];
-        BYTE green = lpBitmapData[i + 1];
-        BYTE red = lpBitmapData[i + 2];
-
-        lpBitmapData[i + 3] = 255; // 알파값을 255로 설정 (불투명)
-    }
 
     // 비트맵 파일 헤더 설정
     bmpFileHeader.bfType = 0x4D42;  // "BM"
@@ -589,6 +664,15 @@ BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             if (targetHwnd)
                 InvalidateRect(targetHwnd, NULL, TRUE);
             break;
+        case IDC_BUTTON_AniOn:
+            curFrame = 0;
+            isPlayAnimation = true;
+            break;
+        case IDC_BUTTON_AniOff:
+            isPlayAnimation = false;
+            if (targetHwnd)
+                InvalidateRect(targetHwnd, NULL, TRUE);
+            break;
         case IDC_BUTTON_save:
         {
             memset(&sfn, 0, sizeof(OPENFILENAME));
@@ -612,6 +696,7 @@ BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 int bottom = startCenterY + height / 2 - 1 ;
                 RECT rectToSave = { left, top, right, bottom }; // 저장할 영역 설정
                 SaveBitmap(targetHwnd, sfn.lpstrFile, rectToSave);
+                SaveImageDataToFile(sfn.lpstrFile);
             }
         }
             break;
@@ -641,7 +726,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
         isDrawRect = true;
+        isPlayAnimation = false;
         GetClientRect(hWnd, &rectView);
+        SetTimer(hWnd, TIMER_ANI, 100, NULL);
         break;
     case WM_COMMAND:
         {
@@ -686,6 +773,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
+        }
+        break;
+    case WM_TIMER:
+        if (wParam == TIMER_ANI && isPlayAnimation)
+        {
+            InvalidateRect(hWnd, NULL, FALSE);
         }
         break;
     case WM_LBUTTONDOWN:
@@ -786,6 +879,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_DESTROY:
         GameEnd();
+        KillTimer(hWnd, TIMER_ANI);
         PostQuitMessage(0);
         break;
     default:
@@ -798,4 +892,16 @@ void SetDlgItemTextFromAnsi(HWND hDlg, int nIDDlgItem, const std::string& str)
     wchar_t wBuffer[256];  // 유니코드 문자열 버퍼
     MultiByteToWideChar(CP_ACP, 0, str.c_str(), -1, wBuffer, 256);  // ANSI -> 유니코드 변환
     SetDlgItemText(hDlg, nIDDlgItem, wBuffer);  // 변환된 유니코드 문자열로 텍스트 설정
+}
+
+string TCHARToString(const TCHAR* tcharStr)
+{
+#ifdef UNICODE
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, tcharStr, -1, NULL, 0, NULL, NULL);
+    std::string str(size_needed, 0);
+    WideCharToMultiByte(CP_UTF8, 0, tcharStr, -1, &str[0], size_needed, NULL, NULL);
+    return str;
+#else
+    return std::string(tcharStr);
+#endif
 }

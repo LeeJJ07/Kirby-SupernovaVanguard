@@ -25,6 +25,8 @@
 #define IDC_EDIT_readR                  1010
 #define IDC_EDIT_readG                  1011
 #define IDC_EDIT_readB                  1012
+#define IDC_BUTTON_AniOn                1013
+#define IDC_BUTTON_AniOff               1014
 #define ID_OpenFile                     2000
 #define ID_FileSave                     2001
 #define ID_MENU_Set                     2002
