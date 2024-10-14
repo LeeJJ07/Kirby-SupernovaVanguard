@@ -32,15 +32,20 @@ typedef struct receiveData
 
 #define MAX_LOADSTRING 100
 #define WM_ASYNC WM_USER + 1
-#define TIMER_01 1  
+#define TIMER_01 1
+#define TIMER_GENERATEMONSTER 2
+
+static int readyclientnum = 0;
 
 int InitServer(HWND hWnd);
 int CloseServer();
 SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
-void SendToClient(pair<SOCKET, PLAYERDATA> cs);
 void SendToAll();
 void ReadData();
+void UpdateMonster();
+void GenerateMonster();
 void CloseClient(SOCKET socket);
+void SetMonsterData(MONSTERDATA& mData);
 void InitUserData(PLAYERDATA& userData, int id);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 
@@ -143,6 +148,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static short userID = 0;
+
 	switch (message)
 	{
 	case WM_COMMAND:
@@ -151,12 +157,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case TIMER_01:
+			UpdateMonster();
 			SendToAll();
+			break;
+		case TIMER_GENERATEMONSTER:
+		{
+			if (readyclientnum == userID && userID)
+			{
+				GenerateMonster();
+
+				SendToAll();
+			}
+		}
 			break;
 		}
 		break;
 	case WM_CREATE:
 		SetTimer(hWnd, TIMER_01, 1, NULL);
+		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
 		return InitServer(hWnd);
 		break;
 	case WM_ASYNC:
@@ -235,18 +253,18 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 
 void ReadData()
 {
+	readyclientnum = 0;
 	for (int i = 0; i < socketList.size(); i++) {
 		ReceiveData temp = {};
 		int dataLen = recv(socketList[i], (char*)&temp, sizeof(ReceiveData), 0);
 		if(dataLen > 0)
+		{
 			SetUserData(totalData.udata[temp.id], temp);
-	}
-}
+			if (totalData.udata[temp.id].inGameStart)
+				readyclientnum++;
+		}
 
-// 현재 연결된 유저들한테 정보를 알려줌
-void SendToClient(pair<SOCKET, TOTALDATA> cs)
-{
-	send(cs.first, (char*)&cs.second, sizeof(TOTALDATA), 0);
+	}	
 }
 
 // 모든 유저들에게 업데이트 된 정보를 전달
@@ -293,4 +311,70 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 	uData.mousePos.y = rData.cursorMove.y;
 
 	uData.inGameStart = rData.isReady;
+}
+
+void SetMonsterData(MONSTERDATA& mData)
+{
+	Monster* nMonster = new Monster({ rand() % 200,rand() % 400 });
+	monsterCount++;
+
+	//nMonster->Generate();
+
+	mData.pos = nMonster->GetPosition();
+	mData.dataType = MONSTERTYPE;
+}
+
+void GenerateMonster()
+{
+	for (int i = 0; i < MONSTERNUM; i++)
+	{
+		if (totalData.mdata[i].dataType == 0)
+		{
+			SetMonsterData(totalData.mdata[i]);
+			return;
+		}
+	}
+}
+
+#include <cmath>
+
+void UpdateMonster()
+{
+	for (int i = 0; i < MONSTERNUM; i++)
+	{
+		if (totalData.mdata[i].dataType == 0)
+			continue;
+
+		int mindistance = 1000000;
+		int targetindex = 0;
+		for (int j = 0; j < PLAYERNUM; j++)
+		{
+			if (totalData.udata[j].dataType == 0)
+				continue;
+
+			int temp = 0;
+			temp += sqrt(totalData.mdata[i].pos.x - totalData.udata[j].pos.x);
+			temp += sqrt(totalData.mdata[i].pos.y - totalData.udata[j].pos.y);
+			if (temp < mindistance)
+			{
+				mindistance = temp;
+				targetindex = j;
+			}
+		}
+		int monsterx = 0;
+		int monstery = 0;
+
+		if (totalData.mdata[i].pos.x > totalData.udata[targetindex].pos.x)
+			monsterx = -1;
+		else if (totalData.mdata[i].pos.x < totalData.udata[targetindex].pos.x)
+			monsterx = 1;
+		
+		if (totalData.mdata[i].pos.y > totalData.udata[targetindex].pos.y)
+			monstery = -1;
+		else if (totalData.mdata[i].pos.y < totalData.udata[targetindex].pos.y)
+			monstery = 1;
+
+		totalData.mdata[i].pos.x += monsterx;
+		totalData.mdata[i].pos.y += monstery;
+	}
 }

@@ -31,10 +31,11 @@ unsigned __stdcall Paint(HWND);
 unsigned __stdcall Send();
 
 std::vector<Object*> vClient(PLAYERNUM);
-//std::vector<Monster*> vMonster(MONSTERNUM);
+std::vector<Object*> vMonster(MONSTERNUM);
 TOTALDATA uData; 
 Object** objArr;
 static SOCKET cSocket;
+int objnum;
 
 // >> : Thread
 CRITICAL_SECTION cs;
@@ -216,7 +217,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	case WM_CHAR:
-		if (wParam == VK_RETURN && canGoToNext)
+		if (wParam == VK_RETURN/* && canGoToNext*/)
 		{
 			switch (curScene)
 			{
@@ -227,7 +228,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 					vClient[myID] = new Player();
 
-					vClient[myID]->ObjectUpdate(uData.udata[myID]);
+					vClient[myID]->ObjectUpdate(uData, myID);
 					vClient[myID]->GetCollider()->MovePosition(vClient[myID]->GetPosition());
 
 					CreateObject((Player*)vClient[myID]);
@@ -361,6 +362,7 @@ void DrawCamera(HDC hdc)
 			((Player*)objArr[i])->DrawPlayer(hdc);
 			break;
 		case MONSTER:
+			((Monster*)objArr[i])->DrawMonster(hdc);
 			break;
 		case PMISSILE:
 			break;

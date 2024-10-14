@@ -39,12 +39,11 @@ public:
 };
 
 extern Object** objArr;
-static int objnum = 0;
+extern int objnum;
 
 template<class T>
 void CreateObject(T* t)
 {
-	objArr[objnum] = new T();
 	objArr[objnum] = t;
 	objnum++;
 }

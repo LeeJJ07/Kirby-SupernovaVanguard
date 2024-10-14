@@ -24,5 +24,6 @@ int InitClient(HWND hWnd, SOCKET&);
 void ReadMessage(SOCKET&, std::vector<Object*>&, TOTALDATA& );
 void CloseClient(SOCKET&, std::vector<Object*>&, int);
 void ReadInitMessage(SOCKET&, TOTALDATA&);
+extern std::vector<Object*> vMonster;
 extern void CountReadNum();
 // <<

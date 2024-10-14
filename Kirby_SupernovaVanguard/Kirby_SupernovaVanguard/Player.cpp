@@ -1,12 +1,12 @@
 #include "Player.h"
 
-void Player::ObjectUpdate(struct::PLAYERDATA pD)
+void Player::ObjectUpdate(TOTALDATA pData, int i)
 {
-	SetPosition(pD.pos);
-	GetCollider()->SetOffset(pD.offset);
-	SetLookingDir(pD.lookingDir);
-	SetIsInGame(pD.inGameStart);
-	SetMousePosition(pD.mousePos);
+	SetPosition(pData.udata[i].pos);
+	GetCollider()->SetOffset(pData.udata[i].offset);
+	SetLookingDir(pData.udata[i].lookingDir);
+	SetIsInGame(pData.udata[i].inGameStart);
+	SetMousePosition(pData.udata[i].mousePos);
 }
 
 void Player::DrawPlayer(HDC&)

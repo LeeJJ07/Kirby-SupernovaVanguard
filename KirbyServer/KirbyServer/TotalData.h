@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Player.h"
+#include "Monster.h"
 
 enum DATATYPE {
 	PLAYERTYPE = 'p',
-	MONSTERDTYPE = 'm',
+	MONSTERTYPE = 'm',
 	ITEMTYPE = 'i'
 };
 
@@ -27,6 +28,7 @@ struct PLAYERDATA : public OBJECTDATA
 struct MONSTERDATA :public OBJECTDATA
 {
 	Player* target;
+	EMonsterType monstertype;
 
 	std::chrono::high_resolution_clock::time_point t1_targeting;
 	std::chrono::high_resolution_clock::time_point t2_targeting;

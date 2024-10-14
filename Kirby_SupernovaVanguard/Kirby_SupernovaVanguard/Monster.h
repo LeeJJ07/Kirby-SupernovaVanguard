@@ -1,7 +1,8 @@
 #pragma once
 #include "Object.h"
+#include "PlayerData.h"
 
-enum EMonsterType { A, B, C, D };
+static enum EMonsterType { A, B, C, D };
 
 class Monster : public Object
 {
@@ -30,6 +31,5 @@ public:
 	void			SetMosterType(EMonsterType _monsterType) { this->monsterType = _monsterType; }
 
 	void			DrawMonster(HDC&);
+	void			ObjectUpdate(TOTALDATA, int i);
 };
-
-extern std::vector<Monster*> vMonster;

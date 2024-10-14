@@ -24,7 +24,7 @@ public:
 	void			SetCharacterType(ECharacterType characterType) { this->characterType = characterType; }
 	void			SetMousePosition(POINT mousePos) { mousePosition = mousePos; }
 
-	void			ObjectUpdate(PLAYERDATA);
+	void			ObjectUpdate(TOTALDATA, int i);
 	void			DrawPlayer(HDC&);
 };
 

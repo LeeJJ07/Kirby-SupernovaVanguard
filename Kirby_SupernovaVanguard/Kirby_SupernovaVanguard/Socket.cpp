@@ -63,13 +63,29 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 				pData = new Player();
 				CreateObject(pData);
 			}
-			pData->ObjectUpdate(pD.udata[i]);
+			pData->ObjectUpdate(pD, i);
 			pData->GetCollider()->MovePosition(pData->GetPosition());
 
 			p[i] = pData;
 
-			camera.PositionUpdate();			
+			camera.PositionUpdate();
 		}
+
+		for (int i = 0; i < MONSTERNUM; i++)
+		{
+			if (pD.mdata[i].dataType == 0)
+				continue;
+
+			if (!vMonster[i])
+			{
+				vMonster[i] = new Monster;
+				CreateObject((Monster*)vMonster[i]);
+			}
+
+			vMonster[i]->ObjectUpdate(pD, i);
+			vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
+		}
+
 		if (timeSpan_readCount.count() >= 1)
 		{
 			CountReadNum();

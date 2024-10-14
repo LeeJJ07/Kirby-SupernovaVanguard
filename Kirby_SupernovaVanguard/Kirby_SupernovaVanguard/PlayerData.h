@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Player.h"
+#include "Monster.h"
 
 struct OBJECTDATA
 {
@@ -14,13 +15,14 @@ struct OBJECTDATA
 
 struct PLAYERDATA :public OBJECTDATA
 {
-	POINT mousePos;	
+	POINT mousePos;
 	bool inGameStart;
 };
 
 struct MONSTERDATA :public OBJECTDATA
 {
 	Player* target;
+	enum EMonsterType monstertype;
 
 	std::chrono::high_resolution_clock::time_point t1_targeting;
 	std::chrono::high_resolution_clock::time_point t2_targeting;

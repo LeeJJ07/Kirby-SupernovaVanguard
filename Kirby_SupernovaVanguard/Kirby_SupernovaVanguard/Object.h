@@ -29,5 +29,5 @@ public:
 	void			SetIsInGame(bool _isInGame) { isInGame = _isInGame; }
 	void			SetObject(Collider2D* c) { collider = c; }
 
-	virtual void	ObjectUpdate(PLAYERDATA) = 0;
+	virtual void	ObjectUpdate(TOTALDATA, int i) = 0;
 };
