@@ -4,10 +4,13 @@
 #include "Multithread.h"
 #include "Camera.h"
 
+short myID;
+int textreadCount;
+
 enum DATATYPE {
-	PLAYERDATA = 'p',
-	MONSTERDATA = 'm',
-	ITEMDATA = 'i'
+	PLAYERTYPE = 'p',
+	MONSTERTYPE = 'm',
+	ITEMTYPE = 'i'
 };
 
 extern std::chrono::duration<double> timeSpan_readCount;
@@ -39,74 +42,65 @@ int InitClient(HWND hWnd, SOCKET &s)
 	return 1;
 }
 
-int SendMessageToServer(SOCKET &s, TCHAR* str)
-{
-	if (s == INVALID_SOCKET)return 0;
-
-#ifdef _UNICODE
-	msgLen = WideCharToMultiByte(CP_ACP, 0, str, -1, NULL, 0, NULL, NULL);
-	WideCharToMultiByte(CP_ACP, 0, str, -1, (LPSTR)buffer, msgLen, NULL, NULL);
-	msg[msgLen] = NULL;
-#else
-	strcpy_s(buffer, str);
-	msgLen = strlen(buffer);
-#endif
-
-	send(s, (LPSTR)buffer, msgLen + 1, 0);
-	msgCount = 0;
-
-	return 1;
-}
-
-void ReadMessage(SOCKET &s, std::vector<Object*>& p, PlayerData& pD)
+void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 {
 	EnterCriticalSection(&cs);
 
-	int bytesReceived = recv(s, (char*)&pD, sizeof(PlayerData), 0);
+	int bytesReceived = recv(s, (char*)&pD, sizeof(TOTALDATA), 0);
 
 	if (bytesReceived > 0)
 	{
 		readCount++;
 
-		switch (pD.dataType)
+		for (int i = 0; i < PLAYERNUM; i++)
 		{
-		case PLAYERDATA:
-		{
-			Player* pData = dynamic_cast<Player*>(p[pD.id]);
+			if (pD.udata[i].dataType == 0)
+				break;
+
+			Player* pData = dynamic_cast<Player*>(p[i]);
 			if (!pData)
 			{
 				pData = new Player();
 				CreateObject(pData);
 			}
-			pData->ObjectUpdate(pD);
+			pData->ObjectUpdate(pD.udata[i]);
 			pData->GetCollider()->MovePosition(pData->GetPosition());
 
-			p[pD.id] = pData;
+			p[i] = pData;
 
-			camera.PositionUpdate();
-
-			if (timeSpan_readCount.count() >= 1)
-			{
-				CountReadNum();
-			}
+			camera.PositionUpdate();			
 		}
-		break;
+		if (timeSpan_readCount.count() >= 1)
+		{
+			CountReadNum();
 		}
 	}
 
 	LeaveCriticalSection(&cs);
 }
 
-void ReadInitMessage(SOCKET& s, PlayerData& uD)
+void ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 {
 	int bytesReceived;
-	while ((bytesReceived = recv(s, (char*)&uD, sizeof(PlayerData), 0)) == -1);
+	while ((bytesReceived = recv(s, (char*)&uD, sizeof(TOTALDATA), 0)) == -1);
 
-	if (bytesReceived != sizeof(PlayerData))
+
+	if (bytesReceived != sizeof(TOTALDATA))
 	{
 		MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
 		return;
 	}
+
+	short num = -1;
+
+	for (int i = 0; i < PLAYERNUM; i++)
+	{
+		if (uD.udata[i].dataType == 0)
+			break;
+		num++;
+	}
+
+	myID = num;
 }
 
 void CloseClient(SOCKET& s, std::vector<Object*>& p, int id)
@@ -119,6 +113,7 @@ void CloseClient(SOCKET& s, std::vector<Object*>& p, int id)
 
 void CountReadNum()
 {
+
 	textreadCount = readCount;
 
 	readCount = 0;

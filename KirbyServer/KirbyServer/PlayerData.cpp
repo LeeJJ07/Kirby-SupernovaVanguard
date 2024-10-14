@@ -1,6 +1,6 @@
-#include "UserData.h"
+#include "TotalData.h"
 
-void SetUserData(UserData& ud, Object* p)
+void SetUserData(PLAYERDATA& ud, Object* p)
 {
 	ud.pos = p->GetPosition();
 	ud.offset = p->GetCollider()->GetOffset();
@@ -13,7 +13,7 @@ void SetUserData(UserData& ud, Object* p)
 		ud.radius = nRadius;
 }
 
-void SetObject(Object* &p, UserData& ud)
+void SetObject(Object* &p, PLAYERDATA& ud)
 {
 	if (!p)
 		p = new Player();

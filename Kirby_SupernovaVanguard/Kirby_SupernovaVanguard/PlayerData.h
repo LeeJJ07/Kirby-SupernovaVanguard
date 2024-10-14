@@ -2,7 +2,7 @@
 
 #include "Player.h"
 
-struct ObjectData
+struct OBJECTDATA
 {
 	char dataType;
 	PAIR lookingDir;
@@ -12,13 +12,13 @@ struct ObjectData
 	short id;
 };
 
-struct PlayerData :public ObjectData
+struct PLAYERDATA :public OBJECTDATA
 {
 	POINT mousePos;	
 	bool inGameStart;
 };
 
-struct MonsterData :public ObjectData
+struct MONSTERDATA :public OBJECTDATA
 {
 	Player* target;
 
@@ -27,11 +27,11 @@ struct MonsterData :public ObjectData
 	std::chrono::duration<double> timeSpan_targeting;
 };
 
-struct UnionData
+struct TOTALDATA
 {
-	PlayerData	pd;
-	MonsterData	md;
+	PLAYERDATA		udata[PLAYERNUM] = {};
+	MONSTERDATA		mdata[MONSTERNUM];
 };
 
-void SetObjectData(ObjectData*&, Object*);
-void SetObject(Object*& p, ObjectData*& ud);
+void SetObjectData(TOTALDATA*&, Object*);
+void SetObject(Object*& p, TOTALDATA*& ud);

@@ -58,7 +58,7 @@
     <ClInclude Include="ActionData.h">
       <Filter>클래스 파일\Data</Filter>
     </ClInclude>
-    <ClInclude Include="UserData.h">
+    <ClInclude Include="TotalData.h">
       <Filter>클래스 파일\Data</Filter>
     </ClInclude>
     <ClInclude Include="Multithread.h">
@@ -90,7 +90,7 @@
     <ClCompile Include="Object.cpp">
       <Filter>클래스 파일\Object</Filter>
     </ClCompile>
-    <ClCompile Include="UserData.cpp">
+    <ClCompile Include="PlayerData.cpp">
       <Filter>클래스 파일\Data</Filter>
     </ClCompile>
     <ClCompile Include="Socket.cpp">

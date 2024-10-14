@@ -12,7 +12,7 @@
 extern int readCount;
 extern int textreadCount;
 
-struct UserData;
+struct PLAYERDATA;
 
 class Player;
 
@@ -33,8 +33,8 @@ static int msgCount;
 
 int InitClient(HWND hWnd, SOCKET&);
 int SendMessageToServer(SOCKET &, TCHAR*);
-void ReadMessage(SOCKET&, std::vector<Player*>&, UserData&);
+void ReadMessage(SOCKET&, std::vector<Player*>&, PLAYERDATA&);
 void CloseClient(SOCKET&, std::vector<Player*>&, int);
-void ReadInitMessage(SOCKET&, UserData&);
+void ReadInitMessage(SOCKET&, PLAYERDATA&);
 extern void CountReadNum();
 // <<

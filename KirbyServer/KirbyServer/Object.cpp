@@ -1,7 +1,7 @@
 #include "Object.h"
-#include "UserData.h"
+#include "TotalData.h"
 
-void Object::ObjectUpdate(UserData uD)
+void Object::ObjectUpdate(PLAYERDATA uD)
 {
 	SetPosition(uD.pos);
 	GetCollider()->SetOffset(uD.offset);

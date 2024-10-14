@@ -30,13 +30,10 @@ void InitObjArr();
 unsigned __stdcall Paint(HWND);
 unsigned __stdcall Send();
 
-TCHAR str[200];
-std::vector<Object*> vClient(4);
-//std::vector<Monster*> vMonster(100);
-PlayerData uData;
-PlayerData myData;
+std::vector<Object*> vClient(PLAYERNUM);
+//std::vector<Monster*> vMonster(MONSTERNUM);
+TOTALDATA uData; 
 Object** objArr;
-short myID;
 static SOCKET cSocket;
 
 // >> : Thread
@@ -54,7 +51,6 @@ static std::chrono::high_resolution_clock::time_point t2_move;
 static std::chrono::duration<double> timeSpan_move;
 
 bool canGoToNext;
-bool pressEnterKey;
 SceneState curScene;
 StartScene startScene;
 SelectScene selectScene;
@@ -90,7 +86,6 @@ std::chrono::high_resolution_clock::time_point t2_readCount;
 std::chrono::duration<double> timeSpan_readCount;
 
 int readCount;
-int textreadCount;
 
 void DrawReadNum(HDC);
 // <<
@@ -228,12 +223,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case START:
 				if (InitClient(hWnd, cSocket))
 				{
-					ReadInitMessage(cSocket, myData);
-					myID = myData.id;
+					ReadInitMessage(cSocket, uData);
 
 					vClient[myID] = new Player();
 
-					vClient[myID]->ObjectUpdate(myData);
+					vClient[myID]->ObjectUpdate(uData.udata[myID]);
 					vClient[myID]->GetCollider()->MovePosition(vClient[myID]->GetPosition());
 
 					CreateObject((Player*)vClient[myID]);

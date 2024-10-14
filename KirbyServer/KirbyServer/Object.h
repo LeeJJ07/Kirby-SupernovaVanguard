@@ -1,7 +1,7 @@
 #pragma once
 #include "Circle2D.h"
 
-class UserData;
+struct PLAYERDATA;
 
 class Object
 {
@@ -30,5 +30,5 @@ public:
 	void			SetIsInGame(bool isInGame) { this->isInGame = isInGame; }
 	void			SetObject(Collider2D* c) { collider = c; }
 
-	void			ObjectUpdate(UserData);
+	void			ObjectUpdate(PLAYERDATA);
 };

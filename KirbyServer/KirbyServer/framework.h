@@ -22,3 +22,5 @@
 #include <iostream>
 
 #define PAIR std::pair<double,double>
+#define PLAYERNUM 4
+#define MONSTERNUM 100

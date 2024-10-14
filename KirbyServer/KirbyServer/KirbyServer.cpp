@@ -6,7 +6,7 @@
 #include "KirbyServer.h"
 #include <WinSock2.h>
 #include "Object.h"
-#include "UserData.h"
+#include "TotalData.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -15,18 +15,6 @@ using namespace std;
 enum State { RECEIVE, SEND };
 
 Object** objArr;
-
-//typedef struct userData
-//{
-//	bool inGameStart;
-//
-//	pair<double, double> lookingDir;
-//	POINT pos;
-//	POINT offset;
-//	POINT mousePos;
-//	int radius;
-//	short id;
-//}UserData;
 
 typedef struct sendData
 {
@@ -49,19 +37,18 @@ typedef struct receiveData
 int InitServer(HWND hWnd);
 int CloseServer();
 SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
-
-void SendToClient(pair<SOCKET, UserData> cs);
+void SendToClient(pair<SOCKET, PLAYERDATA> cs);
 void SendToAll();
 void ReadData();
 void CloseClient(SOCKET socket);
-void InitUserData(UserData& userData, int id);
-void SetUserData(UserData& uData, ReceiveData rData);
+void InitUserData(PLAYERDATA& userData, int id);
+void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 
 WSADATA wsaData;
 SOCKET s, cs;
 
 vector<SOCKET> socketList;
-vector<UserData> userList;
+TOTALDATA totalData;
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -153,16 +140,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 
-//
-//  함수: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  용도: 주 창의 메시지를 처리합니다.
-//
-//  WM_COMMAND  - 애플리케이션 메뉴를 처리합니다.
-//  WM_PAINT    - 주 창을 그립니다.
-//  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
-//
-//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	static short userID = 0;
@@ -181,6 +158,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		SetTimer(hWnd, TIMER_01, 1, NULL);
 		return InitServer(hWnd);
+		break;
 	case WM_ASYNC:
 		switch (lParam)
 		{
@@ -198,8 +176,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
-
-
 
 			EndPaint(hWnd, &ps);
 		}
@@ -246,13 +222,11 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 	cs = accept(s, (LPSOCKADDR)&c_addr, &_size);
 	WSAAsyncSelect(cs, hWnd, WM_ASYNC, FD_READ | FD_CLOSE);
 
-	UserData userData;
+	PLAYERDATA userData;
 	InitUserData(userData, userID);
 
-	SendToClient({ cs, userData });
-
 	socketList.push_back(cs);
-	userList.push_back(userData);
+	totalData.udata[userID] = userData;
 
 	SendToAll();//{ cs , userData }
 
@@ -265,25 +239,24 @@ void ReadData()
 		ReceiveData temp = {};
 		int dataLen = recv(socketList[i], (char*)&temp, sizeof(ReceiveData), 0);
 		if(dataLen > 0)
-			SetUserData(userList[temp.id], temp);
+			SetUserData(totalData.udata[temp.id], temp);
 	}
 }
 
-// 현재 연결된 유저한테 정보를 알려줌
-void SendToClient(pair<SOCKET, UserData> cs)
+// 현재 연결된 유저들한테 정보를 알려줌
+void SendToClient(pair<SOCKET, TOTALDATA> cs)
 {
-	send(cs.first, (char*)&cs.second, sizeof(UserData), 0);
+	send(cs.first, (char*)&cs.second, sizeof(TOTALDATA), 0);
 }
 
 // 모든 유저들에게 업데이트 된 정보를 전달
 void SendToAll()//pair<SOCKET, UserData> cs
 {
-	for (int i = 0; i < socketList.size(); i++)
+	for (int i = 0; i < PLAYERNUM; i++)
 	{
-		for (int j = 0; j < userList.size(); j++)
-		{
-			send(socketList[i], (char*)&userList[j], sizeof(UserData), 0);
-		}
+		if (totalData.udata[i].dataType == NULL)
+			break;
+		send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
 	}
 }
 
@@ -292,16 +265,16 @@ void CloseClient(SOCKET socket)
 	for (int i = 0; i < socketList.size(); i++) {
 		if (socketList[i] == socket) {
 			closesocket(socketList[i]);
-			userList.erase(userList.begin() + i);
+			//totalData.udata.erase(totalData.udata.begin() + i);
 			socketList.erase(socketList.begin() + i);
 			break;
 		}
 	}
 }
 
-void InitUserData(UserData& userData, int id)
+void InitUserData(PLAYERDATA& userData, int id)
 {
-	userData.dataType = PLAYERDATA;
+	userData.dataType = PLAYERTYPE;
 	userData.id = id;
 	userData.pos = { 50 * (id + 1), 50 * (id + 1)};
 	userData.lookingDir = { 1.0, 1.0 };
@@ -311,11 +284,11 @@ void InitUserData(UserData& userData, int id)
 	userData.inGameStart = false;
 }
 
-void SetUserData(UserData& uData, ReceiveData rData)
+void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 {
 	uData.pos.x += rData.playerMove.x;
 	uData.pos.y += rData.playerMove.y;
-	//마우스 위치도 설정 필요
+
 	uData.mousePos.x = rData.cursorMove.x;
 	uData.mousePos.y = rData.cursorMove.y;
 

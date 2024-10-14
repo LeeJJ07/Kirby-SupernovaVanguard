@@ -1,5 +1,5 @@
 #include "Socket.h"
-#include "UserData.h"
+#include "TotalData.h"
 #include "ActionData.h"
 #include "Multithread.h"
 
@@ -54,46 +54,46 @@ int SendMessageToServer(SOCKET &s, TCHAR* str)
 	return 1;
 }
 
-void ReadMessage(SOCKET &s, std::vector<Player*>& p, UserData &uD)
-{
-	EnterCriticalSection(&criticalSection);
+//void ReadMessage(SOCKET& s, std::vector<Player*>& p, ActionData& uD)
+//{
+//	EnterCriticalSection(&criticalSection);
+//
+//	int bytesReceived = recv(s, (char*)&uD, sizeof(ActionData), 0);
+//
+//	if (bytesReceived > 0)
+//	{
+//		readCount++;
+//
+//		if (!p[uD.id])
+//		{
+//			p[uD.id] = new Player();
+//			Create(p[uD.id]);
+//		}
+//		p[uD.id]->ObjectUpdate(uD);
+//		p[uD.id]->GetCollider()->MovePosition(p[uD.id]->GetPosition());
+//
+//		//camera.PositionUpdate();
+//
+//		if (timeSpan_readCount.count() >= 1)
+//		{
+//			CountReadNum();
+//		}
+//	}
+//
+//	LeaveCriticalSection(&criticalSection);
+//}
 
-	int bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0);
-
-	if (bytesReceived > 0)
-	{
-		readCount++;
-
-		if (!p[uD.id])
-		{
-			p[uD.id] = new Player();
-			Create(p[uD.id]);
-		}
-		p[uD.id]->ObjectUpdate(uD);
-		p[uD.id]->GetCollider()->MovePosition(p[uD.id]->GetPosition());
-
-		//camera.PositionUpdate();
-
-		if (timeSpan_readCount.count() >= 1)
-		{
-			CountReadNum();
-		}
-	}
-
-	LeaveCriticalSection(&criticalSection);
-}
-
-void ReadInitMessage(SOCKET& s, UserData& uD)
-{
-	int bytesReceived;
-	while ((bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0)) == -1);
-
-	if (bytesReceived != sizeof(UserData))
-	{
-		MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
-		return;
-	}
-}
+//void ReadInitMessage(SOCKET& s, UserData& uD)
+//{
+//	int bytesReceived;
+//	while ((bytesReceived = recv(s, (char*)&uD, sizeof(UserData), 0)) == -1);
+//
+//	if (bytesReceived != sizeof(UserData))
+//	{
+//		MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
+//		return;
+//	}
+//}
 
 void CloseClient(SOCKET& s, std::vector<Player*>& p, int id)
 {

@@ -1,6 +1,6 @@
 #include "Player.h"
 
-void Player::ObjectUpdate(PlayerData pD)
+void Player::ObjectUpdate(struct::PLAYERDATA pD)
 {
 	SetPosition(pD.pos);
 	GetCollider()->SetOffset(pD.offset);

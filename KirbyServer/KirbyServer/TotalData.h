@@ -3,12 +3,12 @@
 #include "Player.h"
 
 enum DATATYPE {
-	PLAYERDATA = 'p',
-	MONSTERDATA = 'm',
-	ITEMDATA = 'i'
+	PLAYERTYPE = 'p',
+	MONSTERDTYPE = 'm',
+	ITEMTYPE = 'i'
 };
 
-struct ObjectData
+struct OBJECTDATA
 {
 	char dataType;
 	PAIR lookingDir;
@@ -18,13 +18,13 @@ struct ObjectData
 	short id;
 };
 
-struct UserData : public ObjectData
+struct PLAYERDATA : public OBJECTDATA
 {
 	POINT mousePos;
 	bool inGameStart;
 };
 
-struct MonsterData :public ObjectData
+struct MONSTERDATA :public OBJECTDATA
 {
 	Player* target;
 
@@ -33,5 +33,11 @@ struct MonsterData :public ObjectData
 	std::chrono::duration<double> timeSpan_targeting;
 };
 
-void SetUserData(UserData&, Object*);
-void SetObject(Object*& p, UserData& ud);
+struct TOTALDATA
+{
+	PLAYERDATA		udata[PLAYERNUM];
+	MONSTERDATA		mdata[MONSTERNUM];
+};
+
+void SetUserData(PLAYERDATA&, Object*);
+void SetObject(Object*& p, PLAYERDATA& ud);

@@ -1,8 +1,8 @@
 #pragma once
 #include "Circle2D.h"
 
-class PlayerData;
-class MonsterData;
+class PLAYERDATA;
+class MONSTERDATA;
 class Collider2D;
 
 class Object
@@ -29,5 +29,5 @@ public:
 	void			SetIsInGame(bool _isInGame) { isInGame = _isInGame; }
 	void			SetObject(Collider2D* c) { collider = c; }
 
-	virtual void	ObjectUpdate(PlayerData) = 0;
+	virtual void	ObjectUpdate(PLAYERDATA) = 0;
 };
