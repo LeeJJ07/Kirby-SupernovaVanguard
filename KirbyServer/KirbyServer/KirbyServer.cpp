@@ -36,6 +36,7 @@ typedef struct receiveData
 #define TIMER_GENERATEMONSTER 2
 
 static int readyclientnum = 0;
+static bool isGenerateMonster = false;
 
 int InitServer(HWND hWnd);
 int CloseServer();
@@ -162,7 +163,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case TIMER_GENERATEMONSTER:
 		{
-			if (readyclientnum == userID && userID)
+			if (isGenerateMonster)
 			{
 				GenerateMonster();
 
@@ -175,6 +176,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 		SetTimer(hWnd, TIMER_01, 1, NULL);
 		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
+
 		return InitServer(hWnd);
 		break;
 	case WM_ASYNC:
@@ -263,8 +265,10 @@ void ReadData()
 			if (totalData.udata[temp.id].inGameStart)
 				readyclientnum++;
 		}
-
 	}	
+
+	if (socketList.size() == readyclientnum)
+		isGenerateMonster = true;
 }
 
 // 모든 유저들에게 업데이트 된 정보를 전달
@@ -313,13 +317,13 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 	uData.inGameStart = rData.isReady;
 }
 
-void SetTarget(MONSTERDATA mData, TOTALDATA tData)
+void SetTarget(MONSTERDATA& mData, TOTALDATA& tData)
 {
 	int distance = pow(mData.pos.x - tData.udata[0].pos.x, 2) + pow(mData.pos.y - tData.udata[0].pos.y, 2);
 
 	mData.targetnum = 0;
 
-	for (int i = 1; i < 4; i++)
+	for (int i = 1; i < PLAYERNUM; i++)
 	{
 		if (tData.udata[i].dataType == 0)
 			continue;
@@ -364,7 +368,7 @@ void UpdateMonster()
 
 		totalData.mdata[i].timeSpan_targeting = std::chrono::duration_cast<std::chrono::duration<double>>(totalData.mdata[i].t2_targeting - totalData.mdata[i].t1_targeting);
 
-		if(totalData.mdata[i].timeSpan_targeting.count() > 5)
+		if(totalData.mdata[i].timeSpan_targeting.count() > RETARGETINGTIME)
 		{
 			SetTarget(totalData.mdata[i], totalData);
 
