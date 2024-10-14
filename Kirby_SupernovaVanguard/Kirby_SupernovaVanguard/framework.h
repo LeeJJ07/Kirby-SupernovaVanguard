@@ -15,6 +15,8 @@
 #include <chrono>
 #include <iostream>
 
+#pragma comment(lib, "msimg32.lib")
+
 #define PAIR std::pair<double,double>
 #define PLAYERNUM 4
 #define MONSTERNUM 100
