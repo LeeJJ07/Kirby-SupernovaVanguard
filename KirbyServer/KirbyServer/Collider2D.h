@@ -34,6 +34,7 @@ public:
 
 	void	MovePosition(POINT targetPos) { position.x = targetPos.x + offset.x; position.y = targetPos.y + offset.y; }
 	void	SetOffset(POINT newoffset) { offset = newoffset; }
+	void	SetPosition(POINT position) { this->position = position; }
 
 	virtual void DrawCollider(HDC&) = 0;
 };

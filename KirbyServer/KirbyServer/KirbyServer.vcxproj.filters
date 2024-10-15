@@ -38,6 +38,9 @@
     <Filter Include="클래스 파일\Object\Skill">
       <UniqueIdentifier>{275c27e0-5e3b-476e-87d3-c69cde1b5e46}</UniqueIdentifier>
     </Filter>
+    <Filter Include="클래스 파일\Object\SkillManager">
+      <UniqueIdentifier>{6513f287-c568-4530-b1c8-784a73cb5797}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -111,6 +114,9 @@
     </ClInclude>
     <ClInclude Include="..\..\Kirby_SupernovaVanguard\Kirby_SupernovaVanguard\Skill.h">
       <Filter>클래스 파일\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="SkillManager.h">
+      <Filter>클래스 파일\Object\SkillManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

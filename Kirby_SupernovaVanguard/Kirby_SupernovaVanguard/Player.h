@@ -12,7 +12,7 @@ private:
 	POINT mousePosition;
 
 public:
-	Player() : characterType(KIRBY), mousePosition({ 0,0 }), Object()
+	Player() : characterType(ECharacterType::KIRBY), mousePosition({ 0,0 }), Object()
 	{
 		Circle2D* c = new Circle2D(true, PLAYER);
 		SetObject(c);

@@ -2,6 +2,18 @@
 
 #include "Player.h"
 
+enum SKILLTYPE {
+	KIRBYSKILL = 0,
+	METAKNIGHTSKILL,
+	DEDEDESKILL,
+	MABEROASKILL,
+	ELECTRICFIELD,
+	KUNAI,
+	MAGICARROW,
+	TORNADO,
+	TRUCK
+};
+
 class Skill {
 private:
 	float coolTime;

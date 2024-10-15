@@ -24,3 +24,8 @@ void SetObject(Object* &p, PLAYERDATA& ud)
 	p->GetCollider()->SetOffset(ud.offset);
 	p->SetIsInGame(ud.inGameStart);
 }
+
+void SetObject(Object*& p, SKILLDATA& skilldata)
+{
+	p->SetPosition(skilldata.position);
+}

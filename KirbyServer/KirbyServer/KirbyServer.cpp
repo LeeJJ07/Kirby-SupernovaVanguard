@@ -7,6 +7,7 @@
 #include <WinSock2.h>
 #include "Object.h"
 #include "TotalData.h"
+#include "KirbySkill.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -21,10 +22,16 @@ DWORD dwThID1, dwThID2;
 HANDLE hThreads[2];
 // <<
 
-typedef struct sendData
-{
+// << : skill
+vector<Skill*> vSkill(SKILLNUM);
+void UpdateSkill();
+void SetBasisSkillData(PLAYERDATA& uData, int i);
+void SetSkillData(PLAYERDATA& uData, int index);
+// <<
 
-}SendData;
+// << : player
+std::vector<Player*> vClient(PLAYERNUM);
+// <<
 
 // 클라이언트 ActionData와 형식 같음
 typedef struct receiveData
@@ -32,6 +39,7 @@ typedef struct receiveData
 	short id;
 	POINT playerMove;
 	POINT cursorMove;
+	short charactertype;
 	bool isReady;
 }ReceiveData;
 
@@ -39,9 +47,12 @@ typedef struct receiveData
 #define WM_ASYNC WM_USER + 1
 #define TIMER_01 1
 #define TIMER_GENERATEMONSTER 2
+#define TIMER_UPDATESKILL 3
 
 static int readyclientnum = 0;
-static bool isGenerateMonster = false;
+static bool isAllclientReady = false;
+static bool isGameStart = false;
+static int skillnum;
 
 int InitServer(HWND hWnd);
 int CloseServer();
@@ -168,16 +179,31 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		case TIMER_GENERATEMONSTER:
 		{
-			if (isGenerateMonster)
+			if (isAllclientReady)
 			{
+				if(!isGameStart)
+				{
+					for (int i = 0; i < socketList.size(); i++)
+					{
+						SetBasisSkillData(totalData.udata[i], i);
+					}
+
+					SetTimer(hWnd, TIMER_UPDATESKILL, 1, NULL);
+					isGameStart = true;
+				}
 				GenerateMonster();
 
 				SendToAll();
 			}
 		}
 			break;
-		} 
-		break;
+		case TIMER_UPDATESKILL:
+			{
+			UpdateSkill();
+			}
+			break;
+		}
+	
 	case WM_CREATE:
 		SetTimer(hWnd, TIMER_01, 1, NULL);
 		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
@@ -271,6 +297,9 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 	socketList.push_back(cs);
 	totalData.udata[userID] = userData;
 
+	Player* player = new Player();
+	vClient.push_back(player);
+
 	SendToAll();//{ cs , userData }
 
 	return cs;
@@ -285,13 +314,18 @@ void ReadData()
 		if(dataLen > 0)
 		{
 			SetUserData(totalData.udata[temp.id], temp);
+
 			if (totalData.udata[temp.id].inGameStart)
+			{
 				readyclientnum++;
+			}
 		}
 	}	
 
 	if (socketList.size() == readyclientnum)
-		isGenerateMonster = true;
+	{
+		isAllclientReady = true;
+	}
 }
 
 // 모든 유저들에게 업데이트 된 정보를 전달
@@ -338,6 +372,52 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 	uData.mousePos.y = rData.cursorMove.y;
 
 	uData.inGameStart = rData.isReady;
+	uData.charactertype = rData.charactertype;
+}
+
+void SetBasisSkillData(PLAYERDATA& uData, int i)
+{
+	KirbySkill* kirbyskill = new KirbySkill(i, 0);
+	SkillManager* skillmanager = new SkillManager(kirbyskill->Getskilltype(), kirbyskill->Getcooltime());
+	vClient[i]->GetSkillManager().push_back(skillmanager);
+
+	totalData.sdata[skillnum].masternum = uData.id;
+
+	SetSkillData(uData, 0);
+}
+
+void SetSkillData(PLAYERDATA& uData, int index)
+{
+	switch (uData.skilltype[index])
+	{
+	case SKILLTYPE::KIRBY:
+		SetBasisKirbySkill(uData.id,skillnum);
+		break;
+	case SKILLTYPE::METAKNIGHT:
+
+		break;
+	case SKILLTYPE::DEDEDE:
+
+		break;
+	case SKILLTYPE::MABEROA:
+
+		break;
+	case SKILLTYPE::ELECTRICFIELD:
+
+		break;
+	case SKILLTYPE::KUNAI:
+
+		break;
+	case SKILLTYPE::MAGICARROW:
+
+		break;
+	case SKILLTYPE::TORNADO:
+
+		break;
+	case SKILLTYPE::TRUCK:
+
+		break;
+	}
 }
 
 void SetTarget(MONSTERDATA& mData, TOTALDATA& tData)
@@ -378,6 +458,43 @@ void GenerateMonster()
 		{
 			SetMonsterData(totalData.mdata[i]);
 			return;
+		}
+	}
+}
+
+void UpdateSkill()
+{
+	for (int i = 0; i < vSkill.size(); i++)
+	{
+		switch (vSkill[i]->Getskilltype())
+		{
+		case SKILLTYPE::KIRBY:
+			UpdateKirbySkill(vSkill[i]);
+			break;
+		case SKILLTYPE::METAKNIGHT:
+
+			break;
+		case SKILLTYPE::DEDEDE:
+
+			break;
+		case SKILLTYPE::MABEROA:
+
+			break;
+		case SKILLTYPE::ELECTRICFIELD:
+
+			break;
+		case SKILLTYPE::KUNAI:
+
+			break;
+		case SKILLTYPE::MAGICARROW:
+
+			break;
+		case SKILLTYPE::TORNADO:
+
+			break;
+		case SKILLTYPE::TRUCK:
+
+			break;
 		}
 	}
 }

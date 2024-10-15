@@ -415,6 +415,7 @@ unsigned __stdcall Send()
 			aD.id = myID;
 			aD.playerMove = { x,y };
 			aD.cursorMove = { cursorX, cursorY };
+			aD.charactertype = dynamic_cast<Player*>(vClient[myID])->GetCharacterType();
 
 			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
 

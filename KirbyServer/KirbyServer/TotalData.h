@@ -9,18 +9,6 @@ enum DATATYPE {
 	ITEMTYPE = 'i'
 };
 
-enum SKILLTYPE {
-	KIRBYSKILL = 0,
-	METAKNIGHTSKILL,
-	DEDEDESKILL,
-	MABEROASKILL,
-	ELECTRICFIELDSKILL,
-	KUNAISKILL,
-	MAGICARROWSKILL,
-	TORNADOSKILL,
-	TRUCKSKILL
-};
-
 struct OBJECTDATA
 {
 	char dataType;
@@ -35,11 +23,21 @@ struct PLAYERDATA : public OBJECTDATA
 {
 	POINT mousePos;
 	bool inGameStart;
+	char charactertype;
 };
 
 struct SKILLDATA
 {
-
+	bool isactivate;
+	int masternum;
+	int targetnum;
+	int skilltype;
+	int speed;
+	int damage;
+	int size;
+	float coolTime;
+	POINT position;
+	POINT direction;
 };
 
 struct MONSTERDATA : public OBJECTDATA
@@ -56,6 +54,7 @@ struct TOTALDATA
 {
 	PLAYERDATA		udata[PLAYERNUM];
 	MONSTERDATA		mdata[MONSTERNUM];
+	SKILLDATA		sdata[SKILLNUM];
 };
 
 void SetUserData(PLAYERDATA&, Object*);

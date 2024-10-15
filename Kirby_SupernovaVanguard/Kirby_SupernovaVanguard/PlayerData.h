@@ -2,6 +2,7 @@
 
 #include "Player.h"
 #include "Monster.h"
+#include "Skill.h"
 
 struct OBJECTDATA
 {
@@ -17,6 +18,20 @@ struct PLAYERDATA :public OBJECTDATA
 {
 	POINT mousePos;
 	bool inGameStart;
+	char charactertype;
+};
+
+struct SKILLDATA
+{
+	int masternum;
+	int targetnum;
+	int skilltype;
+	int speed;
+	int damage;
+	int size;
+	float coolTime;
+	POINT position;
+	POINT direction;
 };
 
 struct MONSTERDATA :public OBJECTDATA
@@ -33,6 +48,7 @@ struct TOTALDATA
 {
 	PLAYERDATA		udata[PLAYERNUM] = {};
 	MONSTERDATA		mdata[MONSTERNUM];
+	SKILLDATA		sdata[SKILLNUM];
 };
 
 void SetObjectData(TOTALDATA*&, Object*);
