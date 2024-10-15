@@ -24,9 +24,10 @@ HANDLE hThreads[2];
 
 // << : skill
 vector<Skill*> vSkill(SKILLNUM);
+void GenerateSkill();
 void UpdateSkill();
 void SetBasisSkillData(PLAYERDATA& uData, int i);
-void SetSkillData(PLAYERDATA& uData, int index);
+void SetSkillToDatasheet(Skill* skill);
 // <<
 
 // << : player
@@ -377,21 +378,26 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 
 void SetBasisSkillData(PLAYERDATA& uData, int i)
 {
-	KirbySkill* kirbyskill = new KirbySkill(i, 0);
-	SkillManager* skillmanager = new SkillManager(kirbyskill->Getskilltype(), kirbyskill->Getcooltime());
+	Skill* basisskill;
+	switch (uData.charactertype)
+	{
+	case ECharacterType::KIRBY:
+		basisskill = new KirbySkill(i, 0);
+		break;
+	case ECharacterType::METANIHGT:
+		break;
+	}
+	SkillManager* skillmanager = new SkillManager(basisskill->Getskilltype(), basisskill->Getcooltime());
+
 	vClient[i]->GetSkillManager().push_back(skillmanager);
-
-	totalData.sdata[skillnum].masternum = uData.id;
-
-	SetSkillData(uData, 0);
 }
 
-void SetSkillData(PLAYERDATA& uData, int index)
+void SetSkillToDatasheet(Skill* skill)
 {
-	switch (uData.skilltype[index])
+	switch (skill->Getskilltype())
 	{
 	case SKILLTYPE::KIRBY:
-		SetBasisKirbySkill(uData.id,skillnum);
+		SetBasisKirbySkillInDatasheet(skill);
 		break;
 	case SKILLTYPE::METAKNIGHT:
 
@@ -458,6 +464,33 @@ void GenerateMonster()
 		{
 			SetMonsterData(totalData.mdata[i]);
 			return;
+		}
+	}
+}
+
+void GenerateSkill()
+{
+	for (int i = 0; i < socketList.size(); i++)
+	{
+		std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
+		for (int j = 0; j < temp.size(); j++)
+		{
+			temp[j]->Settime_2();
+
+			double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(temp[j]->Gettime_2() - temp[j]->Gettime_1()).count();
+
+			if (skillcooltime > temp[j]->Getcooltime())
+			{
+				switch (temp[j]->Gettype())
+				{
+				case SKILLTYPE::KIRBY:
+					KirbySkill* kirbySkill = new KirbySkill(i, 0);
+					vSkill.push_back(kirbySkill);
+					SetSkillToDatasheet(vSkill.back());
+					break;
+				}
+				temp[j]->Settime_1();
+			}
 		}
 	}
 }

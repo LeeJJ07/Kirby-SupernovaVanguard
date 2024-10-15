@@ -29,9 +29,11 @@ public:
 	void SetCollider(Collider2D* collider) override { this->collider = collider; }
 };
 
-void SetBasisKirbySkill(short& masternum, int& index)
+void SetBasisKirbySkillInDatasheet(Skill* skill)
 {
-	KirbySkill* kirbyskill = new KirbySkill(masternum, 0);
+	KirbySkill* kirbyskill = dynamic_cast<KirbySkill*>(skill);
+	totalData.sdata[skill->GetID()];
+	/*KirbySkill* kirbyskill = new KirbySkill(masternum, 0);
 	totalData.sdata[index].isactivate = true;
 	totalData.sdata[index].skilltype = kirbyskill->Getskilltype();
 	totalData.sdata[index].speed = kirbyskill->Getspeed();
@@ -40,7 +42,7 @@ void SetBasisKirbySkill(short& masternum, int& index)
 	totalData.sdata[index].coolTime = kirbyskill->Getcooltime();
 	totalData.sdata[index].position = kirbyskill->Getposition();
 	
-	vSkill.push_back(kirbyskill);
+	vSkill.push_back(kirbyskill);*/
 }
 
 void UpdateKirbySkill(Skill* &skill)
