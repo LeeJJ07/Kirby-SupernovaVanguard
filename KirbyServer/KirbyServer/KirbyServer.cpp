@@ -16,6 +16,11 @@ enum State { RECEIVE, SEND };
 
 Object** objArr;
 
+// >> : thread
+DWORD dwThID1, dwThID2;
+HANDLE hThreads[2];
+// <<
+
 typedef struct sendData
 {
 

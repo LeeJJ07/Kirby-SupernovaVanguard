@@ -127,11 +127,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Kirby_SupernovaVanguard\Kirby_SupernovaVanguard\Skill.h" />
     <ClInclude Include="ActionData.h" />
     <ClInclude Include="Circle2D.h" />
     <ClInclude Include="Collider2D.h" />
+    <ClInclude Include="DededeSkill.h" />
+    <ClInclude Include="EletricfieldSkill.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="KirbyServer.h" />
+    <ClInclude Include="KirbySkill.h" />
+    <ClInclude Include="KunaiSkill.h" />
+    <ClInclude Include="MaberoaSkill.h" />
+    <ClInclude Include="MagicarrowSkill.h" />
+    <ClInclude Include="MetaknightSkill.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="Multithread.h" />
     <ClInclude Include="Object.h" />
@@ -140,7 +148,9 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TornadoSkill.h" />
     <ClInclude Include="TotalData.h" />
+    <ClInclude Include="TruckSkill.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Circle2D.cpp" />

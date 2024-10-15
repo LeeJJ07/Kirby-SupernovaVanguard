@@ -35,6 +35,9 @@
     <Filter Include="클래스 파일\Collider\Rectangle">
       <UniqueIdentifier>{7ef1cb3f-85c6-40ab-8979-7f649c7d6dbc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="클래스 파일\Object\Skill">
+      <UniqueIdentifier>{275c27e0-5e3b-476e-87d3-c69cde1b5e46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -78,6 +81,36 @@
     </ClInclude>
     <ClInclude Include="Rectangle2D.h">
       <Filter>클래스 파일\Collider\Rectangle</Filter>
+    </ClInclude>
+    <ClInclude Include="TruckSkill.h">
+      <Filter>클래스 파일\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="DededeSkill.h">
+      <Filter>클래스 파일\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="EletricfieldSkill.h">
+      <Filter>클래스 파일\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="KirbySkill.h">
+      <Filter>클래스 파일\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="KunaiSkill.h">
+      <Filter>클래스 파일\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="MaberoaSkill.h">
+      <Filter>클래스 파일\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="MagicarrowSkill.h">
+      <Filter>클래스 파일\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaknightSkill.h">
+      <Filter>클래스 파일\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="TornadoSkill.h">
+      <Filter>클래스 파일\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Kirby_SupernovaVanguard\Kirby_SupernovaVanguard\Skill.h">
+      <Filter>클래스 파일\Object\Skill</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

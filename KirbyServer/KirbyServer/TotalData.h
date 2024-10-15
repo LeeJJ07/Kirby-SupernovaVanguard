@@ -9,6 +9,18 @@ enum DATATYPE {
 	ITEMTYPE = 'i'
 };
 
+enum SKILLTYPE {
+	KIRBYSKILL = 0,
+	METAKNIGHTSKILL,
+	DEDEDESKILL,
+	MABEROASKILL,
+	ELECTRICFIELDSKILL,
+	KUNAISKILL,
+	MAGICARROWSKILL,
+	TORNADOSKILL,
+	TRUCKSKILL
+};
+
 struct OBJECTDATA
 {
 	char dataType;
@@ -25,7 +37,12 @@ struct PLAYERDATA : public OBJECTDATA
 	bool inGameStart;
 };
 
-struct MONSTERDATA :public OBJECTDATA
+struct SKILLDATA
+{
+
+};
+
+struct MONSTERDATA : public OBJECTDATA
 {
 	int targetnum;
 	EMonsterType monstertype;
