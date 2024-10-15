@@ -128,29 +128,45 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ActionData.h" />
+    <ClInclude Include="Boss.h" />
     <ClInclude Include="Circle2D.h" />
     <ClInclude Include="Collider2D.h" />
+    <ClInclude Include="FireManMonster.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GaoGao.h" />
     <ClInclude Include="KirbyServer.h" />
+    <ClInclude Include="KungFuMan.h" />
+    <ClInclude Include="LandMineMonster.h" />
     <ClInclude Include="Monster.h" />
     <ClInclude Include="Multithread.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Rectangle2D.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="RunnerMonster.h" />
     <ClInclude Include="Socket.h" />
+    <ClInclude Include="SpearMonster.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TotalData.h" />
+    <ClInclude Include="WingBugMonster.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Boss.cpp" />
     <ClCompile Include="Circle2D.cpp" />
     <ClCompile Include="Collider2D.cpp" />
+    <ClCompile Include="FireManMonster.cpp" />
+    <ClCompile Include="GaoGao.cpp" />
     <ClCompile Include="KirbyServer.cpp" />
+    <ClCompile Include="KungFuMan.cpp" />
+    <ClCompile Include="LandMineMonster.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="RunnerMonster.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="PlayerData.cpp" />
+    <ClCompile Include="SpearMonster.cpp" />
+    <ClCompile Include="WingBugMonster.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KirbyServer.rc" />

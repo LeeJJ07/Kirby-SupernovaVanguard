@@ -351,8 +351,8 @@ void DoubleBuffering(HDC hdc)
 
 	DrawCamera(bufferdc);
 
-	if (isDrawCollider)
-		DrawCollider(bufferdc);
+	/*if (isDrawCollider)
+		DrawCollider(bufferdc);*/
 
 	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, bufferdc, cLeft, cTop, SRCCOPY);
 
@@ -375,7 +375,7 @@ void DrawCamera(HDC hdc)
 			((Player*)objArr[i])->DrawPlayer(hdc);
 			break;
 		case MONSTER:
-			((Monster*)objArr[i])->DrawMonster(hdc);
+			((Monster*)objArr[i])->Draw(hdc);
 			break;
 		case PMISSILE:
 			break;
@@ -391,7 +391,7 @@ void DrawCollider(HDC& hdc)
 {
 	for (int i = 0; i < objnum; i++)
 	{
-		objArr[i]->GetCollider()->DrawCollider(hdc);
+		/*objArr[i]->GetCollider()->DrawCollider(hdc);*/
 	}
 }
 

@@ -9,7 +9,7 @@ private:
 	int radius;
 public:
 	Circle2D(int r = BASERADIUS) : Collider2D(), radius(r) {}
-	Circle2D(bool isTrigger, short type) : Collider2D(isTrigger, type), radius(BASERADIUS) {}
+	Circle2D(bool isTrigger, ColliderType type) : Collider2D(isTrigger, type), radius(BASERADIUS) {}
 	~Circle2D() {};
 
 	void SetRadius(int r) { radius = r; }

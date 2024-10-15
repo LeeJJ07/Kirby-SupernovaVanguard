@@ -1,6 +1,7 @@
 #include "Monster.h"
 
 int monsterCount;
+
 //
 //void Monster::Generate()
 //{
@@ -8,8 +9,3 @@ int monsterCount;
 //	vMonster.push_back(nMonster);
 //	monsterCount++;
 //}
-
-void Monster::DrawMonster(HDC&)
-{
-
-}

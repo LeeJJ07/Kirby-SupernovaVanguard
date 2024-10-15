@@ -6,11 +6,11 @@ class Player;
 
 enum ColliderType
 {
-	TERRAIN = 0,
-	PLAYER = 1,
-	MONSTER = 2,
-	PMISSILE = 3,
-	EMISSILE = 4,
+	TERRAIN		= 0,
+	PLAYER		= 1,
+	MONSTER		= 2,
+	PMISSILE	= 3,
+	EMISSILE	= 4,
 };
 
 class Collider2D
@@ -18,13 +18,13 @@ class Collider2D
 private:
 	POINT position;
 	POINT offset;
-	short type;
+	ColliderType type;
 	bool isTrigger;
 
 public:
-	Collider2D() : position({ 0,0 }), offset({ 0,0 }), type(0), isTrigger(false) {}
-	Collider2D(bool trigger, short _type) : position({ 0,0 }), offset({ 0,0 }), type(_type), isTrigger(trigger) {}
-	Collider2D(POINT c, POINT _offset = { 0,0 }, short t = 0, bool trigger = false) : position(c), offset(_offset), type(t), isTrigger(trigger) {}
+	Collider2D() : position({ 0,0 }), offset({ 0,0 }), type(TERRAIN), isTrigger(false) {}
+	Collider2D(bool trigger, ColliderType _type) : position({ 0,0 }), offset({ 0,0 }), type(_type), isTrigger(trigger) {}
+	Collider2D(POINT c, POINT _offset = { 0,0 }, ColliderType t = TERRAIN, bool trigger = false) : position(c), offset(_offset), type(t), isTrigger(trigger) {}
 	~Collider2D() {}
 
 	POINT	GetPosition()const { return position; }

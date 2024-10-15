@@ -79,6 +79,30 @@
     <ClInclude Include="Rectangle2D.h">
       <Filter>클래스 파일\Collider\Rectangle</Filter>
     </ClInclude>
+    <ClInclude Include="WingBugMonster.h">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="FireManMonster.h">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="GaoGao.h">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="KungFuMan.h">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="LandMineMonster.h">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="RunnerMonster.h">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="SpearMonster.h">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss.h">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KirbyServer.cpp">
@@ -104,6 +128,30 @@
     </ClCompile>
     <ClCompile Include="Circle2D.cpp">
       <Filter>클래스 파일\Collider\Circle</Filter>
+    </ClCompile>
+    <ClCompile Include="FireManMonster.cpp">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="GaoGao.cpp">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="KungFuMan.cpp">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="LandMineMonster.cpp">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="RunnerMonster.cpp">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="SpearMonster.cpp">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="WingBugMonster.cpp">
+      <Filter>클래스 파일\Object\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss.cpp">
+      <Filter>클래스 파일\Object\Monster</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

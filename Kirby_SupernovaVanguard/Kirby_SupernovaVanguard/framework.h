@@ -18,7 +18,12 @@
 #pragma comment(lib, "msimg32.lib")
 
 #define PAIR std::pair<double,double>
-#define PLAYERNUM 4
-#define MONSTERNUM 100
+#define PLAYERNUM			4
+#define MONSTERNUM			100
 
 extern short myID;
+
+// >> : 몬스터
+#define BASE_DAMAGE			10
+#define BASE_HEALTH			50
+#define BASE_SPEED			1	

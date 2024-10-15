@@ -14,7 +14,7 @@ using namespace std;
 
 enum State { RECEIVE, SEND };
 
-Object** objArr;
+std::vector<Monster*> monsterArr(MONSTERNUM);
 
 typedef struct sendData
 {
@@ -46,7 +46,7 @@ void ReadData();
 void UpdateMonster();
 void GenerateMonster();
 void CloseClient(SOCKET socket);
-void SetMonsterData(MONSTERDATA& mData);
+void SetMonsterData(MONSTERDATA& mData, Monster*& m);
 void InitUserData(PLAYERDATA& userData, int id);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 
@@ -159,6 +159,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case TIMER_01:
 			UpdateMonster();
+
 			SendToAll();
 			break;
 		case TIMER_GENERATEMONSTER:
@@ -235,7 +236,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -356,13 +357,38 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData)
 	}
 }
 
-void SetMonsterData(MONSTERDATA& mData)
+void SetMonsterData(MONSTERDATA& mData, Monster*& m)
 {
-	Monster* nMonster = new Monster({ rand() % 200,rand() % 400 });
+	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+	switch (mType)
+	{
+	case RUNNER:
+		m = new RunnerMonster({ rand() % 200,rand() % 400 }, mType, CHASE,
+			RUNNER_BASE_DAMAGE, RUNNER_BASE_HEALTH, RUNNER_BASE_SPEED, TRUE);
+		break;
+	case SPEAR:
+		m = new SpearMonster({ rand() % 200,rand() % 400 }, mType, CHASE,
+			SPEAR_BASE_DAMAGE, SPEAR_BASE_HEALTH, SPEAR_BASE_SPEED, TRUE);
+		break;
+	case WINGBUG:
+		m = new WingBugMonster({ rand() % 200,rand() % 400 }, mType, CHASE,
+			WINGBUG_BASE_DAMAGE, WINGBUG_BASE_HEALTH, WINGBUG_BASE_SPEED, TRUE);
+		break;
+	case FIREMAN:
+		m = new FireManMonster({ rand() % 200,rand() % 400 }, mType, CHASE,
+			FIREMAN_BASE_DAMAGE, FIREMAN_BASE_HEALTH, FIREMAN_BASE_SPEED, TRUE);
+		break;
+	case LANDMINE:
+		m = new LandMineMonster({ rand() % 200,rand() % 400 }, mType, CHASE,
+			LANDMINE_BASE_DAMAGE, LANDMINE_BASE_HEALTH, LANDMINE_BASE_SPEED, TRUE);
+		break;
+	}
+	
 	monsterCount++;
 
 	mData.dataType = MONSTERTYPE;
-	mData.pos = nMonster->GetPosition();
+	mData.pos = m->GetPosition();
+	mData.monsterType = mType;
 }
 
 void GenerateMonster()
@@ -371,7 +397,7 @@ void GenerateMonster()
 	{
 		if (totalData.mdata[i].dataType == 0)
 		{
-			SetMonsterData(totalData.mdata[i]);
+			SetMonsterData(totalData.mdata[i], monsterArr[i]);
 			return;
 		}
 	}
@@ -394,7 +420,9 @@ void UpdateMonster()
 
 			totalData.mdata[i].t1_targeting = std::chrono::high_resolution_clock::now();
 		}
+		monsterArr[i]->Update();
 
+		// 수정 필요
 		int x = 0, y = 0;
 
 		if (totalData.mdata[i].pos.x > totalData.udata[totalData.mdata[i].targetnum].pos.x)

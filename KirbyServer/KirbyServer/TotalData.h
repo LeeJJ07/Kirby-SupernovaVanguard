@@ -2,6 +2,14 @@
 
 #include "Player.h"
 #include "Monster.h"
+#include "RunnerMonster.h"
+#include "SpearMonster.h"
+#include "WingBugMonster.h"
+#include "FireManMonster.h"
+#include "LandMineMonster.h"
+#include "KungFuMan.h"
+#include "GaoGao.h"
+#include "Boss.h"
 
 enum DATATYPE {
 	PLAYERTYPE = 'p',
@@ -28,7 +36,7 @@ struct PLAYERDATA : public OBJECTDATA
 struct MONSTERDATA :public OBJECTDATA
 {
 	int targetnum;
-	EMonsterType monstertype;
+	EMonsterType monsterType;
 
 	std::chrono::high_resolution_clock::time_point t1_targeting;
 	std::chrono::high_resolution_clock::time_point t2_targeting;

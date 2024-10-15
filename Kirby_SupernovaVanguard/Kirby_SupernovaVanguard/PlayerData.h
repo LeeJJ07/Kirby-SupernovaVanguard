@@ -1,7 +1,9 @@
 #pragma once
 
 #include "Player.h"
-#include "Monster.h"
+//#include "Monster.h"
+
+enum EMonsterType;
 
 struct OBJECTDATA
 {
@@ -22,7 +24,7 @@ struct PLAYERDATA :public OBJECTDATA
 struct MONSTERDATA :public OBJECTDATA
 {
 	int targetnum;
-	enum EMonsterType monstertype;
+	EMonsterType monsterType;
 
 	std::chrono::high_resolution_clock::time_point t1_targeting;
 	std::chrono::high_resolution_clock::time_point t2_targeting;
