@@ -24,7 +24,7 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void DoubleBuffering(HDC, std::vector<Object*>);
-void DrawCamera(HDC);
+void DrawObject(HDC);
 void DrawCollider(HDC&);
 void InitObjArr();
 unsigned __stdcall Paint(HWND);
@@ -43,6 +43,11 @@ CRITICAL_SECTION cs;
 
 // >> : Map
 HBITMAP hImage;
+static HDC memdc;
+static HBITMAP mapBit, oldMemBitmap;
+
+static HDC bufferdc;
+static HBITMAP oldBufferBitmap, bufferBitmap;
 // <<
 
 // >> : move
@@ -318,6 +323,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		KillTimer(hWnd, TIMER_START);
 		KillTimer(hWnd, TIMER_SELECT);
 		CloseClient(cSocket, vClient, myID);
+
+		SelectObject(memdc, oldMemBitmap);
+		DeleteDC(memdc);
+		SelectObject(bufferdc, oldBufferBitmap);
+		DeleteDC(bufferdc);
+
+		DeleteObject(mapBit);
+		DeleteObject(bufferBitmap);
+
 		PostQuitMessage(0);
 		break;
 	default:
@@ -328,42 +342,34 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 void DoubleBuffering(HDC hdc)
 {
-	HDC memdc, bufferdc;
-	static HBITMAP  mapBit, oldBit;
-
 	int cTop = camera.GetCameraPos().y - CAMERA_HEIGHT / 2;
 	int cLeft = camera.GetCameraPos().x - CAMERA_WIDTH / 2;
 
-	memdc = CreateCompatibleDC(hdc);
-	bufferdc = CreateCompatibleDC(hdc);
-	//hBit = CreateCompatibleBitmap(hdc, CAMERA_WIDTH, CAMERA_HEIGHT);
-	mapBit = CreateCompatibleBitmap(hdc, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y);
+	if (mapBit == NULL)
+	{
+		memdc = CreateCompatibleDC(hdc);
+		mapBit = CreateCompatibleBitmap(hdc, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y);
+		oldMemBitmap = (HBITMAP)SelectObject(memdc, mapBit);
 
-	oldBit = (HBITMAP)SelectObject(bufferdc, mapBit);
-	HBRUSH hBrush = (HBRUSH)GetStockObject(WHITE_BRUSH);
-	RECT rect = { 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y };
+		SelectObject(memdc, hImage);
+		BitBlt(memdc, 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y, memdc, 0, 0, SRCCOPY);
 
-	//FillRect(memdc, &rect, hBrush);
+		bufferdc = CreateCompatibleDC(hdc);
+		bufferBitmap = CreateCompatibleBitmap(hdc, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y);
+		oldBufferBitmap = (HBITMAP)SelectObject(bufferdc, bufferBitmap);
+	}
 
-	SelectObject(memdc, hImage);
-	//BitBlt(hdc, 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y, memdc, 0, 0, SRCCOPY);
-	BitBlt(bufferdc, 0, 0, MAX_MAP_SIZE_X, MAX_MAP_SIZE_Y, memdc, 0, 0, SRCCOPY);
+	BitBlt(bufferdc, cLeft, cTop, CAMERA_WIDTH, CAMERA_HEIGHT, memdc, cLeft, cTop, SRCCOPY);
 
-	DrawCamera(bufferdc);
+	DrawObject(bufferdc);
 
 	/*if (isDrawCollider)
 		DrawCollider(bufferdc);*/
 
 	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, bufferdc, cLeft, cTop, SRCCOPY);
-
-	SelectObject(bufferdc, oldBit);
-	DeleteDC(memdc);
-	DeleteDC(bufferdc);
-	//DeleteObject(hBit);
-	DeleteObject(mapBit);
 }
 
-void DrawCamera(HDC hdc)
+void DrawObject(HDC hdc)
 {
 	for (int i = 0; i < objnum; i++)
 	{

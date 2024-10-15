@@ -127,16 +127,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Kirby_SupernovaVanguard\Kirby_SupernovaVanguard\Skill.h" />
     <ClInclude Include="ActionData.h" />
     <ClInclude Include="Boss.h" />
     <ClInclude Include="Circle2D.h" />
     <ClInclude Include="Collider2D.h" />
+<<<<<<< HEAD
     <ClInclude Include="FireManMonster.h" />
+=======
+    <ClInclude Include="DededeSkill.h" />
+    <ClInclude Include="EletricfieldSkill.h" />
+>>>>>>> d9b0720317de6dd85875dd9621a007c35b27a414
     <ClInclude Include="framework.h" />
     <ClInclude Include="GaoGao.h" />
     <ClInclude Include="KirbyServer.h" />
+<<<<<<< HEAD
     <ClInclude Include="KungFuMan.h" />
     <ClInclude Include="LandMineMonster.h" />
+=======
+    <ClInclude Include="KirbySkill.h" />
+    <ClInclude Include="KunaiSkill.h" />
+    <ClInclude Include="MaberoaSkill.h" />
+    <ClInclude Include="MagicarrowSkill.h" />
+    <ClInclude Include="MetaknightSkill.h" />
+>>>>>>> d9b0720317de6dd85875dd9621a007c35b27a414
     <ClInclude Include="Monster.h" />
     <ClInclude Include="Multithread.h" />
     <ClInclude Include="Object.h" />
@@ -147,8 +161,13 @@
     <ClInclude Include="Socket.h" />
     <ClInclude Include="SpearMonster.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TornadoSkill.h" />
     <ClInclude Include="TotalData.h" />
+<<<<<<< HEAD
     <ClInclude Include="WingBugMonster.h" />
+=======
+    <ClInclude Include="TruckSkill.h" />
+>>>>>>> d9b0720317de6dd85875dd9621a007c35b27a414
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Boss.cpp" />
