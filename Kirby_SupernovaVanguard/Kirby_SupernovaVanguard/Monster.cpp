@@ -40,6 +40,9 @@ void Monster::Draw(HDC& hdc)
     // 이전 브러시 복원 및 브러시 삭제
     SelectObject(hdc, oldBrush);
     DeleteObject(brush);
+
+    // 추가 코드 index 관리
+    // drawIndex = (drawIndex + 1)% (현재 애니메이션의 크기)
 }
 
 void Monster::ObjectUpdate(TOTALDATA mData, int i)
@@ -48,4 +51,10 @@ void Monster::ObjectUpdate(TOTALDATA mData, int i)
 	GetCollider()->SetOffset(mData.mdata[i].offset);
     
     SetMonsterType(mData.mdata[i].monsterType);
+    
+    if (curState != mData.mdata[i].curState)
+    {
+        drawIndex = 0;
+        SetMonsterState(mData.mdata[i].curState);
+    }
 }

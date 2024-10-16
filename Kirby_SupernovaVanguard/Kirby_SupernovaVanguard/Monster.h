@@ -9,14 +9,17 @@ class Monster : public Object
 {
 private:
 	EMonsterType monsterType;
+	EMonsterState curState;
 
 	int damage;
 	int maxHealth;
 	int curHealth;
 	float speed;
 
+	int drawIndex;
+
 public:
-	Monster() : monsterType(RUNNER), Object()
+	Monster() : monsterType(RUNNER), curState(CHASE), Object(), drawIndex(0)
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
@@ -26,7 +29,7 @@ public:
 		this->curHealth = this->maxHealth;
 		this->speed = BASE_SPEED;
 	}
-	Monster(POINT p) : monsterType(RUNNER), Object(p)
+	Monster(POINT p) : monsterType(RUNNER), curState(CHASE), Object(p), drawIndex(0)
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
@@ -37,8 +40,8 @@ public:
 		this->speed = BASE_SPEED;
 
 	}
-	Monster(POINT p, EMonsterType a, int damage, int maxHealth, float speed)
-		: monsterType(a), Object(p)
+	Monster(POINT p, EMonsterType a, EMonsterState s, int damage, int maxHealth, float speed)
+		: monsterType(a), curState(s), Object(p), drawIndex(0)
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
@@ -47,11 +50,14 @@ public:
 		this->maxHealth = maxHealth;
 		this->curHealth = this->maxHealth;
 		this->speed = speed;
+
 	}
 
 	EMonsterType GetMonsterType() { return monsterType; }
+	EMonsterState GetMonsterState() { return curState; }
 
 	void SetMonsterType(EMonsterType monsterType) { this->monsterType = monsterType; }
+	void SetMonsterState(EMonsterState nextState) { this->curState = nextState; }
 
 	int GetDamage() { return damage; }
 	int GetMaxHealth() { return maxHealth; }
@@ -61,6 +67,9 @@ public:
 	void SetMaxHealth(int maxHealth) { this->maxHealth = maxHealth;}
 	void SetCurHealth(int curHealth) { this->curHealth = curHealth; }
 	void SetSpeed(float speed) { this->speed = speed; }
+
+	int GetDrawIndex() { return drawIndex; }
+	void SetDrawIndex(int idx) { this->drawIndex = idx; }
 
 	void OnHit(int playerDamage)
 	{
@@ -73,5 +82,5 @@ public:
 	}
 
 	void Draw(HDC&);
-	void ObjectUpdate(TOTALDATA, int i); // 이게 어떤거징?
+	void ObjectUpdate(TOTALDATA, int i);
 };

@@ -23,9 +23,15 @@
 #include <cmath>
 #include <time.h>
 
+#define SCREEN_SIZE_X 1920
+#define SCREEN_SIZE_Y 1200
+
+#define DEFAULT_SPAWN_SIZE_X 50
+#define DEFAULT_SPAWN_SIZE_Y 50
+
 #define PAIR std::pair<double,double>
 #define PLAYERNUM					4
-#define MONSTERNUM					100
+#define MONSTERNUM					1000
 #define RETARGETINGTIME				1
 
 

@@ -19,7 +19,7 @@
 
 #define PAIR std::pair<double,double>
 #define PLAYERNUM			4
-#define MONSTERNUM			100
+#define MONSTERNUM			1000
 
 extern short myID;
 

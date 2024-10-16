@@ -37,6 +37,7 @@ struct MONSTERDATA :public OBJECTDATA
 {
 	int targetnum;
 	EMonsterType monsterType;
+	EMonsterState curState;
 
 	std::chrono::high_resolution_clock::time_point t1_targeting;
 	std::chrono::high_resolution_clock::time_point t2_targeting;

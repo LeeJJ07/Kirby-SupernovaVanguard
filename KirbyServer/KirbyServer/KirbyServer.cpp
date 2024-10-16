@@ -13,6 +13,7 @@
 using namespace std;
 
 enum State { RECEIVE, SEND };
+enum Direction { UP, RIGHT, DOWN, LEFT };
 
 std::vector<Monster*> monsterArr(MONSTERNUM);
 
@@ -44,9 +45,11 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
 void SendToAll();
 void ReadData();
 void UpdateMonster();
-void GenerateMonster();
+void GenerateMonster(int playerIdx);
 void CloseClient(SOCKET socket);
-void SetMonsterData(MONSTERDATA& mData, Monster*& m);
+void SetMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx);
+bool IsValidSpawnPos(int playerIdx, POINT pos);
+POINT SetRandomSpawnPos(int playerIdx);
 void InitUserData(PLAYERDATA& userData, int id);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 
@@ -166,7 +169,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (isGenerateMonster)
 			{
-				GenerateMonster();
+				for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
+				{
+					if (totalData.udata[pIdx].dataType == 0)
+						break;
+					GenerateMonster(pIdx);
+				}
 
 				SendToAll();
 			}
@@ -215,8 +223,8 @@ int InitServer(HWND hWnd)
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	
-	int sendBufSize = 8192 * 2;  // 송신 버퍼 크기 (예: 8KB)
-	int recvBufSize = 8192 * 2;  // 수신 버퍼 크기 (예: 8KB)
+	int sendBufSize = 81920 * 2;  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = 81920 * 2;  // 수신 버퍼 크기 (예: 8KB)
 
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -236,7 +244,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -357,29 +365,35 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData)
 	}
 }
 
-void SetMonsterData(MONSTERDATA& mData, Monster*& m)
+void SetMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx)
 {
+	POINT generatePos = SetRandomSpawnPos(playerIdx);
+
+	if (!IsValidSpawnPos(playerIdx, generatePos))
+		return;
+
 	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+
 	switch (mType)
 	{
 	case RUNNER:
-		m = new RunnerMonster({ rand() % 200,rand() % 400 }, mType, CHASE,
+		m = new RunnerMonster(generatePos, mType, CHASE,
 			RUNNER_BASE_DAMAGE, RUNNER_BASE_HEALTH, RUNNER_BASE_SPEED, TRUE);
 		break;
 	case SPEAR:
-		m = new SpearMonster({ rand() % 200,rand() % 400 }, mType, CHASE,
+		m = new SpearMonster(generatePos, mType, CHASE,
 			SPEAR_BASE_DAMAGE, SPEAR_BASE_HEALTH, SPEAR_BASE_SPEED, TRUE);
 		break;
 	case WINGBUG:
-		m = new WingBugMonster({ rand() % 200,rand() % 400 }, mType, CHASE,
+		m = new WingBugMonster(generatePos, mType, CHASE,
 			WINGBUG_BASE_DAMAGE, WINGBUG_BASE_HEALTH, WINGBUG_BASE_SPEED, TRUE);
 		break;
 	case FIREMAN:
-		m = new FireManMonster({ rand() % 200,rand() % 400 }, mType, CHASE,
+		m = new FireManMonster(generatePos, mType, CHASE,
 			FIREMAN_BASE_DAMAGE, FIREMAN_BASE_HEALTH, FIREMAN_BASE_SPEED, TRUE);
 		break;
 	case LANDMINE:
-		m = new LandMineMonster({ rand() % 200,rand() % 400 }, mType, CHASE,
+		m = new LandMineMonster(generatePos, mType, CHASE,
 			LANDMINE_BASE_DAMAGE, LANDMINE_BASE_HEALTH, LANDMINE_BASE_SPEED, TRUE);
 		break;
 	}
@@ -391,13 +405,60 @@ void SetMonsterData(MONSTERDATA& mData, Monster*& m)
 	mData.monsterType = mType;
 }
 
-void GenerateMonster()
+bool IsValidSpawnPos(int playerIdx, POINT pos)
+{
+	for (int i = 0; i < PLAYERNUM; i++)
+	{
+		if (playerIdx == i || totalData.udata[i].dataType == 0)
+			continue;
+
+		int distance = pow(totalData.udata[i].pos.x - pos.x, 2) + pow(totalData.udata[i].pos.y - pos.y, 2);
+
+		if (distance < SCREEN_SIZE_Y / 2 * SCREEN_SIZE_Y / 2)
+			return false;
+	}
+	return true;
+}
+
+POINT SetRandomSpawnPos(int playerIdx)
+{
+	POINT generatePos = { totalData.udata[playerIdx].pos.x, totalData.udata[playerIdx].pos.y };
+	Direction spawnDir = (Direction)(rand() % 4);
+	int randX = 0, randY = 0;
+	
+	switch (spawnDir)
+	{
+	case UP:
+		randX = rand() % SCREEN_SIZE_X;
+		randY = -(SCREEN_SIZE_Y + DEFAULT_SPAWN_SIZE_Y);
+		break;
+	case DOWN:
+		randX = rand() % SCREEN_SIZE_X;
+		randY = (SCREEN_SIZE_Y + DEFAULT_SPAWN_SIZE_Y);
+		break;
+	case RIGHT:
+		randX = (SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
+		randY = rand() % SCREEN_SIZE_Y;
+		break;
+	case LEFT:
+		randX = -(SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
+		randY = rand() % SCREEN_SIZE_Y;
+		break;
+	}
+
+	generatePos.x += randX;
+	generatePos.y += randY;
+
+	return generatePos;
+}
+
+void GenerateMonster(int playerIdx)
 {
 	for (int i = 0; i < MONSTERNUM; i++)
 	{
 		if (totalData.mdata[i].dataType == 0)
 		{
-			SetMonsterData(totalData.mdata[i], monsterArr[i]);
+			SetMonsterData(totalData.mdata[i], monsterArr[i], playerIdx);
 			return;
 		}
 	}
