@@ -24,7 +24,7 @@
 
 #define PAIR std::pair<double,double>
 #define PLAYERNUM 4
-#define MONSTERNUM 100
+#define MONSTERNUM 1000
 #define SKILLNUM 100
 #define SKILLARR 6
 

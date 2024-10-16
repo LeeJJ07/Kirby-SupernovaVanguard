@@ -24,8 +24,9 @@ HANDLE hThreads[2];
 
 // << : skill
 vector<Skill*> vSkill(SKILLNUM);
+void GenerateSkill();
 void UpdateSkill();
-void SetBasisSkillData(PLAYERDATA& uData, int i);
+void SetBasisKirbySkillInDatasheet(Skill*);
 void SetSkillData(PLAYERDATA& uData, int index);
 // <<
 
@@ -391,7 +392,7 @@ void SetSkillData(PLAYERDATA& uData, int index)
 	switch (uData.skilltype[index])
 	{
 	case SKILLTYPE::KIRBY:
-		SetBasisKirbySkill(uData.id,skillnum);
+		SetBasisKirbySkillInDatasheet(uData.id,skillnum);
 		break;
 	case SKILLTYPE::METAKNIGHT:
 
