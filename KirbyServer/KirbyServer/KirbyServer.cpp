@@ -414,7 +414,7 @@ bool IsValidSpawnPos(int playerIdx, POINT pos)
 
 		int distance = pow(totalData.udata[i].pos.x - pos.x, 2) + pow(totalData.udata[i].pos.y - pos.y, 2);
 
-		if (distance < SCREEN_SIZE_Y / 2 * SCREEN_SIZE_Y / 2)
+		if (distance < SCREEN_SIZE_Y / 4 * SCREEN_SIZE_Y / 4)
 			return false;
 	}
 	return true;
