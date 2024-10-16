@@ -22,8 +22,8 @@ int InitClient(HWND hWnd, SOCKET &s)
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 
-	int sendBufSize = 8192 * 2;  // 송신 버퍼 크기 (예: 8KB)
-	int recvBufSize = 8192 * 2;  // 수신 버퍼 크기 (예: 8KB)
+	int sendBufSize = 81920 * 2;  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = 81920 * 2;  // 수신 버퍼 크기 (예: 8KB)
 	
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -107,7 +107,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 	LeaveCriticalSection(&cs);
 }
 
-void ReadInitMessage(SOCKET& s, TOTALDATA& uD)
+bool ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 {
 	int totalBytesReceived = 0; // 총 수신한 바이트 수
 	int bytesToReceive = sizeof(TOTALDATA); // 수신할 데이터 크기
@@ -121,15 +121,14 @@ void ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 		if (bytesReceived == SOCKET_ERROR)
 		{
 			MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
-			return;
+			return false;
 		}
 		if (bytesReceived == 0)
 		{
 			// 연결이 종료된 경우
 			MessageBox(NULL, _T("Connection closed"), _T("Error"), MB_OK);
-			return;
+			return false;
 		}
-
 		totalBytesReceived += bytesReceived; // 수신한 바이트 수를 업데이트
 	}
 
@@ -143,6 +142,8 @@ void ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 	}
 
 	myID = num;
+
+	return true;
 }
 
 void CloseClient(SOCKET& s, std::vector<Object*>& p, int id)

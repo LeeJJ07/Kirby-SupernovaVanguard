@@ -127,7 +127,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Kirby_SupernovaVanguard\Kirby_SupernovaVanguard\Skill.h" />
     <ClInclude Include="ActionData.h" />
     <ClInclude Include="Circle2D.h" />
     <ClInclude Include="Collider2D.h" />
@@ -146,6 +145,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Rectangle2D.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Skill.h" />
     <ClInclude Include="SkillManager.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="targetver.h" />

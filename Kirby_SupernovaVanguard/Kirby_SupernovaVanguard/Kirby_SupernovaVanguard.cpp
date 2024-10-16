@@ -218,9 +218,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		InitObjArr();
 
-		hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
-		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
-
 		if (hThreads[0])
 			ResumeThread(hThreads[0]);
 		if (hThreads[1])
@@ -236,7 +233,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case START:
 				if (InitClient(hWnd, cSocket))
 				{
-					ReadInitMessage(cSocket, uData);
+					if (!ReadInitMessage(cSocket, uData))
+						break;
 
 					vClient[myID] = new Player();
 
@@ -252,6 +250,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					t1_move = std::chrono::high_resolution_clock::now();
 					t1_sendCount = std::chrono::high_resolution_clock::now();
 					t1_readCount = std::chrono::high_resolution_clock::now();
+
+					hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
+					hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
 
 					curScene = SELECT;
 				}
@@ -403,7 +404,7 @@ void DrawCollider(HDC& hdc)
 
 void InitObjArr()
 {
-	objArr = new Object * [1000];
+	objArr = new Object * [OBJECTNUM];
 }
 
 unsigned __stdcall Send()

@@ -26,8 +26,8 @@ HANDLE hThreads[2];
 vector<Skill*> vSkill(SKILLNUM);
 void GenerateSkill();
 void UpdateSkill();
-void SetBasisKirbySkillInDatasheet(Skill*);
-void SetSkillData(PLAYERDATA& uData, int index);
+void SetBasisSkillData(int);
+void SetSkillToDatasheet();
 // <<
 
 // << : player
@@ -49,6 +49,7 @@ typedef struct receiveData
 #define TIMER_01 1
 #define TIMER_GENERATEMONSTER 2
 #define TIMER_UPDATESKILL 3
+#define TIMER_GENERATESKILL 4
 
 static int readyclientnum = 0;
 static bool isAllclientReady = false;
@@ -71,7 +72,6 @@ WSADATA wsaData;
 SOCKET s, cs;
 
 vector<SOCKET> socketList;
-TOTALDATA totalData;
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -186,10 +186,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					for (int i = 0; i < socketList.size(); i++)
 					{
-						SetBasisSkillData(totalData.udata[i], i);
+						SetBasisSkillData(i);
 					}
 
 					SetTimer(hWnd, TIMER_UPDATESKILL, 1, NULL);
+					SetTimer(hWnd, TIMER_GENERATESKILL, 5, NULL);
 					isGameStart = true;
 				}
 				GenerateMonster();
@@ -198,11 +199,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 		}
 			break;
-		case TIMER_UPDATESKILL:
-			{
-			UpdateSkill();
-			}
+		case TIMER_GENERATESKILL:
+			GenerateSkill();
 			break;
+		case TIMER_UPDATESKILL:
+		{
+			UpdateSkill();
+			SetSkillToDatasheet();
+		}
+		break;
 		}
 	
 	case WM_CREATE:
@@ -246,8 +251,8 @@ int InitServer(HWND hWnd)
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	
-	int sendBufSize = 8192 * 2;  // 송신 버퍼 크기 (예: 8KB)
-	int recvBufSize = 8192 * 2;  // 수신 버퍼 크기 (예: 8KB)
+	int sendBufSize = 81920 * 2;  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = 81920 * 2;  // 수신 버퍼 크기 (예: 8KB)
 
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -298,7 +303,7 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 	socketList.push_back(cs);
 	totalData.udata[userID] = userData;
 
-	Player* player = new Player();
+	Player* player = new Player(userID);
 	vClient.push_back(player);
 
 	SendToAll();//{ cs , userData }
@@ -376,48 +381,87 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 	uData.charactertype = rData.charactertype;
 }
 
-void SetBasisSkillData(PLAYERDATA& uData, int i)
+void SetBasisSkillData(int playerIndex)
 {
-	KirbySkill* kirbyskill = new KirbySkill(i, 0);
-	SkillManager* skillmanager = new SkillManager(kirbyskill->Getskilltype(), kirbyskill->Getcooltime());
-	vClient[i]->GetSkillManager().push_back(skillmanager);
+	Skill* basisSkill = nullptr;
+	switch (vClient[playerIndex]->GetCharacterType())
+	{
+	case ECharacterType::KIRBY:
+		basisSkill = new KirbySkill(playerIndex, 0);
+		break;
+	case ECharacterType::METANIHGT:
+		break;
+	}
+	SkillManager* skillmanager = new SkillManager(basisSkill->Getskilltype(), basisSkill->Getcooltime());
 
-	totalData.sdata[skillnum].masternum = uData.id;
-
-	SetSkillData(uData, 0);
+	vClient[playerIndex]->GetSkillManager().push_back(skillmanager);
 }
 
-void SetSkillData(PLAYERDATA& uData, int index)
+void GenerateSkill()
 {
-	switch (uData.skilltype[index])
+	for (int i = 0; i < socketList.size(); i++)
 	{
-	case SKILLTYPE::KIRBY:
-		SetBasisKirbySkillInDatasheet(uData.id,skillnum);
-		break;
-	case SKILLTYPE::METAKNIGHT:
+		std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
+		for (int j = 0; j < temp.size(); j++)
+		{
+			temp[j]->Settime_2();
+			
+			double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(temp[j]->Gettime_2() - temp[j]->Gettime_1()).count();
+			
+			if (skillcooltime > temp[j]->Getcooltime())
+			{
+				switch (temp[j]->Gettype())
+				{
+				case SKILLTYPE::KIRBYSKILL:
+				{
+					KirbySkill* kirbySkill = new KirbySkill(i, 0);
+					vSkill.push_back(kirbySkill);
+				}
+					break;
+				case SKILLTYPE::METAKNIGHTSKILL:
+					break;
+				}
+				temp[j]->Settime_1();
+			}
+		}
+	}
+}
 
-		break;
-	case SKILLTYPE::DEDEDE:
+void SetSkillToDatasheet()
+{
+	for (auto skill : vSkill)
+	{
+		switch (skill->Getskilltype())
+		{
+		case SKILLTYPE::KIRBYSKILL:
+			SetBasisKirbySkillInDatasheet(skill, skillnum);
+			break;
+		case SKILLTYPE::METAKNIGHTSKILL:
 
-		break;
-	case SKILLTYPE::MABEROA:
+			break;
+		case SKILLTYPE::DEDEDESKILL:
 
-		break;
-	case SKILLTYPE::ELECTRICFIELD:
+			break;
+		case SKILLTYPE::MABEROASKILL:
 
-		break;
-	case SKILLTYPE::KUNAI:
+			break;
+		case SKILLTYPE::ELECTRICFIELDSKILL:
 
-		break;
-	case SKILLTYPE::MAGICARROW:
+			break;
+		case SKILLTYPE::KUNAISKILL:
 
-		break;
-	case SKILLTYPE::TORNADO:
+			break;
+		case SKILLTYPE::MAGICARROWSKILL:
 
-		break;
-	case SKILLTYPE::TRUCK:
+			break;
+		case SKILLTYPE::TORNADOSKILL:
 
-		break;
+			break;
+		case SKILLTYPE::TRUCKSKILL:
+
+			break;
+		}
+		skillnum++;
 	}
 }
 
@@ -465,35 +509,35 @@ void GenerateMonster()
 
 void UpdateSkill()
 {
-	for (int i = 0; i < vSkill.size(); i++)
+	for (Skill* skill : vSkill)
 	{
-		switch (vSkill[i]->Getskilltype())
+		switch (skill->Getskilltype())
 		{
-		case SKILLTYPE::KIRBY:
-			UpdateKirbySkill(vSkill[i]);
+		case SKILLTYPE::KIRBYSKILL:
+			UpdateKirbySkill(skill);
 			break;
-		case SKILLTYPE::METAKNIGHT:
+		case SKILLTYPE::METAKNIGHTSKILL:
 
 			break;
-		case SKILLTYPE::DEDEDE:
+		case SKILLTYPE::DEDEDESKILL:
 
 			break;
-		case SKILLTYPE::MABEROA:
+		case SKILLTYPE::MABEROASKILL:
 
 			break;
-		case SKILLTYPE::ELECTRICFIELD:
+		case SKILLTYPE::ELECTRICFIELDSKILL:
 
 			break;
-		case SKILLTYPE::KUNAI:
+		case SKILLTYPE::KUNAISKILL:
 
 			break;
-		case SKILLTYPE::MAGICARROW:
+		case SKILLTYPE::MAGICARROWSKILL:
 
 			break;
-		case SKILLTYPE::TORNADO:
+		case SKILLTYPE::TORNADOSKILL:
 
 			break;
-		case SKILLTYPE::TRUCK:
+		case SKILLTYPE::TRUCKSKILL:
 
 			break;
 		}

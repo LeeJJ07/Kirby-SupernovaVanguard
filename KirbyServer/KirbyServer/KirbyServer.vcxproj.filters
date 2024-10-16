@@ -115,11 +115,11 @@
     <ClInclude Include="TornadoSkill.h">
       <Filter>클래스 파일\Object\Skill</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Kirby_SupernovaVanguard\Kirby_SupernovaVanguard\Skill.h">
-      <Filter>클래스 파일\Object\Skill</Filter>
-    </ClInclude>
     <ClInclude Include="SkillManager.h">
       <Filter>클래스 파일\Manager\SkillManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Skill.h">
+      <Filter>클래스 파일\Object\Skill</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
