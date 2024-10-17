@@ -23,8 +23,8 @@ int InitClient(HWND hWnd, SOCKET &s)
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 
-	int sendBufSize = 81920 * 2;  // �۽� ���� ũ�� (��: 8KB)
-	int recvBufSize = 81920 * 2;  // ���� ���� ũ�� (��: 8KB)
+	int sendBufSize = 81920 * 2;
+	int recvBufSize = 81920 * 2;
 	
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -33,7 +33,6 @@ int InitClient(HWND hWnd, SOCKET &s)
 		return 1;
 	}
 
-	// ���� ���� ũ�� ����
 	if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (char*)&recvBufSize, sizeof(recvBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting recv buffer size failed.\n";
 		closesocket(s);
@@ -130,32 +129,26 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 bool ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 {
-	int totalBytesReceived = 0; // �� ������ ����Ʈ ��
-	int bytesToReceive = sizeof(TOTALDATA); // ������ ������ ũ��
+	int totalBytesReceived = 0;
+	int bytesToReceive = sizeof(TOTALDATA);
 	int bytesReceived;
 
 	Sleep(1);
-	// ��� �����͸� ���� ������ �ݺ�
+
 	while (totalBytesReceived < bytesToReceive)
 	{
 		bytesReceived = recv(s, (char*)&uD + totalBytesReceived, bytesToReceive - totalBytesReceived, 0);
 		if (bytesReceived == SOCKET_ERROR)
 		{
-			/*MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
-			return false;*/
 			continue;
 		}
 		if (bytesReceived == 0)
 		{
-			// ������ ����� ���
-			/*MessageBox(NULL, _T("Connection closed"), _T("Error"), MB_OK);
-			return false;*/
 			continue;
 		}
-		totalBytesReceived += bytesReceived; // ������ ����Ʈ ���� ������Ʈ
+		totalBytesReceived += bytesReceived;
 	}
 
-	// uD���� ������ ó��
 	short num = -1;
 	for (int i = 0; i < PLAYERNUM; i++)
 	{

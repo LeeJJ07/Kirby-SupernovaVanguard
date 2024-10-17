@@ -102,6 +102,36 @@
     <ClInclude Include="AllSkill.h">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClInclude>
+    <ClInclude Include="KirbySkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="KunaiSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="MaberoaSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="MagicarrowSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaknightSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="Skill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="TornadoSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="TruckSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="DededeSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="EletricfieldSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Kirby_SupernovaVanguard.ico">

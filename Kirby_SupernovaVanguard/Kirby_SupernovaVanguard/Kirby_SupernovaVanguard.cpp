@@ -393,7 +393,6 @@ void DrawCamera(HDC hdc)
 			break;
 		case PMISSILE:
 			DrawSkill(hdc, (Skill*)objArr[i]);
-			//((Skill*)objArr[i])
 			break;
 		case EMISSILE:
 			break;
@@ -407,7 +406,7 @@ void DrawCollider(HDC& hdc)
 {
 	for (int i = 0; i < objnum; i++)
 	{
-		/*objArr[i]->GetCollider()->DrawCollider(hdc);*/
+		objArr[i]->GetCollider()->DrawCollider(hdc);
 	}
 }
 
