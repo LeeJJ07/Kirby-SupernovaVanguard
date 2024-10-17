@@ -3,6 +3,7 @@
 #include "ActionData.h"
 #include "StartScene.h"
 #include "SelectScene.h"
+#include "AllSkill.h"
 #include "Camera.h"
 #include "Socket.h"
 #include "Map.h"
@@ -24,7 +25,7 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void DoubleBuffering(HDC, std::vector<Object*>);
-void DrawObject(HDC);
+void DrawCamera(HDC);
 void DrawCollider(HDC&);
 void InitObjArr();
 unsigned __stdcall Paint(HWND);
@@ -32,6 +33,7 @@ unsigned __stdcall Send();
 
 std::vector<Object*> vClient(PLAYERNUM);
 std::vector<Object*> vMonster(MONSTERNUM);
+std::vector<Object*> vSkill(SKILLNUM);
 TOTALDATA uData;
 Object** objArr;
 static SOCKET cSocket;
@@ -218,16 +220,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		InitObjArr();
 
-		hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
-		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
-
 		if (hThreads[0])
 			ResumeThread(hThreads[0]);
 		if (hThreads[1])
 			ResumeThread(hThreads[1]);
-
-		break;
 	}
+	break;
 	case WM_CHAR:
 		if (wParam == VK_RETURN/* && canGoToNext*/)
 		{
@@ -236,7 +234,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case START:
 				if (InitClient(hWnd, cSocket))
 				{
-					ReadInitMessage(cSocket, uData);
+					if (!ReadInitMessage(cSocket, uData))
+						break;
 
 					vClient[myID] = new Player();
 
@@ -253,6 +252,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					t1_sendCount = std::chrono::high_resolution_clock::now();
 					t1_readCount = std::chrono::high_resolution_clock::now();
 
+					hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
+					hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
+
 					curScene = SELECT;
 				}
 				break;
@@ -262,6 +264,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 		}
+		break;
 	case WM_LBUTTONDOWN:
 	{
 		cursorX = LOWORD(lParam);
@@ -361,7 +364,12 @@ void DoubleBuffering(HDC hdc)
 
 	BitBlt(bufferdc, cLeft, cTop, CAMERA_WIDTH, CAMERA_HEIGHT, memdc, cLeft, cTop, SRCCOPY);
 
-	DrawObject(bufferdc);
+	CString t;
+
+	t.Format(_T("Render fps : %d %d"), cLeft, cTop);
+	TextOut(bufferdc, 200, 200, t, t.GetLength());
+
+	DrawCamera(bufferdc);
 
 	if (isDrawCollider)
 		DrawCollider(bufferdc);
@@ -369,10 +377,16 @@ void DoubleBuffering(HDC hdc)
 	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, bufferdc, cLeft, cTop, SRCCOPY);
 }
 
-void DrawObject(HDC hdc)
+void DrawCamera(HDC hdc)
 {
 	for (int i = 0; i < objnum; i++)
 	{
+		if (objArr[i]->GetPosition().x < vClient[myID]->GetPosition().x - 1000
+			|| objArr[i]->GetPosition().x > vClient[myID]->GetPosition().x + 1000
+			|| objArr[i]->GetPosition().y < vClient[myID]->GetPosition().y - 650
+			|| objArr[i]->GetPosition().y > vClient[myID]->GetPosition().y + 650)
+			continue;
+
 		switch (objArr[i]->GetCollider()->GetType())
 		{
 		case TERRAIN:
@@ -381,9 +395,10 @@ void DrawObject(HDC hdc)
 			((Player*)objArr[i])->DrawPlayer(hdc);
 			break;
 		case MONSTER:
-			((Monster*)objArr[i])->DrawMonster(hdc);
+			((Monster*)objArr[i])->Draw(hdc);
 			break;
 		case PMISSILE:
+			DrawSkill(hdc, (Skill*)objArr[i]);
 			break;
 		case EMISSILE:
 			break;
@@ -403,7 +418,7 @@ void DrawCollider(HDC& hdc)
 
 void InitObjArr()
 {
-	objArr = new Object * [1000];
+	objArr = new Object * [OBJECTNUM];
 }
 
 unsigned __stdcall Send()

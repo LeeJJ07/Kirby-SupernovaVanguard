@@ -19,8 +19,16 @@
 
 #define PAIR std::pair<double,double>
 #define PLAYERNUM 4
-#define MONSTERNUM 100
+#define MONSTERNUM 1000
 #define SKILLNUM 100
+#define OBJECTNUM 2000
 #define SKILLARR 6
 
+static enum ECharacterType { KIRBY, DDD, METANIHGT, MABEOROA };
+
 extern short myID;
+
+// >> : 몬스터
+#define BASE_DAMAGE			10
+#define BASE_HEALTH			50
+#define BASE_SPEED			1	

@@ -2,7 +2,7 @@
 #include "Object.h"
 #include "PlayerData.h"
 
-enum ECharacterType { KIRBY, DDD, METANIHGT, MABEOROA };
+enum ECharacterType;
 
 class Player : public Object
 {

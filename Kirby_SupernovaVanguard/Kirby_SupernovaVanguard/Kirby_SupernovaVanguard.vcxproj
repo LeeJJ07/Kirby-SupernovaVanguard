@@ -128,14 +128,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ActionData.h" />
+    <ClInclude Include="AllSkill.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Circle2D.h" />
     <ClInclude Include="DededeSkill.h" />
+    <ClInclude Include="EletricfieldSkill.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Collider2D.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="KirbySkill.h" />
     <ClInclude Include="Kirby_SupernovaVanguard.h" />
     <ClInclude Include="KunaiSkill.h" />
+    <ClInclude Include="MaberoaSkill.h" />
     <ClInclude Include="MagicarrowSkill.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MetaknightSkill.h" />
@@ -156,17 +160,15 @@
   <ItemGroup>
     <ClCompile Include="Circle2D.cpp" />
     <ClCompile Include="Collider2D.cpp" />
-    <ClCompile Include="EletricfieldSkill.h" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="KirbySkill.h" />
     <ClCompile Include="Kirby_SupernovaVanguard.cpp" />
-    <ClCompile Include="MaberoaSkill.h" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Multithread.h" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SelectScene.cpp" />
+    <ClCompile Include="Skill.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="StartScene.cpp" />
     <ClCompile Include="PlayerData.cpp" />

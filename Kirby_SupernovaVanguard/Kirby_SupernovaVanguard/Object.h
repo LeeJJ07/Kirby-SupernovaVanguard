@@ -7,7 +7,7 @@ class Collider2D;
 
 class Object
 {
-private:
+protected:
 	POINT position;
 	PAIR lookingDirection;
 
@@ -15,7 +15,10 @@ private:
 
 	Collider2D* collider;
 public:
-	Object() :position({ 0,0 }), lookingDirection({ 1,0 }), isInGame(false), collider(nullptr) {}
+	Object() :position({ 0,0 }), lookingDirection({ 1,0 }), isInGame(false), collider(nullptr)
+	{
+	
+	}
 	Object(POINT p) :position(p), lookingDirection({ 1,0 }), isInGame(false), collider(nullptr) {}
 	~Object() { delete collider; }
 

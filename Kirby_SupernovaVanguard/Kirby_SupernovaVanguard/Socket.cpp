@@ -3,6 +3,7 @@
 #include "ActionData.h"
 #include "Multithread.h"
 #include "Camera.h"
+#include "KirbySkill.h"
 
 short myID;
 int textreadCount;
@@ -22,8 +23,8 @@ int InitClient(HWND hWnd, SOCKET &s)
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 
-	int sendBufSize = 8192 * 2;  // 송신 버퍼 크기 (예: 8KB)
-	int recvBufSize = 8192 * 2;  // 수신 버퍼 크기 (예: 8KB)
+	int sendBufSize = sizeof(TOTALDATA);  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = sizeof(TOTALDATA);  // 수신 버퍼 크기 (예: 8KB)
 	
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -32,7 +33,6 @@ int InitClient(HWND hWnd, SOCKET &s)
 		return 1;
 	}
 
-	// 수신 버퍼 크기 설정
 	if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (char*)&recvBufSize, sizeof(recvBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting recv buffer size failed.\n";
 		closesocket(s);
@@ -60,7 +60,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 	int bytesReceived = recv(s, (char*)&pD, sizeof(TOTALDATA), 0);
 
-	if (bytesReceived > 0)
+	if (bytesReceived > sizeof(TOTALDATA) - 50)
 	{
 		readCount++;
 
@@ -86,7 +86,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		for (int i = 0; i < MONSTERNUM; i++)
 		{
 			if (pD.mdata[i].dataType == 0)
-				continue;
+				break;
 
 			if (!vMonster[i])
 			{
@@ -98,6 +98,26 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
 		}
 
+		for (int i = 0; i < SKILLNUM; i++)
+		{
+			if (pD.sdata[i].skilltype == 0)
+				break;
+
+			if (!vSkill[i])
+			{
+				switch (pD.sdata[i].skilltype)
+				{
+				case KIRBYSKILL:
+					vSkill[i] = new KirbySkill();
+					break;
+				}
+				CreateObject((Skill*)vSkill[i]);
+			}
+
+			vSkill[i]->ObjectUpdate(pD, i);
+			vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());
+		}
+
 		if (timeSpan_readCount.count() >= 1)
 		{
 			CountReadNum();
@@ -107,33 +127,28 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 	LeaveCriticalSection(&cs);
 }
 
-void ReadInitMessage(SOCKET& s, TOTALDATA& uD)
+bool ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 {
-	int totalBytesReceived = 0; // 총 수신한 바이트 수
-	int bytesToReceive = sizeof(TOTALDATA); // 수신할 데이터 크기
+	int totalBytesReceived = 0;
+	int bytesToReceive = sizeof(TOTALDATA);
 	int bytesReceived;
 
 	Sleep(1);
-	// 모든 데이터를 받을 때까지 반복
+
 	while (totalBytesReceived < bytesToReceive)
 	{
 		bytesReceived = recv(s, (char*)&uD + totalBytesReceived, bytesToReceive - totalBytesReceived, 0);
 		if (bytesReceived == SOCKET_ERROR)
 		{
-			MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
-			return;
+			continue;
 		}
 		if (bytesReceived == 0)
 		{
-			// 연결이 종료된 경우
-			MessageBox(NULL, _T("Connection closed"), _T("Error"), MB_OK);
-			return;
+			continue;
 		}
-
-		totalBytesReceived += bytesReceived; // 수신한 바이트 수를 업데이트
+		totalBytesReceived += bytesReceived;
 	}
 
-	// uD에서 데이터 처리
 	short num = -1;
 	for (int i = 0; i < PLAYERNUM; i++)
 	{
@@ -141,8 +156,9 @@ void ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 			break;
 		num++;
 	}
-
 	myID = num;
+
+	return true;
 }
 
 void CloseClient(SOCKET& s, std::vector<Object*>& p, int id)

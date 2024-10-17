@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Player.h"
+//#include "Monster.h"
+
+enum EMonsterType;
+enum EMonsterState;
 #include "Monster.h"
 #include "Skill.h"
 
@@ -23,21 +27,20 @@ struct PLAYERDATA :public OBJECTDATA
 
 struct SKILLDATA
 {
-	int masternum;
-	int targetnum;
+	bool isactivate;
 	int skilltype;
-	int speed;
-	int damage;
 	int size;
-	float coolTime;
+	int collidertype;
+	int collidersize;
 	POINT position;
-	POINT direction;
+	POINT colliderposition;
 };
 
 struct MONSTERDATA :public OBJECTDATA
 {
 	int targetnum;
-	enum EMonsterType monstertype;
+	EMonsterType monsterType;
+	EMonsterState curState;
 
 	std::chrono::high_resolution_clock::time_point t1_targeting;
 	std::chrono::high_resolution_clock::time_point t2_targeting;
@@ -46,7 +49,7 @@ struct MONSTERDATA :public OBJECTDATA
 
 struct TOTALDATA
 {
-	PLAYERDATA		udata[PLAYERNUM] = {};
+	PLAYERDATA		udata[PLAYERNUM];
 	MONSTERDATA		mdata[MONSTERNUM];
 	SKILLDATA		sdata[SKILLNUM];
 };

@@ -21,11 +21,49 @@
 #include <chrono>
 #include <iostream>
 #include <cmath>
+#include <time.h>
+
+#define MAX_MAP_SIZE_X				4000
+#define MAX_MAP_SIZE_Y				2000
+
+#define SCREEN_SIZE_X				1920
+#define SCREEN_SIZE_Y				1200
+
+#define DEFAULT_SPAWN_SIZE_X		50
+#define DEFAULT_SPAWN_SIZE_Y		50
 
 #define PAIR std::pair<double,double>
-#define PLAYERNUM 4
-#define MONSTERNUM 100
-#define SKILLNUM 100
-#define SKILLARR 6
+#define PLAYERNUM					4
+#define MONSTERNUM					1000
+#define SKILLNUM					100
+#define SKILLARR					6
 
-#define RETARGETINGTIME 1
+#define RETARGETINGTIME				1
+
+// >> : Monster
+#define BASE_DAMAGE					10
+#define BASE_HEALTH					50
+#define BASE_SPEED					1.5	
+
+#define NORMAL_MONSTER_TYPE_COUNT	5
+
+#define RUNNER_BASE_DAMAGE			20
+#define RUNNER_BASE_HEALTH			50
+#define RUNNER_BASE_SPEED			2
+
+#define SPEAR_BASE_DAMAGE			7
+#define SPEAR_BASE_HEALTH			30
+#define SPEAR_BASE_SPEED			1.5
+#define SPEAR_BASE_RANGE			300
+
+#define WINGBUG_BASE_DAMAGE			10
+#define WINGBUG_BASE_HEALTH			20
+#define WINGBUG_BASE_SPEED			2.5
+
+#define FIREMAN_BASE_DAMAGE			30
+#define FIREMAN_BASE_HEALTH			15
+#define FIREMAN_BASE_SPEED			2
+
+#define LANDMINE_BASE_DAMAGE		30
+#define LANDMINE_BASE_HEALTH		150
+#define LANDMINE_BASE_SPEED			0

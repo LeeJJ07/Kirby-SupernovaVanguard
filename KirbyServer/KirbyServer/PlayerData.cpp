@@ -15,9 +15,6 @@ void SetUserData(PLAYERDATA& ud, Object* p)
 
 void SetObject(Object* &p, PLAYERDATA& ud)
 {
-	if (!p)
-		p = new Player();
-
 	p->SetPosition(ud.pos);
 	p->SetLookingDir(ud.lookingDir);
 	p->SetMousePosition(ud.mousePos);

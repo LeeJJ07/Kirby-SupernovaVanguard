@@ -40,13 +40,7 @@
     <ClCompile Include="Circle2D.cpp">
       <Filter>클래스파일\Colliders\Circle</Filter>
     </ClCompile>
-    <ClCompile Include="KirbySkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="MaberoaSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="EletricfieldSkill.h">
+    <ClCompile Include="Skill.cpp">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClCompile>
   </ItemGroup>
@@ -105,25 +99,37 @@
     <ClInclude Include="Rectangle2D.h">
       <Filter>클래스파일\Colliders\Rectangle</Filter>
     </ClInclude>
-    <ClInclude Include="Skill.h">
+    <ClInclude Include="AllSkill.h">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClInclude>
-    <ClInclude Include="MetaknightSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="DededeSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="MagicarrowSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="TornadoSkill.h">
+    <ClInclude Include="KirbySkill.h">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClInclude>
     <ClInclude Include="KunaiSkill.h">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClInclude>
+    <ClInclude Include="MaberoaSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="MagicarrowSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaknightSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="Skill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="TornadoSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
     <ClInclude Include="TruckSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="DededeSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="EletricfieldSkill.h">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClInclude>
   </ItemGroup>
@@ -185,7 +191,7 @@
       <UniqueIdentifier>{e8349358-f465-40e7-a760-56fce2d35f7e}</UniqueIdentifier>
     </Filter>
     <Filter Include="클래스파일\Objects\Skill">
-      <UniqueIdentifier>{0b46a681-b76b-4e25-b68b-b159c0f51dcb}</UniqueIdentifier>
+      <UniqueIdentifier>{8bdb0f94-66f5-40fc-a2f5-63f9b956c960}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
