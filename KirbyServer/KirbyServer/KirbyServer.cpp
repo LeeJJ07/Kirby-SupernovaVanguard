@@ -23,11 +23,19 @@ HANDLE hThreads[2];
 // <<
 
 // << : skill
+<<<<<<< HEAD
 vector<Skill*> vSkill;
 void GenerateSkill();
 void UpdateSkill();
 void SetBasisSkillData(int);
 void SetSkillToDatasheet();
+=======
+vector<Skill*> vSkill(SKILLNUM);
+void GenerateSkill();
+void UpdateSkill();
+void SetBasisSkillData(PLAYERDATA& uData, int i);
+void SetSkillToDatasheet(Skill* skill);
+>>>>>>> 272e4e3653de8eaf007019700fa50379e3a0c918
 // <<
 
 // << : player
@@ -390,16 +398,25 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 
 void SetBasisSkillData(int playerIndex)
 {
+<<<<<<< HEAD
 	vClient[playerIndex]->SetCharacterType(totalData.udata[playerIndex].charactertype);
 	Skill* basisSkill = nullptr;
 	switch (vClient[playerIndex]->GetCharacterType())
 	{
 	case ECharacterType::KIRBY:
 		basisSkill = new KirbySkill(playerIndex, 0);
+=======
+	Skill* basisskill;
+	switch (uData.charactertype)
+	{
+	case ECharacterType::KIRBY:
+		basisskill = new KirbySkill(i, 0);
+>>>>>>> 272e4e3653de8eaf007019700fa50379e3a0c918
 		break;
 	case ECharacterType::METANIHGT:
 		break;
 	}
+<<<<<<< HEAD
 	SkillManager* skillmanager = new SkillManager(basisSkill->Getskilltype(), basisSkill->Getcooltime());
 
 	std::vector<SkillManager*> sm = vClient[playerIndex]->GetSkillManager();
@@ -440,6 +457,21 @@ void GenerateSkill()
 		}
 	}
 }
+=======
+	SkillManager* skillmanager = new SkillManager(basisskill->Getskilltype(), basisskill->Getcooltime());
+
+	vClient[i]->GetSkillManager().push_back(skillmanager);
+}
+
+void SetSkillToDatasheet(Skill* skill)
+{
+	switch (skill->Getskilltype())
+	{
+	case SKILLTYPE::KIRBY:
+		SetBasisKirbySkillInDatasheet(skill);
+		break;
+	case SKILLTYPE::METAKNIGHT:
+>>>>>>> 272e4e3653de8eaf007019700fa50379e3a0c918
 
 void SetSkillToDatasheet()
 {
@@ -518,6 +550,33 @@ void GenerateMonster()
 		{
 			SetMonsterData(totalData.mdata[i]);
 			return;
+		}
+	}
+}
+
+void GenerateSkill()
+{
+	for (int i = 0; i < socketList.size(); i++)
+	{
+		std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
+		for (int j = 0; j < temp.size(); j++)
+		{
+			temp[j]->Settime_2();
+
+			double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(temp[j]->Gettime_2() - temp[j]->Gettime_1()).count();
+
+			if (skillcooltime > temp[j]->Getcooltime())
+			{
+				switch (temp[j]->Gettype())
+				{
+				case SKILLTYPE::KIRBY:
+					KirbySkill* kirbySkill = new KirbySkill(i, 0);
+					vSkill.push_back(kirbySkill);
+					SetSkillToDatasheet(vSkill.back());
+					break;
+				}
+				temp[j]->Settime_1();
+			}
 		}
 	}
 }
