@@ -1,190 +1,217 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="클래스 파일">
-      <UniqueIdentifier>{d66e7225-5bb9-4122-8dfe-00f55d5ba7a8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Main">
-      <UniqueIdentifier>{c71ee7b3-c1b0-4b8f-8e12-68ce9005e217}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Collider">
-      <UniqueIdentifier>{b624d9ea-5abc-47de-a65a-915ac7da5614}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Object">
-      <UniqueIdentifier>{274f9d68-8a2f-4653-b25b-d6bafa722dfc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Data">
-      <UniqueIdentifier>{e7586e14-d90f-4b6f-992f-129362236e02}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Communication">
-      <UniqueIdentifier>{b3a87d7f-74fc-4367-b6f4-f415a1a8663d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Object\Monster">
-      <UniqueIdentifier>{dd1775ac-e500-4be4-8400-a64267546ac2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Object\Player">
-      <UniqueIdentifier>{6dbaac2f-bdc6-4713-8654-6374d76a3678}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Collider\Circle">
-      <UniqueIdentifier>{6b5e6df2-dba5-4e07-a39c-13782d830b6a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Collider\Rectangle">
-      <UniqueIdentifier>{7ef1cb3f-85c6-40ab-8979-7f649c7d6dbc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Object\Skill">
-      <UniqueIdentifier>{275c27e0-5e3b-476e-87d3-c69cde1b5e46}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Manager">
-      <UniqueIdentifier>{f40f59bd-9c65-497d-a117-e89302a942f7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스 파일\Manager\SkillManager">
-      <UniqueIdentifier>{6513f287-c568-4530-b1c8-784a73cb5797}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>클래스 파일\Main</Filter>
-    </ClInclude>
-    <ClInclude Include="KirbyServer.h">
-      <Filter>클래스 파일\Main</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>클래스 파일\Main</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>클래스 파일\Main</Filter>
-    </ClInclude>
-    <ClInclude Include="Collider2D.h">
-      <Filter>클래스 파일\Collider</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>클래스 파일\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="ActionData.h">
-      <Filter>클래스 파일\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="TotalData.h">
-      <Filter>클래스 파일\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Multithread.h">
-      <Filter>클래스 파일\Communication</Filter>
-    </ClInclude>
-    <ClInclude Include="Socket.h">
-      <Filter>클래스 파일\Communication</Filter>
-    </ClInclude>
-    <ClInclude Include="Monster.h">
-      <Filter>클래스 파일\Object\Monster</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>클래스 파일\Object\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Circle2D.h">
-      <Filter>클래스 파일\Collider\Circle</Filter>
-    </ClInclude>
-    <ClInclude Include="Rectangle2D.h">
-      <Filter>클래스 파일\Collider\Rectangle</Filter>
-    </ClInclude>
-    <ClInclude Include="WingBugMonster.h">
-      <Filter>클래스 파일\Object\Monster</Filter>
-    </ClInclude>
-    <ClInclude Include="FireManMonster.h">
-      <Filter>클래스 파일\Object\Monster</Filter>
-    </ClInclude>
-    <ClInclude Include="GaoGao.h">
-      <Filter>클래스 파일\Object\Monster</Filter>
-    </ClInclude>
-    <ClInclude Include="KungFuMan.h">
-      <Filter>클래스 파일\Object\Monster</Filter>
-    </ClInclude>
-    <ClInclude Include="LandMineMonster.h">
-      <Filter>클래스 파일\Object\Monster</Filter>
-    </ClInclude>
-    <ClInclude Include="RunnerMonster.h">
-      <Filter>클래스 파일\Object\Monster</Filter>
-    </ClInclude>
-    <ClInclude Include="SpearMonster.h">
-      <Filter>클래스 파일\Object\Monster</Filter>
-    </ClInclude>
-    <ClInclude Include="Boss.h">
-      <Filter>클래스 파일\Object\Monster</Filter>
-    <ClInclude Include="MetaknightSkill.h">
-      <Filter>클래스 파일\Object\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="TornadoSkill.h">
-      <Filter>클래스 파일\Object\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="SkillManager.h">
-      <Filter>클래스 파일\Manager\SkillManager</Filter>
-    </ClInclude>
-    <ClInclude Include="Skill.h">
-      <Filter>클래스 파일\Object\Skill</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="KirbyServer.cpp">
-      <Filter>클래스 파일\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Collider2D.cpp">
-      <Filter>클래스 파일\Collider</Filter>
-    </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>클래스 파일\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerData.cpp">
-      <Filter>클래스 파일\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="Socket.cpp">
-      <Filter>클래스 파일\Communication</Filter>
-    </ClCompile>
-    <ClCompile Include="Monster.cpp">
-      <Filter>클래스 파일\Object\Monster</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>클래스 파일\Object\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Circle2D.cpp">
-      <Filter>클래스 파일\Collider\Circle</Filter>
+    <ClCompile Include="Boss.cpp">
+      <Filter>클래스\Object\Monster</Filter>
     </ClCompile>
     <ClCompile Include="FireManMonster.cpp">
-      <Filter>클래스 파일\Object\Monster</Filter>
-    </ClCompile>
-    <ClCompile Include="GaoGao.cpp">
-      <Filter>클래스 파일\Object\Monster</Filter>
+      <Filter>클래스\Object\Monster</Filter>
     </ClCompile>
     <ClCompile Include="KungFuMan.cpp">
-      <Filter>클래스 파일\Object\Monster</Filter>
+      <Filter>클래스\Object\Monster</Filter>
     </ClCompile>
     <ClCompile Include="LandMineMonster.cpp">
-      <Filter>클래스 파일\Object\Monster</Filter>
+      <Filter>클래스\Object\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="Monster.cpp">
+      <Filter>클래스\Object\Monster</Filter>
     </ClCompile>
     <ClCompile Include="RunnerMonster.cpp">
-      <Filter>클래스 파일\Object\Monster</Filter>
+      <Filter>클래스\Object\Monster</Filter>
     </ClCompile>
     <ClCompile Include="SpearMonster.cpp">
-      <Filter>클래스 파일\Object\Monster</Filter>
+      <Filter>클래스\Object\Monster</Filter>
     </ClCompile>
     <ClCompile Include="WingBugMonster.cpp">
-      <Filter>클래스 파일\Object\Monster</Filter>
+      <Filter>클래스\Object\Monster</Filter>
     </ClCompile>
-    <ClCompile Include="Boss.cpp">
-      <Filter>클래스 파일\Object\Monster</Filter>
+    <ClCompile Include="GaoGao.cpp">
+      <Filter>클래스\Object\Monster</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>클래스\Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>클래스\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider2D.cpp">
+      <Filter>클래스\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="Circle2D.cpp">
+      <Filter>클래스\Collider\Circle</Filter>
+    </ClCompile>
+    <ClCompile Include="KirbyServer.cpp">
+      <Filter>클래스\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Socket.cpp">
+      <Filter>클래스\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerData.cpp">
+      <Filter>클래스\Data\SendData</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Boss.h">
+      <Filter>클래스\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="FireManMonster.h">
+      <Filter>클래스\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="KungFuMan.h">
+      <Filter>클래스\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="LandMineMonster.h">
+      <Filter>클래스\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="Monster.h">
+      <Filter>클래스\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="RunnerMonster.h">
+      <Filter>클래스\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="SpearMonster.h">
+      <Filter>클래스\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="WingBugMonster.h">
+      <Filter>클래스\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="GaoGao.h">
+      <Filter>클래스\Object\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="DededeSkill.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="EletricfieldSkill.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="KunaiSkill.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="MaberoaSkill.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="MagicarrowSkill.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaknightSkill.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="Skill.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="SkillManager.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="TornadoSkill.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="TruckSkill.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="KirbySkill.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>클래스\Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>클래스\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider2D.h">
+      <Filter>클래스\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="Circle2D.h">
+      <Filter>클래스\Collider\Circle</Filter>
+    </ClInclude>
+    <ClInclude Include="Rectangle2D.h">
+      <Filter>클래스\Collider\Rectangle</Filter>
+    </ClInclude>
+    <ClInclude Include="KirbyServer.h">
+      <Filter>클래스\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>클래스\framework</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>클래스\framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Socket.h">
+      <Filter>클래스\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>클래스\framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Multithread.h">
+      <Filter>클래스\Multithreaad</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionData.h">
+      <Filter>클래스\Data\ReadData</Filter>
+    </ClInclude>
+    <ClInclude Include="TotalData.h">
+      <Filter>클래스\Data\SendData</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="KirbyServer.ico">
+      <Filter>화면 보이기</Filter>
+    </Image>
+    <Image Include="small.ico">
+      <Filter>화면 보이기</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="클래스">
+      <UniqueIdentifier>{264de445-6619-47a3-8e77-1b7c1fd54af9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Object">
+      <UniqueIdentifier>{88c301af-2391-4711-b8c1-38cd70db2ccd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Object\Monster">
+      <UniqueIdentifier>{ca0fbbdf-708f-495c-98a4-8ac64943bd57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Object\Skill">
+      <UniqueIdentifier>{dd43a303-16ae-4717-8356-42113c21065c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Object\Player">
+      <UniqueIdentifier>{f48e82a7-bcb9-4e15-9802-c61630c09b9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Collider">
+      <UniqueIdentifier>{0f1909a5-39a6-43ca-ac3a-8d506c3b464d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Collider\Circle">
+      <UniqueIdentifier>{9152bf8f-400b-4344-809e-7ec8bfe1cecc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Collider\Rectangle">
+      <UniqueIdentifier>{aac8b444-eec7-42b7-8c42-360e58648035}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Main">
+      <UniqueIdentifier>{3c6ceeae-7d25-4fcb-9848-cce66850bb4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\framework">
+      <UniqueIdentifier>{0419e2b3-d278-443f-b426-781dec4ccdfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Data">
+      <UniqueIdentifier>{5c7fefab-0dca-401e-9f38-da2f404fc15c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Communication">
+      <UniqueIdentifier>{932ad79e-0c7d-40a0-9d84-4bf866a8bd16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="화면 보이기">
+      <UniqueIdentifier>{dd0c351e-3ad5-466d-85ee-5b9113430c25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Multithreaad">
+      <UniqueIdentifier>{5f091458-5588-460f-a2cf-ee45ce702fcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Data\ReadData">
+      <UniqueIdentifier>{c46a663a-1272-4427-9704-e526bd866fac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Data\SendData">
+      <UniqueIdentifier>{95568765-a2f4-4e16-94fc-5a72f2348e52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KirbyServer.rc">
-      <Filter>리소스 파일</Filter>
+      <Filter>화면 보이기</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="small.ico">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="KirbyServer.ico">
-      <Filter>리소스 파일</Filter>
-    </Image>
   </ItemGroup>
 </Project>
