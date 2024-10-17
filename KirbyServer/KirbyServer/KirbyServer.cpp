@@ -58,13 +58,15 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
 void SendToAll();
 void ReadData();
 void UpdateMonster();
+void SetMonsterData(MONSTERDATA& mData, Monster*& m);
 void GenerateMonster(int playerIdx);
 void CloseClient(SOCKET socket);
-void SetMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx);
+void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx);
 bool IsValidSpawnPos(int playerIdx, POINT pos);
-POINT SetRandomSpawnPos(int playerIdx);
+POINT SetRandomSpawnPos(int playerIdx, EMonsterType mType);
 void InitUserData(PLAYERDATA& userData, int id);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
+void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx);
 
 WSADATA wsaData;
 SOCKET s, cs;
@@ -189,6 +191,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						break;
 					GenerateMonster(pIdx);
 				}
+<<<<<<< HEAD
 				if(!isGameStart)
 				{
 					for (int i = 0; i < socketList.size(); i++)
@@ -201,6 +204,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					isGameStart = true;
 				}
 
+=======
+>>>>>>> Monster
 				SendToAll();
 			}
 		}
@@ -262,8 +267,8 @@ int InitServer(HWND hWnd)
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	
-	int sendBufSize = 81920 * 2;  // 송신 버퍼 크기 (예: 8KB)
-	int recvBufSize = 81920 * 2;  // 수신 버퍼 크기 (예: 8KB)
+	int sendBufSize = 88256 * 2;  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = 88256 * 2;  // 수신 버퍼 크기 (예: 8KB)
 
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -484,11 +489,12 @@ void SetSkillToDatasheet()
 	}
 }
 
-void SetTarget(MONSTERDATA& mData, TOTALDATA& tData)
+void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 {
 	int distance = pow(mData.pos.x - tData.udata[0].pos.x, 2) + pow(mData.pos.y - tData.udata[0].pos.y, 2);
 
 	mData.targetnum = 0;
+	monsterArr[monsterIdx]->SetTargetPos(tData.udata[0].pos);
 
 	for (int i = 1; i < PLAYERNUM; i++)
 	{
@@ -501,39 +507,41 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData)
 			distance = newdistance;
 
 			mData.targetnum = i;
+			monsterArr[monsterIdx]->SetTargetPos(tData.udata[mData.targetnum].pos);
 		}
 	}
 }
 
-void SetMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx)
+void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx)
 {
-	POINT generatePos = SetRandomSpawnPos(playerIdx);
+	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+	POINT generatePos = SetRandomSpawnPos(playerIdx, mType);
 
 	if (!IsValidSpawnPos(playerIdx, generatePos))
 		return;
 
-	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
-
 	switch (mType)
 	{
 	case RUNNER:
-		m = new RunnerMonster(generatePos, mType, CHASE,
+		m = new RunnerMonster(generatePos, mType, CHASE, {0, 0},
 			RUNNER_BASE_DAMAGE, RUNNER_BASE_HEALTH, RUNNER_BASE_SPEED, TRUE);
 		break;
 	case SPEAR:
-		m = new SpearMonster(generatePos, mType, CHASE,
-			SPEAR_BASE_DAMAGE, SPEAR_BASE_HEALTH, SPEAR_BASE_SPEED, TRUE);
+		m = new SpearMonster(generatePos, mType, CHASE, { 0, 0 },
+			SPEAR_BASE_DAMAGE, SPEAR_BASE_HEALTH, SPEAR_BASE_SPEED, SPEAR_BASE_RANGE, TRUE);
 		break;
 	case WINGBUG:
-		m = new WingBugMonster(generatePos, mType, CHASE,
+		m = new WingBugMonster(generatePos, mType, CHASE, { 0, 0 },
 			WINGBUG_BASE_DAMAGE, WINGBUG_BASE_HEALTH, WINGBUG_BASE_SPEED, TRUE);
+		if (generatePos.x < totalData.udata[playerIdx].pos.x) m->SetLookingDir({ 1, 0 });
+		else m->SetLookingDir({ -1, 0 });
 		break;
 	case FIREMAN:
-		m = new FireManMonster(generatePos, mType, CHASE,
+		m = new FireManMonster(generatePos, mType, CHASE, { 0, 0 },
 			FIREMAN_BASE_DAMAGE, FIREMAN_BASE_HEALTH, FIREMAN_BASE_SPEED, TRUE);
 		break;
 	case LANDMINE:
-		m = new LandMineMonster(generatePos, mType, CHASE,
+		m = new LandMineMonster(generatePos, mType, CHASE, { 0, 0 },
 			LANDMINE_BASE_DAMAGE, LANDMINE_BASE_HEALTH, LANDMINE_BASE_SPEED, TRUE);
 		break;
 	}
@@ -560,35 +568,54 @@ bool IsValidSpawnPos(int playerIdx, POINT pos)
 	return true;
 }
 
-POINT SetRandomSpawnPos(int playerIdx)
+POINT SetRandomSpawnPos(int playerIdx, EMonsterType mType)
 {
 	POINT generatePos = { totalData.udata[playerIdx].pos.x, totalData.udata[playerIdx].pos.y };
-	Direction spawnDir = (Direction)(rand() % 4);
-	int randX = 0, randY = 0;
-	
-	switch (spawnDir)
+
+	switch (mType)
 	{
-	case UP:
-		randX = rand() % SCREEN_SIZE_X;
-		randY = -(SCREEN_SIZE_Y + DEFAULT_SPAWN_SIZE_Y);
+	case RUNNER:
+	case FIREMAN:
+	case SPEAR:
+	{
+		Direction spawnDir = (Direction)(rand() % 4);
+		int randX = 0, randY = 0;
+
+		switch (spawnDir)
+		{
+		case UP:
+			randX = rand() % SCREEN_SIZE_X;
+			randY = -(SCREEN_SIZE_Y + DEFAULT_SPAWN_SIZE_Y);
+			break;
+		case DOWN:
+			randX = rand() % SCREEN_SIZE_X;
+			randY = (SCREEN_SIZE_Y + DEFAULT_SPAWN_SIZE_Y);
+			break;
+		case RIGHT:
+			randX = (SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
+			randY = rand() % SCREEN_SIZE_Y;
+			break;
+		case LEFT:
+			randX = -(SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
+			randY = rand() % SCREEN_SIZE_Y;
+			break;
+		}
+		generatePos.x += randX;
+		generatePos.y += randY;
+	}
 		break;
-	case DOWN:
-		randX = rand() % SCREEN_SIZE_X;
-		randY = (SCREEN_SIZE_Y + DEFAULT_SPAWN_SIZE_Y);
+	case WINGBUG:
+	{
+		int randomNum = rand() % 2;
+		if (randomNum)generatePos.x += (SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
+		else generatePos.x += -(SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
+	}
 		break;
-	case RIGHT:
-		randX = (SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
-		randY = rand() % SCREEN_SIZE_Y;
-		break;
-	case LEFT:
-		randX = -(SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
-		randY = rand() % SCREEN_SIZE_Y;
+	case LANDMINE:
+		//#####################################
+		//위치 다시 세팅
 		break;
 	}
-
-	generatePos.x += randX;
-	generatePos.y += randY;
-
 	return generatePos;
 }
 
@@ -598,7 +625,7 @@ void GenerateMonster(int playerIdx)
 	{
 		if (totalData.mdata[i].dataType == 0)
 		{
-			SetMonsterData(totalData.mdata[i], monsterArr[i], playerIdx);
+			InitMonsterData(totalData.mdata[i], monsterArr[i], playerIdx);
 			return;
 		}
 	}
@@ -654,26 +681,25 @@ void UpdateMonster()
 
 		if(totalData.mdata[i].timeSpan_targeting.count() > RETARGETINGTIME)
 		{
-			SetTarget(totalData.mdata[i], totalData);
-
+			SetTarget(totalData.mdata[i], totalData, i);
 			totalData.mdata[i].t1_targeting = std::chrono::high_resolution_clock::now();
 		}
 		monsterArr[i]->Update();
+		if (!monsterArr[i]->GetEnabled())
+		{
+			totalData.mdata[i].dataType = 0;
+			delete monsterArr[i];
+			continue;
+		}
 
-		// 수정 필요
-		int x = 0, y = 0;
-
-		if (totalData.mdata[i].pos.x > totalData.udata[totalData.mdata[i].targetnum].pos.x)
-			x = -1;
-		else
-			x = 1;
-
-		if (totalData.mdata[i].pos.y > totalData.udata[totalData.mdata[i].targetnum].pos.y)
-			y = -1;
-		else
-			y = 1;
-
-		totalData.mdata[i].pos.x += x;
-		totalData.mdata[i].pos.y += y;
+		SetMonsterData(totalData.mdata[i], monsterArr[i]);
 	}
+}
+
+void SetMonsterData(MONSTERDATA& mData, Monster*& m)
+{
+	
+	mData.pos = m->GetPosition();
+	mData.lookingDir = m->GetLookingDir();
+	mData.curState = m->GetMonsterState();
 }

@@ -23,6 +23,9 @@
 #include <cmath>
 #include <time.h>
 
+#define MAX_MAP_SIZE_X 4000
+#define MAX_MAP_SIZE_Y 2000
+
 #define SCREEN_SIZE_X 1920
 #define SCREEN_SIZE_Y 1200
 
@@ -40,7 +43,7 @@
 // >> : Monster
 #define BASE_DAMAGE					10
 #define BASE_HEALTH					50
-#define BASE_SPEED					1	
+#define BASE_SPEED					1.5	
 
 #define NORMAL_MONSTER_TYPE_COUNT	5
 
@@ -50,7 +53,8 @@
 
 #define SPEAR_BASE_DAMAGE			7
 #define SPEAR_BASE_HEALTH			30
-#define SPEAR_BASE_SPEED			1
+#define SPEAR_BASE_SPEED			1.5
+#define SPEAR_BASE_RANGE			300
 
 #define WINGBUG_BASE_DAMAGE			10
 #define WINGBUG_BASE_HEALTH			20

@@ -5,10 +5,17 @@ struct PLAYERDATA;
 
 class Object
 {
+<<<<<<< HEAD
 private:
 	POINT	position;
 	POINT	mousePosition;
 	PAIR	lookingDirection;
+=======
+protected:
+	POINT position;
+	PAIR lookingDirection;
+	POINT mousePosition;
+>>>>>>> Monster
 
 	bool isInGame;
 
@@ -31,4 +38,6 @@ public:
 	void			SetObject(Collider2D* c)	{ collider = c; }
 
 	void			ObjectUpdate(PLAYERDATA);
+
+	PAIR			NormalizationDir(POINT target);
 };
