@@ -5,6 +5,8 @@
 
 enum EMonsterType;
 enum EMonsterState;
+#include "Monster.h"
+#include "Skill.h"
 
 struct OBJECTDATA
 {
@@ -20,6 +22,18 @@ struct PLAYERDATA :public OBJECTDATA
 {
 	POINT mousePos;
 	bool inGameStart;
+	char charactertype;
+};
+
+struct SKILLDATA
+{
+	bool isactivate;
+	int skilltype;
+	int size;
+	int collidertype;
+	int collidersize;
+	POINT position;
+	POINT colliderposition;
 };
 
 struct MONSTERDATA :public OBJECTDATA
@@ -35,8 +49,9 @@ struct MONSTERDATA :public OBJECTDATA
 
 struct TOTALDATA
 {
-	PLAYERDATA		udata[PLAYERNUM] = {};
+	PLAYERDATA		udata[PLAYERNUM];
 	MONSTERDATA		mdata[MONSTERNUM];
+	SKILLDATA		sdata[SKILLNUM];
 };
 
 void SetObjectData(TOTALDATA*&, Object*);

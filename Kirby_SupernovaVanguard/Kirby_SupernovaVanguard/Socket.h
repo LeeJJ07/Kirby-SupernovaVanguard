@@ -23,7 +23,8 @@ static SOCKADDR_IN addr = { 0 };
 int InitClient(HWND hWnd, SOCKET&);
 void ReadMessage(SOCKET&, std::vector<Object*>&, TOTALDATA& );
 void CloseClient(SOCKET&, std::vector<Object*>&, int);
-void ReadInitMessage(SOCKET&, TOTALDATA&);
+bool ReadInitMessage(SOCKET&, TOTALDATA&);
 extern std::vector<Object*> vMonster;
+extern std::vector<Object*> vSkill;
 extern void CountReadNum();
 // <<

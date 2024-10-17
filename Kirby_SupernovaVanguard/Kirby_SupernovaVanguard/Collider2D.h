@@ -13,6 +13,12 @@ enum ColliderType
 	EMISSILE	= 4,
 };
 
+enum ColliderFigureType
+{
+	CIRCLEFIGURE = 3,
+	RECTANGLEFIGURE = 4,
+};
+
 class Collider2D
 {
 private:

@@ -27,10 +27,22 @@ struct OBJECTDATA
 	short id;
 };
 
-struct PLAYERDATA : public OBJECTDATA
+struct PLAYERDATA :public OBJECTDATA
 {
 	POINT mousePos;
 	bool inGameStart;
+	int charactertype;
+};
+
+struct SKILLDATA
+{
+	bool isactivate;
+	int skilltype;
+	int size;
+	int collidertype;
+	int collidersize;
+	POINT position;
+	POINT colliderposition;
 };
 
 struct MONSTERDATA :public OBJECTDATA
@@ -48,7 +60,10 @@ struct TOTALDATA
 {
 	PLAYERDATA		udata[PLAYERNUM];
 	MONSTERDATA		mdata[MONSTERNUM];
+	SKILLDATA		sdata[SKILLNUM];
 };
+
+static TOTALDATA totalData;
 
 void SetUserData(PLAYERDATA&, Object*);
 void SetObject(Object*& p, PLAYERDATA& ud);

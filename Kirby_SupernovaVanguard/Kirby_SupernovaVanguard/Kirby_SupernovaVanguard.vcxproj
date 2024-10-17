@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ActionData.h" />
+    <ClInclude Include="AllSkill.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Circle2D.h" />
     <ClInclude Include="framework.h" />
@@ -157,6 +158,7 @@
     <ClCompile Include="Multithread.h" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SelectScene.cpp" />
+    <ClCompile Include="Skill.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="StartScene.cpp" />
     <ClCompile Include="PlayerData.cpp" />

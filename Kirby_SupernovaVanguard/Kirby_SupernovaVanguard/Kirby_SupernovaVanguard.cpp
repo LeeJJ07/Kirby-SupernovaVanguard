@@ -3,6 +3,7 @@
 #include "ActionData.h"
 #include "StartScene.h"
 #include "SelectScene.h"
+#include "AllSkill.h"
 #include "Camera.h"
 #include "Socket.h"
 #include "Map.h"
@@ -32,6 +33,7 @@ unsigned __stdcall Send();
 
 std::vector<Object*> vClient(PLAYERNUM);
 std::vector<Object*> vMonster(MONSTERNUM);
+std::vector<Object*> vSkill(SKILLNUM);
 TOTALDATA uData;
 Object** objArr;
 static SOCKET cSocket;
@@ -218,16 +220,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		InitObjArr();
 
-		hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
-		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
-
 		if (hThreads[0])
 			ResumeThread(hThreads[0]);
 		if (hThreads[1])
 			ResumeThread(hThreads[1]);
-
-		break;
 	}
+	break;
 	case WM_CHAR:
 		if (wParam == VK_RETURN/* && canGoToNext*/)
 		{
@@ -236,7 +234,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case START:
 				if (InitClient(hWnd, cSocket))
 				{
-					ReadInitMessage(cSocket, uData);
+					if (!ReadInitMessage(cSocket, uData))
+						break;
 
 					vClient[myID] = new Player();
 
@@ -253,6 +252,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					t1_sendCount = std::chrono::high_resolution_clock::now();
 					t1_readCount = std::chrono::high_resolution_clock::now();
 
+					hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
+					hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
+
 					curScene = SELECT;
 				}
 				break;
@@ -262,6 +264,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 		}
+		break;
 	case WM_LBUTTONDOWN:
 	{
 		cursorX = LOWORD(lParam);
@@ -389,6 +392,8 @@ void DrawCamera(HDC hdc)
 			((Monster*)objArr[i])->Draw(hdc);
 			break;
 		case PMISSILE:
+			DrawSkill(hdc, (Skill*)objArr[i]);
+			//((Skill*)objArr[i])
 			break;
 		case EMISSILE:
 			break;
@@ -408,7 +413,7 @@ void DrawCollider(HDC& hdc)
 
 void InitObjArr()
 {
-	objArr = new Object * [1000];
+	objArr = new Object * [OBJECTNUM];
 }
 
 unsigned __stdcall Send()
@@ -420,6 +425,7 @@ unsigned __stdcall Send()
 			aD.id = myID;
 			aD.playerMove = { x,y };
 			aD.cursorMove = { cursorX, cursorY };
+			aD.charactertype = dynamic_cast<Player*>(vClient[myID])->GetCharacterType();
 
 			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
 

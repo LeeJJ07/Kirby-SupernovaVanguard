@@ -15,12 +15,14 @@ void SetUserData(PLAYERDATA& ud, Object* p)
 
 void SetObject(Object* &p, PLAYERDATA& ud)
 {
-	if (!p)
-		p = new Player();
-
 	p->SetPosition(ud.pos);
 	p->SetLookingDir(ud.lookingDir);
 	p->SetMousePosition(ud.mousePos);
 	p->GetCollider()->SetOffset(ud.offset);
 	p->SetIsInGame(ud.inGameStart);
+}
+
+void SetObject(Object*& p, SKILLDATA& skilldata)
+{
+	p->SetPosition(skilldata.position);
 }

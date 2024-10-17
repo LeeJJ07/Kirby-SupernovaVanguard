@@ -32,8 +32,10 @@
 #define PAIR std::pair<double,double>
 #define PLAYERNUM					4
 #define MONSTERNUM					1000
-#define RETARGETINGTIME				1
+#define SKILLNUM 100
+#define SKILLARR 6
 
+#define RETARGETINGTIME				1
 
 // >> : Monster
 #define BASE_DAMAGE					10

@@ -2,50 +2,50 @@
 
 void Monster::Draw(HDC& hdc)
 {
-    // »ö»ó ¼³Á¤À» À§ÇÑ ºê·¯½Ã ÇÚµé
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ê·¯ï¿½ï¿½ ï¿½Úµï¿½
     HBRUSH brush;
 
     switch (monsterType)
     {
     case RUNNER:
-        brush = CreateSolidBrush(RGB(255, 0, 0)); // »¡°­
+        brush = CreateSolidBrush(RGB(255, 0, 0)); // ï¿½ï¿½ï¿½ï¿½
         break;
     case SPEAR:
-        brush = CreateSolidBrush(RGB(255, 165, 0)); // ÁÖÈ²
+        brush = CreateSolidBrush(RGB(255, 165, 0)); // ï¿½ï¿½È²
         break;
     case WINGBUG:
-        brush = CreateSolidBrush(RGB(255, 255, 0)); // ³ë¶û
+        brush = CreateSolidBrush(RGB(255, 255, 0)); // ï¿½ï¿½ï¿½
         break;
     case FIREMAN:
-        brush = CreateSolidBrush(RGB(0, 255, 0)); // ÃÊ·Ï
+        brush = CreateSolidBrush(RGB(0, 255, 0)); // ï¿½Ê·ï¿½
         break;
     case LANDMINE:
-        brush = CreateSolidBrush(RGB(0, 0, 255)); // ÆÄ¶û
+        brush = CreateSolidBrush(RGB(0, 0, 255)); // ï¿½Ä¶ï¿½
         break;
     default:
-        brush = CreateSolidBrush(RGB(255, 255, 255)); // ±âº» »ö»ó (Èò»ö)
+        brush = CreateSolidBrush(RGB(255, 255, 255)); // ï¿½âº» ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½)
         break;
     }
 
-    // ºê·¯½Ã ¼±ÅÃ
+    // ï¿½ê·¯ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
 
-    // ¿ø ±×¸®±â
+    // ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
     int left = GetPosition().x - 10;
     int right = GetPosition().x + 10;
     int top = GetPosition().y - 10;
     int bottom = GetPosition().y + 10;
     Ellipse(hdc, left, top, right, bottom);
 
-    // ÀÌÀü ºê·¯½Ã º¹¿ø ¹× ºê·¯½Ã »èÁ¦
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ê·¯ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ê·¯ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     SelectObject(hdc, oldBrush);
     DeleteObject(brush);
 
-    // Ãß°¡ ÄÚµå index °ü¸®
-    // drawIndex = (drawIndex + 1)% (ÇöÀç ¾Ö´Ï¸ÞÀÌ¼ÇÀÇ Å©±â)
+    // ï¿½ß°ï¿½ ï¿½Úµï¿½ index ï¿½ï¿½ï¿½ï¿½
+    // drawIndex = (drawIndex + 1)% (ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ï¿½ï¿½ Å©ï¿½ï¿½)
 }
 
-void Monster::ObjectUpdate(TOTALDATA mData, int i)
+void Monster::ObjectUpdate(TOTALDATA totalData, int i)
 {
 	SetPosition(mData.mdata[i].pos);
 	GetCollider()->SetOffset(mData.mdata[i].offset);

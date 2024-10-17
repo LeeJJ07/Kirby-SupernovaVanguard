@@ -7,6 +7,7 @@
 #include <WinSock2.h>
 #include "Object.h"
 #include "TotalData.h"
+#include "KirbySkill.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -17,10 +18,17 @@ enum Direction { UP, RIGHT, DOWN, LEFT };
 
 std::vector<Monster*> monsterArr(MONSTERNUM);
 
-typedef struct sendData
-{
+// << : skill
+vector<Skill*> vSkill;
+void GenerateSkill();
+void UpdateSkill();
+void SetBasisSkillData(int);
+void SetSkillToDatasheet();
+// <<
 
-}SendData;
+// << : player
+std::vector<Player*> vClient;
+// <<
 
 // 클라이언트 ActionData와 형식 같음
 typedef struct receiveData
@@ -28,6 +36,7 @@ typedef struct receiveData
 	short id;
 	POINT playerMove;
 	POINT cursorMove;
+	short charactertype;
 	bool isReady;
 }ReceiveData;
 
@@ -35,9 +44,13 @@ typedef struct receiveData
 #define WM_ASYNC WM_USER + 1
 #define TIMER_01 1
 #define TIMER_GENERATEMONSTER 2
+#define TIMER_UPDATESKILL 3
+#define TIMER_GENERATESKILL 4
 
 static int readyclientnum = 0;
-static bool isGenerateMonster = false;
+static bool isAllclientReady = false;
+static bool isGameStart = false;
+static int skillnum;
 
 int InitServer(HWND hWnd);
 int CloseServer();
@@ -57,7 +70,6 @@ WSADATA wsaData;
 SOCKET s, cs;
 
 vector<SOCKET> socketList;
-TOTALDATA totalData;
 
 // 전역 변수:
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
@@ -161,13 +173,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case TIMER_01:
+		{
 			UpdateMonster();
 
 			SendToAll();
-			break;
+		}
+		break;
 		case TIMER_GENERATEMONSTER:
 		{
-			if (isGenerateMonster)
+			if (isAllclientReady)
 			{
 				for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
 				{
@@ -175,18 +189,42 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						break;
 					GenerateMonster(pIdx);
 				}
+				if(!isGameStart)
+				{
+					for (int i = 0; i < socketList.size(); i++)
+					{
+						SetBasisSkillData(i);
+					}
+
+					SetTimer(hWnd, TIMER_UPDATESKILL, 5, NULL);
+					SetTimer(hWnd, TIMER_GENERATESKILL, 1, NULL);
+					isGameStart = true;
+				}
 
 				SendToAll();
 			}
 		}
-			break;
-		} 
+		break;
+		case TIMER_GENERATESKILL:
+		{
+			GenerateSkill();
+		}
+		break;
+		case TIMER_UPDATESKILL:
+		{
+			UpdateSkill();
+			SetSkillToDatasheet();
+		}
+		break;
+		}
 		break;
 	case WM_CREATE:
+	{
 		SetTimer(hWnd, TIMER_01, 1, NULL);
 		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
 
 		return InitServer(hWnd);
+	}
 		break;
 	case WM_ASYNC:
 		switch (lParam)
@@ -201,6 +239,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			CloseClient(wParam);
 			break;
 		}
+		break;
 	case WM_PAINT:
 		{
 			PAINTSTRUCT ps;
@@ -275,6 +314,9 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 	socketList.push_back(cs);
 	totalData.udata[userID] = userData;
 
+	Player* player = new Player(userID);
+	vClient.push_back(player);
+
 	SendToAll();//{ cs , userData }
 
 	return cs;
@@ -289,13 +331,18 @@ void ReadData()
 		if(dataLen > 0)
 		{
 			SetUserData(totalData.udata[temp.id], temp);
+
 			if (totalData.udata[temp.id].inGameStart)
+			{
 				readyclientnum++;
+			}
 		}
 	}	
 
 	if (socketList.size() == readyclientnum)
-		isGenerateMonster = true;
+	{
+		isAllclientReady = true;
+	}
 }
 
 // 모든 유저들에게 업데이트 된 정보를 전달
@@ -342,6 +389,99 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 	uData.mousePos.y = rData.cursorMove.y;
 
 	uData.inGameStart = rData.isReady;
+	uData.charactertype = rData.charactertype;
+}
+
+void SetBasisSkillData(int playerIndex)
+{
+	vClient[playerIndex]->SetCharacterType(totalData.udata[playerIndex].charactertype);
+	Skill* basisSkill = nullptr;
+	switch (vClient[playerIndex]->GetCharacterType())
+	{
+	case ECharacterType::KIRBY:
+		basisSkill = new KirbySkill(playerIndex, 0);
+		break;
+	case ECharacterType::METANIHGT:
+		break;
+	}
+	SkillManager* skillmanager = new SkillManager(basisSkill->Getskilltype(), basisSkill->Getcooltime());
+
+	std::vector<SkillManager*> sm = vClient[playerIndex]->GetSkillManager();
+	sm.push_back(skillmanager);
+	vClient[playerIndex]->SetSkillManager(sm);
+}
+
+void GenerateSkill()
+{
+	if (vSkill.size() >= 98)
+		return;
+	for (int i = 0; i < socketList.size(); i++)
+	{
+		std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
+		for (int j = 0; j < temp.size(); j++)
+		{
+			temp[j]->Settime_2();
+			
+			double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(temp[j]->Gettime_2() - temp[j]->Gettime_1()).count();
+			
+			if (skillcooltime > temp[j]->Getcooltime())
+			{
+				switch (temp[j]->Gettype())
+				{
+				case SKILLTYPE::KIRBYSKILL:
+				{
+					KirbySkill* kirbySkill = new KirbySkill(i, 0);
+					kirbySkill->Setposition(totalData.udata[i].pos);
+					vSkill.push_back(kirbySkill);
+				}
+					break;
+				case SKILLTYPE::METAKNIGHTSKILL:
+					break;
+				}
+				skillnum++;
+				temp[j]->Settime_1();
+			}
+		}
+	}
+}
+
+void SetSkillToDatasheet()
+{
+	int i = 0;
+	for (auto skill : vSkill)
+	{
+		switch (skill->Getskilltype())
+		{
+		case SKILLTYPE::KIRBYSKILL:
+			SetKirbySkillInDatasheet(skill, i);
+			break;
+		case SKILLTYPE::METAKNIGHTSKILL:
+
+			break;
+		case SKILLTYPE::DEDEDESKILL:
+
+			break;
+		case SKILLTYPE::MABEROASKILL:
+
+			break;
+		case SKILLTYPE::ELECTRICFIELDSKILL:
+
+			break;
+		case SKILLTYPE::KUNAISKILL:
+
+			break;
+		case SKILLTYPE::MAGICARROWSKILL:
+
+			break;
+		case SKILLTYPE::TORNADOSKILL:
+
+			break;
+		case SKILLTYPE::TRUCKSKILL:
+
+			break;
+		}
+		i++;
+	}
 }
 
 void SetTarget(MONSTERDATA& mData, TOTALDATA& tData)
@@ -460,6 +600,43 @@ void GenerateMonster(int playerIdx)
 		{
 			SetMonsterData(totalData.mdata[i], monsterArr[i], playerIdx);
 			return;
+		}
+	}
+}
+
+void UpdateSkill()
+{
+	for (Skill* skill : vSkill)
+	{
+		switch (skill->Getskilltype())
+		{
+		case SKILLTYPE::KIRBYSKILL:
+			UpdateKirbySkill(skill);
+			break;
+		case SKILLTYPE::METAKNIGHTSKILL:
+
+			break;
+		case SKILLTYPE::DEDEDESKILL:
+
+			break;
+		case SKILLTYPE::MABEROASKILL:
+
+			break;
+		case SKILLTYPE::ELECTRICFIELDSKILL:
+
+			break;
+		case SKILLTYPE::KUNAISKILL:
+
+			break;
+		case SKILLTYPE::MAGICARROWSKILL:
+
+			break;
+		case SKILLTYPE::TORNADOSKILL:
+
+			break;
+		case SKILLTYPE::TRUCKSKILL:
+
+			break;
 		}
 	}
 }

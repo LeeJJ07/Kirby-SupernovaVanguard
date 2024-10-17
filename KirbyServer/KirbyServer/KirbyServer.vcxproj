@@ -144,6 +144,8 @@
     <ClInclude Include="Rectangle2D.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RunnerMonster.h" />
+    <ClInclude Include="Skill.h" />
+    <ClInclude Include="SkillManager.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="SpearMonster.h" />
     <ClInclude Include="targetver.h" />

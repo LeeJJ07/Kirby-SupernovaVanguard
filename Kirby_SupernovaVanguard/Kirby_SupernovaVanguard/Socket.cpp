@@ -3,6 +3,7 @@
 #include "ActionData.h"
 #include "Multithread.h"
 #include "Camera.h"
+#include "KirbySkill.h"
 
 short myID;
 int textreadCount;
@@ -22,8 +23,8 @@ int InitClient(HWND hWnd, SOCKET &s)
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 
-	int sendBufSize = 81920 * 2;  // ¼Û½Å ¹öÆÛ Å©±â (¿¹: 8KB)
-	int recvBufSize = 81920 * 2;  // ¼ö½Å ¹öÆÛ Å©±â (¿¹: 8KB)
+	int sendBufSize = 81920 * 2;  // ï¿½Û½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ (ï¿½ï¿½: 8KB)
+	int recvBufSize = 81920 * 2;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ (ï¿½ï¿½: 8KB)
 	
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -32,7 +33,7 @@ int InitClient(HWND hWnd, SOCKET &s)
 		return 1;
 	}
 
-	// ¼ö½Å ¹öÆÛ Å©±â ¼³Á¤
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (char*)&recvBufSize, sizeof(recvBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting recv buffer size failed.\n";
 		closesocket(s);
@@ -86,7 +87,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		for (int i = 0; i < MONSTERNUM; i++)
 		{
 			if (pD.mdata[i].dataType == 0)
-				continue;
+				break;
 
 			if (!vMonster[i])
 			{
@@ -98,6 +99,26 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
 		}
 
+		for (int i = 0; i < SKILLNUM; i++)
+		{
+			if (pD.sdata[i].skilltype == 0)
+				break;
+
+			if (!vSkill[i])
+			{
+				switch (pD.sdata[i].skilltype)
+				{
+				case KIRBYSKILL:
+					vSkill[i] = new KirbySkill();
+					break;
+				}
+				CreateObject((Skill*)vSkill[i]);
+			}
+
+			vSkill[i]->ObjectUpdate(pD, i);
+			vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());
+		}
+
 		if (timeSpan_readCount.count() >= 1)
 		{
 			CountReadNum();
@@ -107,33 +128,34 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 	LeaveCriticalSection(&cs);
 }
 
-void ReadInitMessage(SOCKET& s, TOTALDATA& uD)
+bool ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 {
-	int totalBytesReceived = 0; // ÃÑ ¼ö½ÅÇÑ ¹ÙÀÌÆ® ¼ö
-	int bytesToReceive = sizeof(TOTALDATA); // ¼ö½ÅÇÒ µ¥ÀÌÅÍ Å©±â
+	int totalBytesReceived = 0; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½
+	int bytesToReceive = sizeof(TOTALDATA); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½
 	int bytesReceived;
 
 	Sleep(1);
-	// ¸ðµç µ¥ÀÌÅÍ¸¦ ¹ÞÀ» ¶§±îÁö ¹Ýº¹
+	// ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ýºï¿½
 	while (totalBytesReceived < bytesToReceive)
 	{
 		bytesReceived = recv(s, (char*)&uD + totalBytesReceived, bytesToReceive - totalBytesReceived, 0);
 		if (bytesReceived == SOCKET_ERROR)
 		{
-			MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
-			return;
+			/*MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
+			return false;*/
+			continue;
 		}
 		if (bytesReceived == 0)
 		{
-			// ¿¬°áÀÌ Á¾·áµÈ °æ¿ì
-			MessageBox(NULL, _T("Connection closed"), _T("Error"), MB_OK);
-			return;
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+			/*MessageBox(NULL, _T("Connection closed"), _T("Error"), MB_OK);
+			return false;*/
+			continue;
 		}
-
-		totalBytesReceived += bytesReceived; // ¼ö½ÅÇÑ ¹ÙÀÌÆ® ¼ö¸¦ ¾÷µ¥ÀÌÆ®
+		totalBytesReceived += bytesReceived; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
 	}
 
-	// uD¿¡¼­ µ¥ÀÌÅÍ Ã³¸®
+	// uDï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
 	short num = -1;
 	for (int i = 0; i < PLAYERNUM; i++)
 	{
@@ -143,7 +165,7 @@ void ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 	}
 	myID = num;
 
-
+	return true;
 }
 
 void CloseClient(SOCKET& s, std::vector<Object*>& p, int id)
