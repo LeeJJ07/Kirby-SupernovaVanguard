@@ -191,7 +191,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						break;
 					GenerateMonster(pIdx);
 				}
-<<<<<<< HEAD
 				if(!isGameStart)
 				{
 					for (int i = 0; i < socketList.size(); i++)
@@ -203,9 +202,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					SetTimer(hWnd, TIMER_GENERATESKILL, 1, NULL);
 					isGameStart = true;
 				}
-
-=======
->>>>>>> Monster
 				SendToAll();
 			}
 		}

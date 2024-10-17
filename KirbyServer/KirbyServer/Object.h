@@ -5,17 +5,11 @@ struct PLAYERDATA;
 
 class Object
 {
-<<<<<<< HEAD
-private:
-	POINT	position;
-	POINT	mousePosition;
-	PAIR	lookingDirection;
-=======
+
 protected:
 	POINT position;
 	PAIR lookingDirection;
 	POINT mousePosition;
->>>>>>> Monster
 
 	bool isInGame;
 
