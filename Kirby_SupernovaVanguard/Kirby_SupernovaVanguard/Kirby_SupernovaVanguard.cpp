@@ -381,6 +381,12 @@ void DrawCamera(HDC hdc)
 {
 	for (int i = 0; i < objnum; i++)
 	{
+		if (objArr[i]->GetPosition().x < vClient[myID]->GetPosition().x - 1000
+			|| objArr[i]->GetPosition().x > vClient[myID]->GetPosition().x + 1000
+			|| objArr[i]->GetPosition().y < vClient[myID]->GetPosition().y - 650
+			|| objArr[i]->GetPosition().y > vClient[myID]->GetPosition().y + 650)
+			continue;
+
 		switch (objArr[i]->GetCollider()->GetType())
 		{
 		case TERRAIN:

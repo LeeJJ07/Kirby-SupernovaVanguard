@@ -7,7 +7,7 @@ enum EMonsterState { CHASE, ATTACK, DEATH };
 
 class Monster : public Object
 {
-private:
+protected:
 	EMonsterType monsterType;
 	EMonsterState curState;
 
