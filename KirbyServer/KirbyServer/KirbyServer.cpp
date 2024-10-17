@@ -45,13 +45,15 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID);
 void SendToAll();
 void ReadData();
 void UpdateMonster();
+void SetMonsterData(MONSTERDATA& mData, Monster*& m);
 void GenerateMonster(int playerIdx);
 void CloseClient(SOCKET socket);
-void SetMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx);
+void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx);
 bool IsValidSpawnPos(int playerIdx, POINT pos);
 POINT SetRandomSpawnPos(int playerIdx);
 void InitUserData(PLAYERDATA& userData, int id);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
+void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx);
 
 WSADATA wsaData;
 SOCKET s, cs;
@@ -223,8 +225,8 @@ int InitServer(HWND hWnd)
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	
-	int sendBufSize = 81920 * 2;  // 송신 버퍼 크기 (예: 8KB)
-	int recvBufSize = 81920 * 2;  // 수신 버퍼 크기 (예: 8KB)
+	int sendBufSize = 88256 * 2;  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = 88256 * 2;  // 수신 버퍼 크기 (예: 8KB)
 
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -344,11 +346,12 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 	uData.inGameStart = rData.isReady;
 }
 
-void SetTarget(MONSTERDATA& mData, TOTALDATA& tData)
+void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 {
 	int distance = pow(mData.pos.x - tData.udata[0].pos.x, 2) + pow(mData.pos.y - tData.udata[0].pos.y, 2);
 
 	mData.targetnum = 0;
+	monsterArr[monsterIdx]->SetTargetPos(tData.udata[0].pos);
 
 	for (int i = 1; i < PLAYERNUM; i++)
 	{
@@ -361,11 +364,12 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData)
 			distance = newdistance;
 
 			mData.targetnum = i;
+			monsterArr[monsterIdx]->SetTargetPos(tData.udata[mData.targetnum].pos);
 		}
 	}
 }
 
-void SetMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx)
+void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx)
 {
 	POINT generatePos = SetRandomSpawnPos(playerIdx);
 
@@ -377,23 +381,23 @@ void SetMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx)
 	switch (mType)
 	{
 	case RUNNER:
-		m = new RunnerMonster(generatePos, mType, CHASE,
+		m = new RunnerMonster(generatePos, mType, CHASE, {0, 0},
 			RUNNER_BASE_DAMAGE, RUNNER_BASE_HEALTH, RUNNER_BASE_SPEED, TRUE);
 		break;
 	case SPEAR:
-		m = new SpearMonster(generatePos, mType, CHASE,
+		m = new SpearMonster(generatePos, mType, CHASE, { 0, 0 },
 			SPEAR_BASE_DAMAGE, SPEAR_BASE_HEALTH, SPEAR_BASE_SPEED, TRUE);
 		break;
 	case WINGBUG:
-		m = new WingBugMonster(generatePos, mType, CHASE,
+		m = new WingBugMonster(generatePos, mType, CHASE, { 0, 0 },
 			WINGBUG_BASE_DAMAGE, WINGBUG_BASE_HEALTH, WINGBUG_BASE_SPEED, TRUE);
 		break;
 	case FIREMAN:
-		m = new FireManMonster(generatePos, mType, CHASE,
+		m = new FireManMonster(generatePos, mType, CHASE, { 0, 0 },
 			FIREMAN_BASE_DAMAGE, FIREMAN_BASE_HEALTH, FIREMAN_BASE_SPEED, TRUE);
 		break;
 	case LANDMINE:
-		m = new LandMineMonster(generatePos, mType, CHASE,
+		m = new LandMineMonster(generatePos, mType, CHASE, { 0, 0 },
 			LANDMINE_BASE_DAMAGE, LANDMINE_BASE_HEALTH, LANDMINE_BASE_SPEED, TRUE);
 		break;
 	}
@@ -458,7 +462,7 @@ void GenerateMonster(int playerIdx)
 	{
 		if (totalData.mdata[i].dataType == 0)
 		{
-			SetMonsterData(totalData.mdata[i], monsterArr[i], playerIdx);
+			InitMonsterData(totalData.mdata[i], monsterArr[i], playerIdx);
 			return;
 		}
 	}
@@ -477,26 +481,18 @@ void UpdateMonster()
 
 		if(totalData.mdata[i].timeSpan_targeting.count() > RETARGETINGTIME)
 		{
-			SetTarget(totalData.mdata[i], totalData);
-
+			SetTarget(totalData.mdata[i], totalData, i);
 			totalData.mdata[i].t1_targeting = std::chrono::high_resolution_clock::now();
 		}
 		monsterArr[i]->Update();
 
-		// 수정 필요
-		int x = 0, y = 0;
-
-		if (totalData.mdata[i].pos.x > totalData.udata[totalData.mdata[i].targetnum].pos.x)
-			x = -1;
-		else
-			x = 1;
-
-		if (totalData.mdata[i].pos.y > totalData.udata[totalData.mdata[i].targetnum].pos.y)
-			y = -1;
-		else
-			y = 1;
-
-		totalData.mdata[i].pos.x += x;
-		totalData.mdata[i].pos.y += y;
+		SetMonsterData(totalData.mdata[i], monsterArr[i]);
 	}
+}
+
+void SetMonsterData(MONSTERDATA& mData, Monster*& m)
+{
+	mData.pos = m->GetPosition();
+	mData.lookingDir = m->GetLookingDir();
+	mData.curState = m->GetMonsterState();
 }

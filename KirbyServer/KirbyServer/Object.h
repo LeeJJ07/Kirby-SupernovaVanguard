@@ -5,7 +5,7 @@ struct PLAYERDATA;
 
 class Object
 {
-private:
+protected:
 	POINT position;
 	PAIR lookingDirection;
 	POINT mousePosition;
@@ -31,4 +31,6 @@ public:
 	void			SetObject(Collider2D* c) { collider = c; }
 
 	void			ObjectUpdate(PLAYERDATA);
+
+	PAIR			NormalizationDir(POINT target);
 };

@@ -11,9 +11,11 @@ extern int monsterCount;
 
 class Monster : public Object
 {
-private:
+protected:
 	EMonsterType monsterType;
 	EMonsterState curState;
+
+	POINT targetPos;
 
 	int damage;
 	int maxHealth;
@@ -28,6 +30,7 @@ public:
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
 
+		this->targetPos = { 0, 0 };
 		this->damage = BASE_DAMAGE;
 		this->maxHealth = BASE_HEALTH;
 		this->curHealth = this->maxHealth;
@@ -40,6 +43,7 @@ public:
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
 
+		this->targetPos = { 0, 0 };
 		this->damage = BASE_DAMAGE;
 		this->maxHealth = BASE_HEALTH;
 		this->curHealth = this->maxHealth;
@@ -47,12 +51,13 @@ public:
 
 		isEnabled = false;
 	}
-	Monster(POINT p, EMonsterType mType, EMonsterState cs, int damage, int maxHealth, float speed, bool isEnabled)
+	Monster(POINT p, EMonsterType mType, EMonsterState cs, POINT targetPos, int damage, int maxHealth, float speed, bool isEnabled)
 		: monsterType(mType), curState(cs), Object(p)
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
 
+		this->targetPos = targetPos;
 		this->damage = damage;
 		this->maxHealth = maxHealth;
 		this->curHealth = this->maxHealth;
@@ -64,12 +69,16 @@ public:
 	virtual ~Monster() {}
 
 	EMonsterType	GetMonsterType() { return monsterType; }
-	void SetMosterType(EMonsterType _monsterType) { this->monsterType = _monsterType; }
+	void SetMosterType(EMonsterType monsterType) { this->monsterType = monsterType; }
+	EMonsterState GetMonsterState() { return curState; }
+	void SetMonsterState(EMonsterState nextState) { this->curState = nextState; }
 
+	POINT GetTargetPos() { return targetPos; }
 	int GetDamage() { return damage; }
 	int GetMaxHealth() { return maxHealth; }
 	int GetCurHealth() { return curHealth; }
 	float GetSpeed() { return speed; }
+	void SetTargetPos(POINT targetPos) { this->targetPos = targetPos; }
 	void SetDamage(int damage) { this->damage = damage; }
 	void SetMaxHealth(int maxHealth) { this->maxHealth = maxHealth; }
 	void SetCurHealth(int curHealth) { this->curHealth = curHealth; }
