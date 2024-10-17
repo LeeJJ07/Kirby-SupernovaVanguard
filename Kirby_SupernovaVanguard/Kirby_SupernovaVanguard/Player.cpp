@@ -11,6 +11,11 @@ void Player::ObjectUpdate(TOTALDATA pData, int i)
 
 void Player::DrawPlayer(HDC& hdc)
 {
+    if (position.x < 1000)
+    {
+        int xxxxx = 10000;
+        return;
+    }
     // 색상 설정을 위한 브러시 핸들
     HBRUSH brush;
     brush = CreateSolidBrush(RGB(255, 255, 255)); // 기본 색상 (흰색)

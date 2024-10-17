@@ -263,8 +263,8 @@ int InitServer(HWND hWnd)
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	
-	int sendBufSize = 10000 * 2;  // 송신 버퍼 크기 (예: 8KB)
-	int recvBufSize = 10000 * 2;  // 수신 버퍼 크기 (예: 8KB)
+	int sendBufSize = sizeof(TOTALDATA);  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = sizeof(TOTALDATA);  // 수신 버퍼 크기 (예: 8KB)
 
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
