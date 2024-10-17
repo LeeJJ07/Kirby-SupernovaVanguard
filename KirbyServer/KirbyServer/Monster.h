@@ -78,11 +78,14 @@ public:
 	int GetMaxHealth() { return maxHealth; }
 	int GetCurHealth() { return curHealth; }
 	float GetSpeed() { return speed; }
+	bool GetEnabled() { return isEnabled; }
 	void SetTargetPos(POINT targetPos) { this->targetPos = targetPos; }
 	void SetDamage(int damage) { this->damage = damage; }
 	void SetMaxHealth(int maxHealth) { this->maxHealth = maxHealth; }
 	void SetCurHealth(int curHealth) { this->curHealth = curHealth; }
 	void SetSpeed(float speed) { this->speed = speed; }
+	void SetEnabled(bool isEnabled) { this->isEnabled = isEnabled; }
 
+	virtual void StateUpdate() = 0;
 	virtual void Update() = 0;
 };

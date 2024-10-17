@@ -50,7 +50,7 @@ void GenerateMonster(int playerIdx);
 void CloseClient(SOCKET socket);
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx);
 bool IsValidSpawnPos(int playerIdx, POINT pos);
-POINT SetRandomSpawnPos(int playerIdx);
+POINT SetRandomSpawnPos(int playerIdx, EMonsterType mType);
 void InitUserData(PLAYERDATA& userData, int id);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx);
@@ -177,7 +177,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						break;
 					GenerateMonster(pIdx);
 				}
-
 				SendToAll();
 			}
 		}
@@ -371,12 +370,11 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx)
 {
-	POINT generatePos = SetRandomSpawnPos(playerIdx);
+	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+	POINT generatePos = SetRandomSpawnPos(playerIdx, mType);
 
 	if (!IsValidSpawnPos(playerIdx, generatePos))
 		return;
-
-	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
 
 	switch (mType)
 	{
@@ -386,11 +384,13 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx)
 		break;
 	case SPEAR:
 		m = new SpearMonster(generatePos, mType, CHASE, { 0, 0 },
-			SPEAR_BASE_DAMAGE, SPEAR_BASE_HEALTH, SPEAR_BASE_SPEED, TRUE);
+			SPEAR_BASE_DAMAGE, SPEAR_BASE_HEALTH, SPEAR_BASE_SPEED, SPEAR_BASE_RANGE, TRUE);
 		break;
 	case WINGBUG:
 		m = new WingBugMonster(generatePos, mType, CHASE, { 0, 0 },
 			WINGBUG_BASE_DAMAGE, WINGBUG_BASE_HEALTH, WINGBUG_BASE_SPEED, TRUE);
+		if (generatePos.x < totalData.udata[playerIdx].pos.x) m->SetLookingDir({ 1, 0 });
+		else m->SetLookingDir({ -1, 0 });
 		break;
 	case FIREMAN:
 		m = new FireManMonster(generatePos, mType, CHASE, { 0, 0 },
@@ -424,35 +424,54 @@ bool IsValidSpawnPos(int playerIdx, POINT pos)
 	return true;
 }
 
-POINT SetRandomSpawnPos(int playerIdx)
+POINT SetRandomSpawnPos(int playerIdx, EMonsterType mType)
 {
 	POINT generatePos = { totalData.udata[playerIdx].pos.x, totalData.udata[playerIdx].pos.y };
-	Direction spawnDir = (Direction)(rand() % 4);
-	int randX = 0, randY = 0;
-	
-	switch (spawnDir)
+
+	switch (mType)
 	{
-	case UP:
-		randX = rand() % SCREEN_SIZE_X;
-		randY = -(SCREEN_SIZE_Y + DEFAULT_SPAWN_SIZE_Y);
+	case RUNNER:
+	case FIREMAN:
+	case SPEAR:
+	{
+		Direction spawnDir = (Direction)(rand() % 4);
+		int randX = 0, randY = 0;
+
+		switch (spawnDir)
+		{
+		case UP:
+			randX = rand() % SCREEN_SIZE_X;
+			randY = -(SCREEN_SIZE_Y + DEFAULT_SPAWN_SIZE_Y);
+			break;
+		case DOWN:
+			randX = rand() % SCREEN_SIZE_X;
+			randY = (SCREEN_SIZE_Y + DEFAULT_SPAWN_SIZE_Y);
+			break;
+		case RIGHT:
+			randX = (SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
+			randY = rand() % SCREEN_SIZE_Y;
+			break;
+		case LEFT:
+			randX = -(SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
+			randY = rand() % SCREEN_SIZE_Y;
+			break;
+		}
+		generatePos.x += randX;
+		generatePos.y += randY;
+	}
 		break;
-	case DOWN:
-		randX = rand() % SCREEN_SIZE_X;
-		randY = (SCREEN_SIZE_Y + DEFAULT_SPAWN_SIZE_Y);
+	case WINGBUG:
+	{
+		int randomNum = rand() % 2;
+		if (randomNum)generatePos.x += (SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
+		else generatePos.x += -(SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
+	}
 		break;
-	case RIGHT:
-		randX = (SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
-		randY = rand() % SCREEN_SIZE_Y;
-		break;
-	case LEFT:
-		randX = -(SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
-		randY = rand() % SCREEN_SIZE_Y;
+	case LANDMINE:
+		//#####################################
+		//위치 다시 세팅
 		break;
 	}
-
-	generatePos.x += randX;
-	generatePos.y += randY;
-
 	return generatePos;
 }
 
@@ -485,6 +504,12 @@ void UpdateMonster()
 			totalData.mdata[i].t1_targeting = std::chrono::high_resolution_clock::now();
 		}
 		monsterArr[i]->Update();
+		if (!monsterArr[i]->GetEnabled())
+		{
+			totalData.mdata[i].dataType = 0;
+			delete monsterArr[i];
+			continue;
+		}
 
 		SetMonsterData(totalData.mdata[i], monsterArr[i]);
 	}
@@ -492,6 +517,7 @@ void UpdateMonster()
 
 void SetMonsterData(MONSTERDATA& mData, Monster*& m)
 {
+	
 	mData.pos = m->GetPosition();
 	mData.lookingDir = m->GetLookingDir();
 	mData.curState = m->GetMonsterState();

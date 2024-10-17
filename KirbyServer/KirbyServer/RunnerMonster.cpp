@@ -1,10 +1,20 @@
 #include "RunnerMonster.h"
 
+void RunnerMonster::StateUpdate()
+{
+	switch (curState)
+	{
+	case CHASE:
+		break;
+	case DEATH:
+		break;
+	}
+}
+
 void RunnerMonster::Update()
 {
-	// 수정 필요
 	lookingDirection = NormalizationDir(targetPos);
 
-	position.x += round(lookingDirection.first * speed);
-	position.y += round(lookingDirection.second * speed);
+	position.x += (int)round(lookingDirection.first * speed);
+	position.y += (int)round(lookingDirection.second * speed);
 }

@@ -15,6 +15,6 @@ public:
 		:Monster(p, mType, cs, targetPos, damage, maxHealth, speed, isEnabled)
 	{}
 
+	void StateUpdate() override;
 	void Update() override;
-
 };
