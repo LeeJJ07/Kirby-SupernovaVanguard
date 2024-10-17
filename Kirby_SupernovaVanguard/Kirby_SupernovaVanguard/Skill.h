@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Player.h"
+#include "Object.h"
+#include "PlayerData.h"
 
 enum SKILLTYPE {
-	KIRBYSKILL = 0,
+	KIRBYSKILL = 1,
 	METAKNIGHTSKILL,
 	DEDEDESKILL,
 	MABEROASKILL,
@@ -14,33 +15,30 @@ enum SKILLTYPE {
 	TRUCKSKILL
 };
 
-class Skill {
+class Skill : public Object {
 private:
-	float coolTime;
-	int speed;
-	int damage;
 	int size;
-	Object* master;
-	POINT position;
-	POINT direction;
+	SKILLTYPE skilltype;
 
 public:
-	Skill() :coolTime(5.0), speed(1), damage(1), size(1), master(nullptr), position({ 0,0 }), direction({ 0,0 }) {}
+	Skill() :size(0),skilltype(KIRBYSKILL)
+	{}
 	~Skill() {}
 
-	float Getcooltime() { return coolTime; }
-	int Getspeed() { return speed; }
-	int Getdamage() { return damage; }
-	int Getsize() { return size; }
-	Object* Getmaster() { return master; }
-	POINT Getposition() { return position; }
-	POINT Getdirection() { return direction; }
+	
+	int	Getsize() { return size; }
+	SKILLTYPE	Getskilltype() { return skilltype; }
 
-	void Setcooltime(float coolTime) { this->coolTime = coolTime; }
-	void Setspeed(int speed) { this->speed = speed; }
-	void Setdamage(int damage) { this->damage = damage; }
-	void Setsize(int size) { this->size = size; }
-	void Setmaster(Object* master) { this->master = master; }
-	void Setposition(POINT position) { this->position = position; }
-	void Setdirection(POINT direction) { this->direction = direction; }
+	void	Setsize(int size) { this->size = size; }
+	void	Setskilltype(int i)
+	{
+		switch (i)
+		{
+		case KIRBYSKILL:
+			this->skilltype = KIRBYSKILL;
+			break;
+		}
+	}
+
+	void	ObjectUpdate(TOTALDATA, int i);
 };

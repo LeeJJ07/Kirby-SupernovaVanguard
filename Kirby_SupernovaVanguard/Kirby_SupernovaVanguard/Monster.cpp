@@ -5,8 +5,8 @@ void Monster::DrawMonster(HDC&)
 
 }
 
-void Monster::ObjectUpdate(TOTALDATA mData, int i)
+void Monster::ObjectUpdate(TOTALDATA totalData, int i)
 {
-	SetPosition(mData.mdata[i].pos);
-	GetCollider()->SetOffset(mData.mdata[i].offset);
+	SetPosition(totalData.mdata[i].pos);
+	GetCollider()->SetOffset(totalData.mdata[i].offset);
 }

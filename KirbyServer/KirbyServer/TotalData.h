@@ -23,7 +23,7 @@ struct PLAYERDATA :public OBJECTDATA
 {
 	POINT mousePos;
 	bool inGameStart;
-	char charactertype;
+	int charactertype;
 };
 
 struct SKILLDATA
@@ -31,7 +31,10 @@ struct SKILLDATA
 	bool isactivate;
 	int skilltype;
 	int size;
+	int collidertype;
+	int collidersize;
 	POINT position;
+	POINT colliderposition;
 };
 
 struct MONSTERDATA :public OBJECTDATA

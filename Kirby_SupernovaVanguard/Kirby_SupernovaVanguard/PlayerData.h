@@ -28,7 +28,10 @@ struct SKILLDATA
 	bool isactivate;
 	int skilltype;
 	int size;
+	int collidertype;
+	int collidersize;
 	POINT position;
+	POINT colliderposition;
 };
 
 struct MONSTERDATA :public OBJECTDATA

@@ -29,7 +29,26 @@ public:
 	int	GetID() { return ID; }
 	std::vector<SkillManager*> GetSkillManager() { return vSkillManager; }
 
-	void	SetCharacterType(ECharacterType characterType) { this->characterType = characterType; }
+	void SetSkillManager(std::vector<SkillManager*> vSkillManager) { this->vSkillManager = vSkillManager; }
+
+	void	SetCharacterType(int characterType)
+	{ 
+		switch (characterType)
+		{
+		case 0:
+			this->characterType = KIRBY;
+			break;
+		case 1:
+			this->characterType = METANIHGT;
+			break;
+		case 2:
+			this->characterType = DDD;
+			break;
+		case 3:
+			this->characterType = MABOROA;
+			break;
+		}
+	}
 	void	DrawPlayer(HDC&);
 };
 

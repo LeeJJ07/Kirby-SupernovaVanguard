@@ -3,6 +3,8 @@
 #include "Skill.h"
 #include "TotalData.h"
 
+#define KIRBYSKILLMAXXSIZE 50
+
 class KirbySkill : public Skill
 {
 private:
@@ -15,7 +17,7 @@ public:
 	KirbySkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::KIRBYSKILL, COLLIDERTYPE::CIRCLE, 5, 10, 5, 5., { totalData.udata[masternum].pos.x,totalData.udata[masternum].pos.y }, { 1,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::KIRBYSKILL, COLLIDERTYPE::CIRCLE, 5, 10, 5, 5., { totalData.udata[masternum].pos.x,totalData.udata[masternum].pos.y }, { 5,0 }),
 		biggersize(1),
 		decelerationrate(1),
 		imageaddress(nullptr)
@@ -37,35 +39,37 @@ public:
 	void KirbySkillSlower();
 };
 
-void SetBasisKirbySkillInDatasheet(Skill* skill, int& skillnum)
+void SetKirbySkillInDatasheet(Skill*& skill, int& skillnum)
 {
-	KirbySkill* kirbyskill = dynamic_cast<KirbySkill*>(skill);
-	totalData.sdata[skillnum];
+	KirbySkill*	kirbyskill = dynamic_cast<KirbySkill*>(skill);
+	Circle2D*	kirbycollider = dynamic_cast<Circle2D*>(kirbyskill->GetCollider());
 
 	totalData.sdata[skillnum].isactivate = true;
-	totalData.sdata[skillnum].skilltype = kirbyskill->Getskilltype();
-	totalData.sdata[skillnum].size = kirbyskill->Getsize();
-	totalData.sdata[skillnum].position = kirbyskill->Getposition();
+	totalData.sdata[skillnum].skilltype = skill->Getskilltype();
+	totalData.sdata[skillnum].size = skill->Getsize();
+	totalData.sdata[skillnum].position = skill->Getposition();
+	totalData.sdata[skillnum].colliderposition = kirbyskill->GetCollider()->GetPosition();
+	totalData.sdata[skillnum].collidersize = kirbycollider->GetRadius();
+	totalData.sdata[skillnum].collidertype = skill->Getcollidertype();
 }
-
+KirbySkill* kirbyskill = nullptr;
 void UpdateKirbySkill(Skill* &skill)
 {
-	KirbySkill* kirbyskill = dynamic_cast<KirbySkill*>(skill);
+	kirbyskill = dynamic_cast<KirbySkill*>(skill);
 
 	POINT newpos;
-	newpos.x = skill->Getposition().x + skill->Getdirection().x;
-	newpos.y = skill->Getposition().y + skill->Getdirection().y;
+	newpos.x = kirbyskill->Getposition().x + kirbyskill->Getdirection().x;
+	newpos.y = kirbyskill->Getposition().y + kirbyskill->Getdirection().y;
 	kirbyskill->Setposition(newpos);
 
-	kirbyskill->KirbySkillBigger();
+	if (kirbyskill->Getsize() < KIRBYSKILLMAXXSIZE)
+		kirbyskill->KirbySkillBigger();
 
 	kirbyskill->GetCollider()->SetPosition(kirbyskill->Getposition());
 	Circle2D* circle = dynamic_cast<Circle2D*>(kirbyskill->GetCollider());
 	circle->SetRadius(kirbyskill->Getsize());
-
+	
 	kirbyskill->SetCollider(circle);
-
-	skill = kirbyskill;
 }
 
 void KirbySkill::KirbySkillBigger()

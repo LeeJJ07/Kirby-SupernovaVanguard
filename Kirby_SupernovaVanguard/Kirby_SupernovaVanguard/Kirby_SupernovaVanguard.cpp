@@ -3,6 +3,7 @@
 #include "ActionData.h"
 #include "StartScene.h"
 #include "SelectScene.h"
+#include "AllSkill.h"
 #include "Camera.h"
 #include "Socket.h"
 #include "Map.h"
@@ -32,6 +33,7 @@ unsigned __stdcall Send();
 
 std::vector<Object*> vClient(PLAYERNUM);
 std::vector<Object*> vMonster(MONSTERNUM);
+std::vector<Object*> vSkill(SKILLNUM);
 TOTALDATA uData;
 Object** objArr;
 static SOCKET cSocket;
@@ -222,9 +224,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			ResumeThread(hThreads[0]);
 		if (hThreads[1])
 			ResumeThread(hThreads[1]);
-
-		break;
 	}
+	break;
 	case WM_CHAR:
 		if (wParam == VK_RETURN/* && canGoToNext*/)
 		{
@@ -263,6 +264,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 		}
+		break;
 	case WM_LBUTTONDOWN:
 	{
 		cursorX = LOWORD(lParam);
@@ -385,6 +387,8 @@ void DrawObject(HDC hdc)
 			((Monster*)objArr[i])->DrawMonster(hdc);
 			break;
 		case PMISSILE:
+			DrawSkill(hdc, (Skill*)objArr[i]);
+			//((Skill*)objArr[i])
 			break;
 		case EMISSILE:
 			break;

@@ -7,7 +7,7 @@
 #include "Player.h"
 
 enum SKILLTYPE {
-	KIRBYSKILL = 0,
+	KIRBYSKILL = 1,
 	METAKNIGHTSKILL,
 	DEDEDESKILL,
 	MABEROASKILL,
@@ -33,14 +33,15 @@ private:
 	int damage;
 	int size;
 	float coolTime;
+	POINT offset;
 	POINT position;
 	POINT direction;
 public:
 	Skill() :masternum(0), targetnum(0), skilltype(KIRBYSKILL), collidertype(COLLIDERTYPE::CIRCLE),
-		speed(1), damage(1), size(1), coolTime(5.0), position({ 0,0 }), direction({ 0,0 }) {}
+		speed(1), damage(1), size(1), coolTime(5.0), offset({ 0,0 }), position({ 0,0 }), direction({ 1,0 }) {}
 	Skill(int masternum, int targetnum, int skilltype, int collidertype, int speed, int damage, int size, float coolTime, POINT position, POINT direction)
 		:masternum(masternum), targetnum(targetnum), skilltype(KIRBYSKILL), collidertype(collidertype),
-		speed(1), damage(1), size(1), coolTime(5.0), position({0,0}), direction({0,0}) {}
+		speed(1), damage(1), size(1), coolTime(5.0), offset({ 0,0 }), position({0,0}), direction({1,0}) {}
 	~Skill() {}
 
 	int Getmasternum()	{ return masternum; }
@@ -51,6 +52,7 @@ public:
 	int Getdamage()	{ return damage; }
 	int Getsize()	{ return size; }
 	float Getcooltime() { return coolTime; }
+	POINT Getoffset()	{ return offset; }
 	POINT Getposition()	{ return position; }
 	POINT Getdirection()	{ return direction; }
 
@@ -62,6 +64,7 @@ public:
 	void Setdamage(int damage)	{ this->damage = damage; }
 	void Setsize(int size)	{ this->size = size; }
 	void Setcooltime(float coolTime)	{ this->coolTime = coolTime; }
+	void Setoffset(POINT offset) { this->offset = offset; }
 	void Setposition(POINT position)	{ this->position = position; }
 	void Setdirection(POINT direction)	{ this->direction = direction; }
 

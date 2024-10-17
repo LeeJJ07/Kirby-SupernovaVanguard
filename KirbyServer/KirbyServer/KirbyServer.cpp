@@ -23,7 +23,7 @@ HANDLE hThreads[2];
 // <<
 
 // << : skill
-vector<Skill*> vSkill(SKILLNUM);
+vector<Skill*> vSkill;
 void GenerateSkill();
 void UpdateSkill();
 void SetBasisSkillData(int);
@@ -31,7 +31,7 @@ void SetSkillToDatasheet();
 // <<
 
 // << : player
-std::vector<Player*> vClient(PLAYERNUM);
+std::vector<Player*> vClient;
 // <<
 
 // 클라이언트 ActionData와 형식 같음
@@ -175,9 +175,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 		case TIMER_01:
+		{
 			UpdateMonster();
 			SendToAll();
-			break;
+		}
+		break;
 		case TIMER_GENERATEMONSTER:
 		{
 			if (isAllclientReady)
@@ -189,8 +191,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						SetBasisSkillData(i);
 					}
 
-					SetTimer(hWnd, TIMER_UPDATESKILL, 1, NULL);
-					SetTimer(hWnd, TIMER_GENERATESKILL, 5, NULL);
+					SetTimer(hWnd, TIMER_UPDATESKILL, 5, NULL);
+					SetTimer(hWnd, TIMER_GENERATESKILL, 1, NULL);
 					isGameStart = true;
 				}
 				GenerateMonster();
@@ -198,10 +200,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				SendToAll();
 			}
 		}
-			break;
+		break;
 		case TIMER_GENERATESKILL:
+		{
 			GenerateSkill();
-			break;
+		}
+		break;
 		case TIMER_UPDATESKILL:
 		{
 			UpdateSkill();
@@ -209,12 +213,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 		}
-	
+		break;
 	case WM_CREATE:
+	{
 		SetTimer(hWnd, TIMER_01, 1, NULL);
 		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
 
 		return InitServer(hWnd);
+	}
 		break;
 	case WM_ASYNC:
 		switch (lParam)
@@ -229,6 +235,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			CloseClient(wParam);
 			break;
 		}
+		break;
 	case WM_PAINT:
 		{
 			PAINTSTRUCT ps;
@@ -383,6 +390,7 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 
 void SetBasisSkillData(int playerIndex)
 {
+	vClient[playerIndex]->SetCharacterType(totalData.udata[playerIndex].charactertype);
 	Skill* basisSkill = nullptr;
 	switch (vClient[playerIndex]->GetCharacterType())
 	{
@@ -394,11 +402,15 @@ void SetBasisSkillData(int playerIndex)
 	}
 	SkillManager* skillmanager = new SkillManager(basisSkill->Getskilltype(), basisSkill->Getcooltime());
 
-	vClient[playerIndex]->GetSkillManager().push_back(skillmanager);
+	std::vector<SkillManager*> sm = vClient[playerIndex]->GetSkillManager();
+	sm.push_back(skillmanager);
+	vClient[playerIndex]->SetSkillManager(sm);
 }
 
 void GenerateSkill()
 {
+	if (vSkill.size() >= 98)
+		return;
 	for (int i = 0; i < socketList.size(); i++)
 	{
 		std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
@@ -415,12 +427,14 @@ void GenerateSkill()
 				case SKILLTYPE::KIRBYSKILL:
 				{
 					KirbySkill* kirbySkill = new KirbySkill(i, 0);
+					kirbySkill->Setposition(totalData.udata[i].pos);
 					vSkill.push_back(kirbySkill);
 				}
 					break;
 				case SKILLTYPE::METAKNIGHTSKILL:
 					break;
 				}
+				skillnum++;
 				temp[j]->Settime_1();
 			}
 		}
@@ -429,12 +443,13 @@ void GenerateSkill()
 
 void SetSkillToDatasheet()
 {
+	int i = 0;
 	for (auto skill : vSkill)
 	{
 		switch (skill->Getskilltype())
 		{
 		case SKILLTYPE::KIRBYSKILL:
-			SetBasisKirbySkillInDatasheet(skill, skillnum);
+			SetKirbySkillInDatasheet(skill, i);
 			break;
 		case SKILLTYPE::METAKNIGHTSKILL:
 
@@ -461,7 +476,7 @@ void SetSkillToDatasheet()
 
 			break;
 		}
-		skillnum++;
+		i++;
 	}
 }
 

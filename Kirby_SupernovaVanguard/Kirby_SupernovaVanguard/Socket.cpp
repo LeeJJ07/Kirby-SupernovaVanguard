@@ -3,6 +3,7 @@
 #include "ActionData.h"
 #include "Multithread.h"
 #include "Camera.h"
+#include "KirbySkill.h"
 
 short myID;
 int textreadCount;
@@ -86,7 +87,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		for (int i = 0; i < MONSTERNUM; i++)
 		{
 			if (pD.mdata[i].dataType == 0)
-				continue;
+				break;
 
 			if (!vMonster[i])
 			{
@@ -96,6 +97,26 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 			vMonster[i]->ObjectUpdate(pD, i);
 			vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
+		}
+
+		for (int i = 0; i < SKILLNUM; i++)
+		{
+			if (pD.sdata[i].skilltype == 0)
+				break;
+
+			if (!vSkill[i])
+			{
+				switch (pD.sdata[i].skilltype)
+				{
+				case KIRBYSKILL:
+					vSkill[i] = new KirbySkill();
+					break;
+				}
+				CreateObject((Skill*)vSkill[i]);
+			}
+
+			vSkill[i]->ObjectUpdate(pD, i);
+			vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());
 		}
 
 		if (timeSpan_readCount.count() >= 1)
@@ -120,14 +141,16 @@ bool ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 		bytesReceived = recv(s, (char*)&uD + totalBytesReceived, bytesToReceive - totalBytesReceived, 0);
 		if (bytesReceived == SOCKET_ERROR)
 		{
-			MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
-			return false;
+			/*MessageBox(NULL, _T("receive() failed"), _T("Error"), MB_OK);
+			return false;*/
+			continue;
 		}
 		if (bytesReceived == 0)
 		{
 			// 연결이 종료된 경우
-			MessageBox(NULL, _T("Connection closed"), _T("Error"), MB_OK);
-			return false;
+			/*MessageBox(NULL, _T("Connection closed"), _T("Error"), MB_OK);
+			return false;*/
+			continue;
 		}
 		totalBytesReceived += bytesReceived; // 수신한 바이트 수를 업데이트
 	}
