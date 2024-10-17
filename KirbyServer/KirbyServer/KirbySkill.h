@@ -39,28 +39,10 @@ public:
 	void KirbySkillSlower();
 };
 
-<<<<<<< HEAD
 void SetKirbySkillInDatasheet(Skill*& skill, int& skillnum)
 {
 	KirbySkill*	kirbyskill = dynamic_cast<KirbySkill*>(skill);
 	Circle2D*	kirbycollider = dynamic_cast<Circle2D*>(kirbyskill->GetCollider());
-=======
-void SetBasisKirbySkillInDatasheet(Skill* skill)
-{
-	KirbySkill* kirbyskill = dynamic_cast<KirbySkill*>(skill);
-	totalData.sdata[skill->GetID()];
-	/*KirbySkill* kirbyskill = new KirbySkill(masternum, 0);
-	totalData.sdata[index].isactivate = true;
-	totalData.sdata[index].skilltype = kirbyskill->Getskilltype();
-	totalData.sdata[index].speed = kirbyskill->Getspeed();
-	totalData.sdata[index].damage = kirbyskill->Getdamage();
-	totalData.sdata[index].size = kirbyskill->Getsize();
-	totalData.sdata[index].coolTime = kirbyskill->Getcooltime();
-	totalData.sdata[index].position = kirbyskill->Getposition();
-	
-	vSkill.push_back(kirbyskill);*/
-}
->>>>>>> 272e4e3653de8eaf007019700fa50379e3a0c918
 
 	totalData.sdata[skillnum].isactivate = true;
 	totalData.sdata[skillnum].skilltype = skill->Getskilltype();
@@ -70,6 +52,7 @@ void SetBasisKirbySkillInDatasheet(Skill* skill)
 	totalData.sdata[skillnum].collidersize = kirbycollider->GetRadius();
 	totalData.sdata[skillnum].collidertype = skill->Getcollidertype();
 }
+
 KirbySkill* kirbyskill = nullptr;
 void UpdateKirbySkill(Skill* &skill)
 {
