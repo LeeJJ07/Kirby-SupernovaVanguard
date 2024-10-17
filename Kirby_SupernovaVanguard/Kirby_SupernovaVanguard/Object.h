@@ -7,7 +7,7 @@ class Collider2D;
 
 class Object
 {
-private:
+protected:
 	POINT position;
 	PAIR lookingDirection;
 
