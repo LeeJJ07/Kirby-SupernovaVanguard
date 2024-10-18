@@ -35,3 +35,5 @@ public:
 
 	PAIR			NormalizationDir(POINT target);
 };
+
+static bool OBJECTIDARR[FINALINDEX];

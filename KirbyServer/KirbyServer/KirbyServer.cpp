@@ -7,7 +7,7 @@
 #include <WinSock2.h>
 #include "Object.h"
 #include "TotalData.h"
-#include "KirbySkill.h"
+#include "TotalSkill.h"
 
 #pragma comment(lib, "ws2_32.lib")
 
@@ -16,10 +16,14 @@ using namespace std;
 enum State { RECEIVE, SEND };
 enum Direction { UP, RIGHT, DOWN, LEFT };
 
+int curplayerindex = PLAYERINDEX;
+int curmonsterindex = MONSTERINDEX;
+int curskillindex = SKILLINDEX;
+
 std::vector<Monster*> monsterArr(MONSTERNUM);
 
 // << : skill
-vector<Skill*> vSkill;
+vector<Skill*> vSkill(SKILLNUM);
 void GenerateSkill();
 void UpdateSkill();
 void SetBasisSkillData(int);
@@ -61,7 +65,7 @@ void UpdateMonster();
 void SetMonsterData(MONSTERDATA& mData, Monster*& m);
 void GenerateMonster(int playerIdx);
 void CloseClient(SOCKET socket);
-void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx);
+void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID);
 bool IsValidSpawnPos(int playerIdx, POINT pos);
 POINT SetRandomSpawnPos(int playerIdx, EMonsterType mType);
 void InitUserData(PLAYERDATA& userData, int id);
@@ -391,6 +395,33 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 
 	uData.inGameStart = rData.isReady;
 	uData.charactertype = rData.charactertype;
+
+	// >> : SetLookingdir
+		// >> : SetPlayerPosition
+		int PlayerX, PlayerY;
+
+		if (uData.pos.x >= SCREEN_SIZE_X / 2)
+			PlayerX = SCREEN_SIZE_X / 2;
+		else if (uData.pos.x >= (MAX_MAP_SIZE_X - SCREEN_SIZE_X / 2))
+			PlayerX = uData.pos.x - (MAX_MAP_SIZE_X - SCREEN_SIZE_X);
+		else
+			PlayerX = uData.pos.x;
+
+		if (uData.pos.y >= SCREEN_SIZE_Y / 2)
+			PlayerY = SCREEN_SIZE_Y / 2;
+		else if (uData.pos.y >= (MAX_MAP_SIZE_Y - SCREEN_SIZE_Y / 2))
+			PlayerY = uData.pos.y - (MAX_MAP_SIZE_Y - SCREEN_SIZE_Y);
+		else
+			PlayerY = uData.pos.y;
+		// <<
+	
+		PAIR lookingdir = { (PlayerX - uData.mousePos.x), (PlayerY - uData.mousePos.y)};
+		double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+		lookingdir.first /= temp / 5; lookingdir.second /= temp / 5;
+
+		uData.lookingDir.first = -lookingdir.first;
+		uData.lookingDir.second = -lookingdir.second;
+	// <<
 }
 
 void SetBasisSkillData(int playerIndex)
@@ -414,33 +445,45 @@ void SetBasisSkillData(int playerIndex)
 
 void GenerateSkill()
 {
-	if (vSkill.size() >= 98)
-		return;
-	for (int i = 0; i < socketList.size(); i++)
+	for (int s = SKILLINDEX; s < FINALINDEX; s++)
 	{
-		std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
-		for (int j = 0; j < temp.size(); j++)
+		if (!OBJECTIDARR[s])
 		{
-			temp[j]->Settime_2();
-			
-			double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(temp[j]->Gettime_2() - temp[j]->Gettime_1()).count();
-			
-			if (skillcooltime > temp[j]->Getcooltime())
+			for (int i = 0; i < socketList.size(); i++)
 			{
-				switch (temp[j]->Gettype())
+				std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
+				for (int j = 0; j < temp.size(); j++)
 				{
-				case SKILLTYPE::KIRBYSKILL:
-				{
-					KirbySkill* kirbySkill = new KirbySkill(i, 0);
-					kirbySkill->Setposition(totalData.udata[i].pos);
-					vSkill.push_back(kirbySkill);
+					temp[j]->Settime_2();
+
+					double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(temp[j]->Gettime_2() - temp[j]->Gettime_1()).count();
+
+					if (skillcooltime > temp[j]->Getcooltime())
+					{
+						switch (temp[j]->Gettype())
+						{
+						case SKILLTYPE::KIRBYSKILL:
+						{
+							KirbySkill* kirbySkill = new KirbySkill(i, 0);
+							kirbySkill->Setposition(totalData.udata[i].pos);
+							kirbySkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							kirbySkill->Settime_1();
+							kirbySkill->Settime_2();
+							kirbySkill->Setisactivate(true);
+							kirbySkill->SetID(s);
+							vSkill[s - SKILLINDEX] = kirbySkill;
+						}
+						break;
+						case SKILLTYPE::METAKNIGHTSKILL:
+							break;
+						}
+						skillnum++;
+						temp[j]->Settime_1();
+
+						OBJECTIDARR[s] = true;
+						return;
+					}
 				}
-					break;
-				case SKILLTYPE::METAKNIGHTSKILL:
-					break;
-				}
-				skillnum++;
-				temp[j]->Settime_1();
 			}
 		}
 	}
@@ -449,12 +492,18 @@ void GenerateSkill()
 void SetSkillToDatasheet()
 {
 	int i = 0;
-	for (auto skill : vSkill)
+	for (auto it = vSkill.begin(); it != vSkill.end(); ++it)
 	{
+		Skill* skill = *it;
+
+		if (skill == nullptr)
+			continue;
+
+		int ID = skill->GetID() - SKILLINDEX;
 		switch (skill->Getskilltype())
 		{
 		case SKILLTYPE::KIRBYSKILL:
-			SetKirbySkillInDatasheet(skill, i);
+			SetKirbySkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::METAKNIGHTSKILL:
 
@@ -481,7 +530,6 @@ void SetSkillToDatasheet()
 
 			break;
 		}
-		i++;
 	}
 }
 
@@ -508,7 +556,7 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 	}
 }
 
-void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx)
+void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 {
 	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
 	POINT generatePos = SetRandomSpawnPos(playerIdx, mType);
@@ -519,7 +567,7 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx)
 	switch (mType)
 	{
 	case RUNNER:
-		m = new RunnerMonster(generatePos, mType, CHASE, {0, 0},
+		m = new RunnerMonster(generatePos, mType, CHASE, { 0, 0 },
 			RUNNER_BASE_DAMAGE, RUNNER_BASE_HEALTH, RUNNER_BASE_SPEED, TRUE);
 		break;
 	case SPEAR:
@@ -541,12 +589,13 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx)
 			LANDMINE_BASE_DAMAGE, LANDMINE_BASE_HEALTH, LANDMINE_BASE_SPEED, TRUE);
 		break;
 	}
-	
+
 	monsterCount++;
 
 	mData.dataType = MONSTERTYPE;
 	mData.pos = m->GetPosition();
 	mData.monsterType = mType;
+	mData.id = ID;                                                                                                                   
 }
 
 bool IsValidSpawnPos(int playerIdx, POINT pos)
@@ -617,11 +666,12 @@ POINT SetRandomSpawnPos(int playerIdx, EMonsterType mType)
 
 void GenerateMonster(int playerIdx)
 {
-	for (int i = 0; i < MONSTERNUM; i++)
+	for (int i = MONSTERINDEX; i < SKILLINDEX; i++)
 	{
-		if (totalData.mdata[i].dataType == 0)
+		if (!OBJECTIDARR[i])
 		{
-			InitMonsterData(totalData.mdata[i], monsterArr[i], playerIdx);
+			InitMonsterData(totalData.mdata[i - MONSTERINDEX], monsterArr[i - MONSTERINDEX], playerIdx, i);
+			OBJECTIDARR[i] = true;
 			return;
 		}
 	}
@@ -629,8 +679,10 @@ void GenerateMonster(int playerIdx)
 
 void UpdateSkill()
 {
-	for (Skill* skill : vSkill)
+	for (auto skill : vSkill)
 	{
+		if (skill == nullptr)
+			continue;
 		switch (skill->Getskilltype())
 		{
 		case SKILLTYPE::KIRBYSKILL:

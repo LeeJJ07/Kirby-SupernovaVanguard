@@ -25,6 +25,7 @@ enum COLLIDERTYPE {
 
 class Skill {
 private:
+	bool isactivate = false;
 	int masternum;
 	int targetnum;
 	int skilltype;
@@ -32,6 +33,7 @@ private:
 	int speed;
 	int damage;
 	int size;
+	int ID = -1;
 	float coolTime;
 	POINT offset;
 	POINT position;
@@ -44,31 +46,35 @@ public:
 		speed(1), damage(1), size(1), coolTime(5.0), offset({ 0,0 }), position({0,0}), direction({1,0}) {}
 	~Skill() {}
 
-	int Getmasternum()	{ return masternum; }
+	bool	Getisactivate()	{ return isactivate; }
+	int	Getmasternum()	{ return masternum; }
 	int Gettargetnum()	{ return targetnum; }
 	int Getskilltype()	{ return skilltype; }
 	int Getcollidertype()	{ return collidertype; }
 	int Getspeed()	{ return speed; }
 	int Getdamage()	{ return damage; }
 	int Getsize()	{ return size; }
-	float Getcooltime() { return coolTime; }
-	POINT Getoffset()	{ return offset; }
-	POINT Getposition()	{ return position; }
-	POINT Getdirection()	{ return direction; }
+	int GetID()		{ return ID; }
+	float	Getcooltime() { return coolTime; }
+	POINT	Getoffset()	{ return offset; }
+	POINT	Getposition()	{ return position; }
+	POINT	Getdirection()	{ return direction; }
 
-	void Setmasternum(int masternum) { this->masternum = masternum; }
-	void Settargetnum(int targetnum) { this->targetnum = targetnum; }
-	void Setskilltype(int skilltype) { this->skilltype = skilltype; }
-	void Setcollidertype(int collidertype) { this->collidertype = collidertype; }
-	void Setspeed(int speed)	{ this->speed = speed; }
-	void Setdamage(int damage)	{ this->damage = damage; }
-	void Setsize(int size)	{ this->size = size; }
-	void Setcooltime(float coolTime)	{ this->coolTime = coolTime; }
-	void Setoffset(POINT offset) { this->offset = offset; }
-	void Setposition(POINT position)	{ this->position = position; }
-	void Setdirection(POINT direction)	{ this->direction = direction; }
+	void	Setisactivate(bool isactivate)	{ this->isactivate = isactivate; }
+	void	Setmasternum(int masternum) { this->masternum = masternum; }
+	void	Settargetnum(int targetnum) { this->targetnum = targetnum; }
+	void	Setskilltype(int skilltype) { this->skilltype = skilltype; }
+	void	Setcollidertype(int collidertype) { this->collidertype = collidertype; }
+	void	Setspeed(int speed)	{ this->speed = speed; }
+	void	Setdamage(int damage)	{ this->damage = damage; }
+	void	Setsize(int size)	{ this->size = size; }
+	void	SetID(int ID)		{ this->ID = ID; }
+	void	Setcooltime(float coolTime)	{ this->coolTime = coolTime; }
+	void	Setoffset(POINT offset) { this->offset = offset; }
+	void	Setposition(POINT position)	{ this->position = position; }
+	void	Setdirection(POINT direction)	{ this->direction = direction; }
 
-	virtual void SetCollider(Collider2D* collider) = 0;
+	virtual	void SetCollider(Collider2D* collider) = 0;
 };
 
 //enum SKILLTYPE {

@@ -37,7 +37,6 @@ std::vector<Object*> vSkill(SKILLNUM);
 TOTALDATA uData;
 Object** objArr;
 static SOCKET cSocket;
-int objnum;
 
 // >> : Thread
 CRITICAL_SECTION cs;
@@ -242,7 +241,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					vClient[myID]->ObjectUpdate(uData, myID);
 					vClient[myID]->GetCollider()->MovePosition(vClient[myID]->GetPosition());
 
-					CreateObject((Player*)vClient[myID]);
+					CreateObject((Player*)vClient[myID], myID);
 
 					camera.SetTargetObject(vClient[myID]);
 					t1_fps = std::chrono::high_resolution_clock::now();
@@ -271,6 +270,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		cursorY = HIWORD(lParam);
 	}
 	break;
+	case WM_MOUSEMOVE:
+	{
+		if (curScene == GAME)
+		{
+			cursorX = LOWORD(lParam);
+			cursorY = HIWORD(lParam);
+		}
+	}
+		break;
 	case WM_PAINT:
 		if (curScene == START)
 		{
@@ -379,8 +387,11 @@ void DoubleBuffering(HDC hdc)
 
 void DrawCamera(HDC hdc)
 {
-	for (int i = 0; i < objnum; i++)
+	for (int i = 0; i < FINALINDEX; i++)
 	{
+		if (objArr[i] == nullptr)
+			continue;
+
 		if (objArr[i]->GetPosition().x < vClient[myID]->GetPosition().x - 1000
 			|| objArr[i]->GetPosition().x > vClient[myID]->GetPosition().x + 1000
 			|| objArr[i]->GetPosition().y < vClient[myID]->GetPosition().y - 650
@@ -410,15 +421,20 @@ void DrawCamera(HDC hdc)
 
 void DrawCollider(HDC& hdc)
 {
-	for (int i = 0; i < objnum; i++)
+	for (int i = 0; i < OBJECTNUM; i++)
 	{
-		objArr[i]->GetCollider()->DrawCollider(hdc);
+		if (objArr[i] != nullptr)
+			objArr[i]->GetCollider()->DrawCollider(hdc);
 	}
 }
 
 void InitObjArr()
 {
 	objArr = new Object * [OBJECTNUM];
+	for (int i = 0; i < OBJECTNUM; i++)
+	{
+		objArr[i] = nullptr;
+	}
 }
 
 unsigned __stdcall Send()
@@ -549,6 +565,9 @@ void DrawReadNum(HDC hdc)
 
 	t.Format(_T("Read fps : %d"), textreadCount);
 	TextOut(hdc, 350, 0, t, t.GetLength());
+
+	t.Format(_T("L : %d, R : %d"), cursorX, cursorY);
+	TextOut(hdc, 350, 200, t, t.GetLength());
 }
 
 void DrawMousePosition(HDC hdc)
