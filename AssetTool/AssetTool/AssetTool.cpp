@@ -232,9 +232,9 @@ void DrawAnimation(HDC hdc)
     // 현재 프레임에 따라 비트맵의 시작 위치 계산
     int xStart = 0;
     for (int i = 0; i < curFrame; i++)
-        xStart += widths[i] + spacingX;
+        xStart += widths[i] + spacingX - 1;
     if(curFrame != 0)
-        xStart -= spacingX;
+        xStart -= (spacingX - 1);
     int yStart = 0;
 
     int diffX = xStart + widths[curFrame] / 2 - pos[curFrame].x;
