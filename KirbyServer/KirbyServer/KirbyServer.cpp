@@ -288,7 +288,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -772,14 +772,14 @@ void UpdateMonster()
 		if (totalData.mdata[i].dataType == 0)
 			continue;
 
-		totalData.mdata[i].t2_targeting = std::chrono::high_resolution_clock::now();
+		monsterArr[i]->Sett2_targeting();
 
-		totalData.mdata[i].timeSpan_targeting = std::chrono::duration_cast<std::chrono::duration<double>>(totalData.mdata[i].t2_targeting - totalData.mdata[i].t1_targeting);
+		std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(monsterArr[i]->Gett2_targeting() - monsterArr[i]->Gett1_targeting());
 
-		if(totalData.mdata[i].timeSpan_targeting.count() > RETARGETINGTIME)
+		if(time_span.count() > RETARGETINGTIME)
 		{
 			SetTarget(totalData.mdata[i], totalData, i);
-			totalData.mdata[i].t1_targeting = std::chrono::high_resolution_clock::now();
+			monsterArr[i]->Sett1_targeting();
 		}
 		monsterArr[i]->Update();
 		if (!monsterArr[i]->GetEnabled())

@@ -24,6 +24,8 @@ protected:
 
 	bool isEnabled;
 
+	std::chrono::high_resolution_clock::time_point t1_targeting;
+	std::chrono::high_resolution_clock::time_point t2_targeting;
 public:
 	Monster() : monsterType(RUNNER), curState(CHASE), Object()
 	{
@@ -79,12 +81,17 @@ public:
 	int GetCurHealth() { return curHealth; }
 	float GetSpeed() { return speed; }
 	bool GetEnabled() { return isEnabled; }
+	std::chrono::high_resolution_clock::time_point Gett1_targeting() { return t1_targeting; }
+	std::chrono::high_resolution_clock::time_point Gett2_targeting() { return t2_targeting; }
+
 	void SetTargetPos(POINT targetPos) { this->targetPos = targetPos; }
 	void SetDamage(int damage) { this->damage = damage; }
 	void SetMaxHealth(int maxHealth) { this->maxHealth = maxHealth; }
 	void SetCurHealth(int curHealth) { this->curHealth = curHealth; }
 	void SetSpeed(float speed) { this->speed = speed; }
 	void SetEnabled(bool isEnabled) { this->isEnabled = isEnabled; }
+	void Sett1_targeting() { t1_targeting = std::chrono::high_resolution_clock::now(); }
+	void Sett2_targeting() { t2_targeting = std::chrono::high_resolution_clock::now(); }
 
 	virtual void StateUpdate() = 0;
 	virtual void Update() = 0;
