@@ -6,8 +6,8 @@
 enum ECharacterType
 {
 	KIRBY = 1,
-	METANIHGT,
-	DDD,
+	DEDEDE,
+	METAKNIGHT,
 	MABOROA
 };
 
@@ -29,22 +29,22 @@ public:
 	int	GetID() { return ID; }
 	std::vector<SkillManager*> GetSkillManager() { return vSkillManager; }
 
-	void SetSkillManager(std::vector<SkillManager*> vSkillManager) { this->vSkillManager = vSkillManager; }
+	void	SetSkillManager(std::vector<SkillManager*> vSkillManager) { this->vSkillManager = vSkillManager; }
 
 	void	SetCharacterType(int characterType)
-	{ 
+	{
 		switch (characterType)
 		{
-		case 0:
+		case 1:
 			this->characterType = KIRBY;
 			break;
-		case 1:
-			this->characterType = METANIHGT;
-			break;
 		case 2:
-			this->characterType = DDD;
+			this->characterType = DEDEDE;
 			break;
 		case 3:
+			this->characterType = METAKNIGHT;
+			break;
+		case 4:
 			this->characterType = MABOROA;
 			break;
 		}

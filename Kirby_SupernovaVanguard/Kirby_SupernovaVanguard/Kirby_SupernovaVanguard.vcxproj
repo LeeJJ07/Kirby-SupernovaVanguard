@@ -167,6 +167,7 @@
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Multithread.h" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Rectangle2D.cpp" />
     <ClCompile Include="SelectScene.cpp" />
     <ClCompile Include="Skill.cpp" />
     <ClCompile Include="Socket.cpp" />

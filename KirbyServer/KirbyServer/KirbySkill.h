@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Skill.h"
-#include "TotalData.h"
 
 #define KIRBYSKILLMAXXSIZE 50
 
@@ -20,9 +19,9 @@ public:
 	KirbySkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::KIRBYSKILL, COLLIDERTYPE::CIRCLE, 5, 10, 5, 5., { totalData.udata[masternum].pos.x,totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::KIRBYSKILL, COLLIDERTYPE::CIRCLE, 1, 10, 5, 3., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		biggersize(1),
-		decelerationrate(1),
+		decelerationrate(0.01),
 		imageaddress(nullptr)
 	{
 		Circle2D* circle2D = new Circle2D(true, PMISSILE);
@@ -71,12 +70,14 @@ void UpdateKirbySkill(Skill* &skill)
 	kirbyskill = dynamic_cast<KirbySkill*>(skill);
 
 	POINT newpos;
-	newpos.x = kirbyskill->Getposition().x + kirbyskill->Getdirection().x;
-	newpos.y = kirbyskill->Getposition().y + kirbyskill->Getdirection().y;
+	newpos.x = kirbyskill->Getposition().x + kirbyskill->Getdirection().x * kirbyskill->Getspeed();
+	newpos.y = kirbyskill->Getposition().y + kirbyskill->Getdirection().y * kirbyskill->Getspeed();
 	kirbyskill->Setposition(newpos);
 
 	if (kirbyskill->Getsize() < KIRBYSKILLMAXXSIZE)
 		kirbyskill->KirbySkillBigger();
+	else if (kirbyskill->Getspeed() > 0)
+		kirbyskill->KirbySkillSlower();
 
 	kirbyskill->GetCollider()->SetPosition(kirbyskill->Getposition());
 	Circle2D* circle = dynamic_cast<Circle2D*>(kirbyskill->GetCollider());
@@ -99,7 +100,8 @@ void KirbySkill::KirbySkillBigger()
 }
 
 void KirbySkill::KirbySkillSlower()
-
 {
-	this->Setspeed(this->Getspeed());
+	this->Setspeed(this->Getspeed() - this->Getdecelerationrate());
+	if (this->Getspeed() <= 0)
+		this->Setspeed(0);
 }

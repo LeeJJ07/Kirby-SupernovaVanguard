@@ -7,8 +7,8 @@ static int skillID = 0;
 
 enum SKILLTYPE {
 	KIRBYSKILL = 1,
-	METAKNIGHTSKILL,
 	DEDEDESKILL,
+	METAKNIGHTSKILL,
 	MABEROASKILL,
 	ELECTRICFIELDSKILL,
 	KUNAISKILL,
@@ -38,6 +38,15 @@ public:
 		{
 		case KIRBYSKILL:
 			this->skilltype = KIRBYSKILL;
+			break;
+		case DEDEDESKILL:
+			this->skilltype = DEDEDESKILL;
+			break;
+		case METAKNIGHTSKILL:
+			this->skilltype = METAKNIGHTSKILL;
+			break;
+		case MABEROASKILL:
+			this->skilltype = MABEROASKILL;
 			break;
 		}
 	}

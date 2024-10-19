@@ -43,6 +43,9 @@
     <ClCompile Include="Skill.cpp">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClCompile>
+    <ClCompile Include="Rectangle2D.cpp">
+      <Filter>클래스파일\Colliders\Rectangle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">

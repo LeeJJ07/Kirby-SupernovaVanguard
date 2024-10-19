@@ -9,15 +9,15 @@
 #include "TornadoSkill.h"
 #include "TruckSkill.h"
 
-void DrawSkill(HDC hdc, Skill* object)
+static void DrawSkill(HDC hdc, Skill* object)
 {
 	switch (object->Getskilltype())
 	{
 	case KIRBYSKILL:
 		break;
-	case METAKNIGHTSKILL:
-		break;
 	case DEDEDESKILL:
+		break;
+	case METAKNIGHTSKILL:
 		break;
 	case MABEROASKILL:
 		break;

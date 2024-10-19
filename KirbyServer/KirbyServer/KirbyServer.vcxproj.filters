@@ -49,6 +49,9 @@
     <ClCompile Include="PlayerData.cpp">
       <Filter>클래스\Data\SendData</Filter>
     </ClCompile>
+    <ClCompile Include="Rectangle2D.cpp">
+      <Filter>클래스\Collider\Rectangle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Boss.h">
