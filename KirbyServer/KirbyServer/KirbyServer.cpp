@@ -22,7 +22,30 @@ int curskillindex = SKILLINDEX;
 
 std::vector<Monster*> monsterArr(MONSTERNUM);
 
-// << : skill
+// >> : multithread
+DWORD dwThID1, dwThID2;
+HANDLE hThreads[2];
+CRITICAL_SECTION criticalsection;
+unsigned long ulStackSize = 0;
+
+unsigned __stdcall Update();
+unsigned __stdcall Send();
+void UpdateTimer();
+// <<
+
+// >> : send
+static std::chrono::high_resolution_clock::time_point t1_send;
+static std::chrono::high_resolution_clock::time_point t2_send;
+static std::chrono::duration<double> timeSpan_send;
+// <<
+
+// >> : Update
+static std::chrono::high_resolution_clock::time_point t1_update;
+static std::chrono::high_resolution_clock::time_point t2_update;
+static std::chrono::duration<double> timeSpan_update;
+// <<
+
+// >> : skill
 vector<Skill*> vSkill(SKILLNUM);
 void GenerateSkill();
 void UpdateSkill();
@@ -30,7 +53,7 @@ void SetBasisSkillData(int);
 void SetSkillToDatasheet();
 // <<
 
-// << : player
+// >> : player
 std::vector<Player*> vClient;
 // <<
 
@@ -121,6 +144,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		UpdateTimer();
 	}
 
 	return (int) msg.wParam;
@@ -178,12 +203,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		switch (wParam)
 		{
-		case TIMER_01:
-		{
-			UpdateMonster();
-
-			SendToAll();
-		}
 		break;
 		case TIMER_GENERATEMONSTER:
 		{
@@ -202,32 +221,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						SetBasisSkillData(i);
 					}
 
-					SetTimer(hWnd, TIMER_UPDATESKILL, 5, NULL);
-					SetTimer(hWnd, TIMER_GENERATESKILL, 1, NULL);
+					hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Update, NULL, 0, (unsigned*)&dwThID1);
+
+					t1_update = std::chrono::high_resolution_clock::now();
+
+					if (hThreads[0])
+						ResumeThread(hThreads[0]);
 					isGameStart = true;
 				}
-				SendToAll();
 			}
-		}
-		break;
-		case TIMER_GENERATESKILL:
-		{
-			GenerateSkill();
-		}
-		break;
-		case TIMER_UPDATESKILL:
-		{
-			UpdateSkill();
-			SetSkillToDatasheet();
 		}
 		break;
 		}
 		break;
 	case WM_CREATE:
 	{
-		SetTimer(hWnd, TIMER_01, 1, NULL);
-		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
+		InitializeCriticalSection(&criticalsection);
 
+		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
+		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
+
+		t1_send = std::chrono::high_resolution_clock::now();
+
+		if (hThreads[1])
+			ResumeThread(hThreads[1]);
 		return InitServer(hWnd);
 	}
 		break;
@@ -254,6 +271,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_DESTROY:
+		if (hThreads[0])
+			CloseHandle(hThreads[0]);
+		if (hThreads[1])
+			CloseHandle(hThreads[1]);
+
+		DeleteCriticalSection(&criticalsection);
+
 		PostQuitMessage(0);
 		break;
 	default:
@@ -798,4 +822,58 @@ void SetMonsterData(MONSTERDATA& mData, Monster*& m)
 	mData.pos = m->GetPosition();
 	mData.lookingDir = m->GetLookingDir();
 	mData.curState = m->GetMonsterState();
+}
+
+unsigned __stdcall Update()
+{
+	while(TRUE)
+	{
+		if(timeSpan_update.count() >= 0.02)
+		{
+			EnterCriticalSection(&criticalsection);
+
+			UpdateMonster();
+			GenerateSkill();
+			UpdateSkill();
+			SetSkillToDatasheet();
+
+			t1_update = std::chrono::high_resolution_clock::now();
+			timeSpan_update = std::chrono::duration_cast<std::chrono::duration<double>>(t2_update - t1_update);
+
+			LeaveCriticalSection(&criticalsection);
+		}
+		Sleep(0);
+	}
+}
+unsigned __stdcall Send()
+{
+	while (TRUE)
+	{
+		if(timeSpan_send.count() >= 0.001)
+		{
+			EnterCriticalSection(&criticalsection);
+
+			for (int i = 0; i < PLAYERNUM; i++)
+			{
+				if (totalData.udata[i].dataType == NULL)
+					break;
+				send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
+			}
+
+			t1_send = std::chrono::high_resolution_clock::now();
+			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+
+			LeaveCriticalSection(&criticalsection);
+		}
+		Sleep(0);
+	}
+}
+
+void UpdateTimer()
+{
+	t2_update = std::chrono::high_resolution_clock::now();
+	timeSpan_update = std::chrono::duration_cast<std::chrono::duration<double>>(t2_update - t1_update);
+
+	t2_send = std::chrono::high_resolution_clock::now();
+	timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 }
