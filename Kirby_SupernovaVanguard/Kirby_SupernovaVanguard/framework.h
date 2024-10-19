@@ -24,7 +24,7 @@
 #define OBJECTNUM PLAYERNUM + MONSTERNUM + SKILLNUM
 #define SKILLARR 6
 
-static enum ECharacterType { KIRBY, DDD, METANIHGT, MABEOROA };
+static enum ECharacterType { KIRBY = 1, DDD, METANIHGT, MABEOROA };
 
 enum OBJECTINDEX
 {

@@ -1,5 +1,6 @@
 #pragma once
 #include "Circle2D.h"
+#include "Rectangle2D.h"
 
 class PLAYERDATA;
 class MONSTERDATA;

@@ -147,7 +147,7 @@ int SelectScene::SelectCharacter(Player* client, RECT& rectView)
 			&& client->GetMousePosition().y > centerY - 250
 			&& client->GetMousePosition().y < centerY + 150)
 		{
-			client->SetCharacterType((ECharacterType)i);
+			client->SetCharacterType((ECharacterType)(i + 1));
 			return i + 6;
 		}
 	}

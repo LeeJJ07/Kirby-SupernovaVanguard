@@ -15,9 +15,9 @@ void DrawSkill(HDC hdc, Skill* object)
 	{
 	case KIRBYSKILL:
 		break;
-	case METAKNIGHTSKILL:
-		break;
 	case DEDEDESKILL:
+		break;
+	case METAKNIGHTSKILL:
 		break;
 	case MABEROASKILL:
 		break;

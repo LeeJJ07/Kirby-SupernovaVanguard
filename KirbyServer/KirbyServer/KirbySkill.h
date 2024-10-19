@@ -20,7 +20,7 @@ public:
 	KirbySkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::KIRBYSKILL, COLLIDERTYPE::CIRCLE, 5, 10, 5, 5., { totalData.udata[masternum].pos.x,totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::KIRBYSKILL, COLLIDERTYPE::CIRCLE, 1, 10, 5, 5., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		biggersize(1),
 		decelerationrate(1),
 		imageaddress(nullptr)
@@ -71,8 +71,8 @@ void UpdateKirbySkill(Skill* &skill)
 	kirbyskill = dynamic_cast<KirbySkill*>(skill);
 
 	POINT newpos;
-	newpos.x = kirbyskill->Getposition().x + kirbyskill->Getdirection().x;
-	newpos.y = kirbyskill->Getposition().y + kirbyskill->Getdirection().y;
+	newpos.x = kirbyskill->Getposition().x + kirbyskill->Getdirection().x * kirbyskill->Getspeed();
+	newpos.y = kirbyskill->Getposition().y + kirbyskill->Getdirection().y * kirbyskill->Getspeed();
 	kirbyskill->Setposition(newpos);
 
 	if (kirbyskill->Getsize() < KIRBYSKILLMAXXSIZE)

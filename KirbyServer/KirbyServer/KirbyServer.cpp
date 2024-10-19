@@ -434,6 +434,7 @@ void SetBasisSkillData(int playerIndex)
 		basisSkill = new KirbySkill(playerIndex, 0);
 		break;
 	case ECharacterType::METANIHGT:
+		basisSkill = new MetaknightSkill(playerIndex, 0);
 		break;
 	}
 	SkillManager* skillmanager = new SkillManager(basisSkill->Getskilltype(), basisSkill->Getcooltime());
@@ -465,16 +466,26 @@ void GenerateSkill()
 						case SKILLTYPE::KIRBYSKILL:
 						{
 							KirbySkill* kirbySkill = new KirbySkill(i, 0);
-							kirbySkill->Setposition(totalData.udata[i].pos);
 							kirbySkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
 							kirbySkill->Settime_1();
 							kirbySkill->Settime_2();
 							kirbySkill->Setisactivate(true);
 							kirbySkill->SetID(s);
+							kirbySkill->Setoffset({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							kirbySkill->Setposition({ totalData.udata[i].pos.x + kirbySkill->Getoffset().x, totalData.udata[i].pos.y + kirbySkill->Getoffset().y });
 							vSkill[s - SKILLINDEX] = kirbySkill;
 						}
 						break;
 						case SKILLTYPE::METAKNIGHTSKILL:
+							MetaknightSkill* metaknightSkill = new MetaknightSkill(i, 0);
+							metaknightSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							metaknightSkill->Settime_1();
+							metaknightSkill->Settime_2();
+							metaknightSkill->Setisactivate(true);
+							metaknightSkill->SetID(s);
+							metaknightSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * 10, (long)totalData.udata[i].lookingDir.second * 10 });
+							metaknightSkill->Setposition({ totalData.udata[i].pos.x + metaknightSkill->Getoffset().x, totalData.udata[i].pos.y + metaknightSkill->Getoffset().y });
+							vSkill[s - SKILLINDEX] = metaknightSkill;
 							break;
 						}
 						skillnum++;
@@ -505,11 +516,11 @@ void SetSkillToDatasheet()
 		case SKILLTYPE::KIRBYSKILL:
 			SetKirbySkillInDatasheet(skill, ID);
 			break;
-		case SKILLTYPE::METAKNIGHTSKILL:
-
-			break;
 		case SKILLTYPE::DEDEDESKILL:
 
+			break;
+		case SKILLTYPE::METAKNIGHTSKILL:
+			SetMetaknightSkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::MABEROASKILL:
 
@@ -689,7 +700,7 @@ void UpdateSkill()
 			UpdateKirbySkill(skill);
 			break;
 		case SKILLTYPE::METAKNIGHTSKILL:
-
+			UpdateMetaknightSkill(skill);
 			break;
 		case SKILLTYPE::DEDEDESKILL:
 
