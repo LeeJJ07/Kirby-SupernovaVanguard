@@ -150,6 +150,9 @@
     <ClInclude Include="TotalData.h">
       <Filter>클래스\Data\SendData</Filter>
     </ClInclude>
+    <ClInclude Include="TotalSkill.h">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="KirbyServer.ico">

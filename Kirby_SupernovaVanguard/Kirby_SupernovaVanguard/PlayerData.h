@@ -28,6 +28,7 @@ struct PLAYERDATA :public OBJECTDATA
 struct SKILLDATA
 {
 	bool isactivate;
+	short id;
 	int skilltype;
 	int size;
 	int collidertype;

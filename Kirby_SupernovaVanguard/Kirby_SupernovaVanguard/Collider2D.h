@@ -45,11 +45,9 @@ public:
 };
 
 extern Object** objArr;
-extern int objnum;
 
 template<class T>
-void CreateObject(T* t)
+void CreateObject(T* t, int ID)
 {
-	objArr[objnum] = t;
-	objnum++;
+	objArr[ID] = t;
 }

@@ -158,6 +158,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TornadoSkill.h" />
     <ClInclude Include="TotalData.h" />
+    <ClInclude Include="TotalSkill.h" />
     <ClInclude Include="TruckSkill.h" />
     <ClInclude Include="WingBugMonster.h" />
   </ItemGroup>

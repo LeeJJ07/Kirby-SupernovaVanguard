@@ -66,33 +66,42 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 		for (int i = 0; i < PLAYERNUM; i++)
 		{
+			static int j = 0;
+
 			if (pD.udata[i].dataType == 0)
+			{
+				if (i == 0)
+				{
+					LeaveCriticalSection(&cs);
+					return;
+				}
 				break;
+			}
 
 			Player* pData = dynamic_cast<Player*>(p[i]);
 			if (!pData)
 			{
 				pData = new Player();
-				CreateObject(pData);
+				CreateObject(pData, i + PLAYERINDEX);
 			}
 			pData->ObjectUpdate(pD, i);
 			pData->GetCollider()->MovePosition(pData->GetPosition());
 
 			p[i] = pData;
-
+			
 			camera.PositionUpdate();
 		}
 
 		for (int i = 0; i < MONSTERNUM; i++)
 		{
 			if (pD.mdata[i].dataType == 0)
-				break;
-
-			if (!vMonster[i])
 			{
-				vMonster[i] = new Monster;
-				CreateObject((Monster*)vMonster[i]);
+				objArr[i + MONSTERINDEX] = nullptr;
+				continue;
 			}
+
+			vMonster[i] = new Monster;
+			CreateObject((Monster*)vMonster[i], i + MONSTERINDEX);
 
 			vMonster[i]->ObjectUpdate(pD, i);
 			vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
@@ -100,19 +109,19 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 		for (int i = 0; i < SKILLNUM; i++)
 		{
-			if (pD.sdata[i].skilltype == 0)
-				break;
-
-			if (!vSkill[i])
+			if (pD.sdata[i].isactivate == false)
 			{
-				switch (pD.sdata[i].skilltype)
-				{
-				case KIRBYSKILL:
-					vSkill[i] = new KirbySkill();
-					break;
-				}
-				CreateObject((Skill*)vSkill[i]);
+				objArr[i + SKILLINDEX] = nullptr;
+				continue;
 			}
+
+			switch (pD.sdata[i].skilltype)
+			{
+			case KIRBYSKILL:
+				vSkill[i] = new KirbySkill();
+				break;
+			}
+			CreateObject((Skill*)vSkill[i], i + SKILLINDEX);
 
 			vSkill[i]->ObjectUpdate(pD, i);
 			vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());
