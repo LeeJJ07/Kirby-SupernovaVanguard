@@ -9,7 +9,7 @@
 #include "TornadoSkill.h"
 #include "TruckSkill.h"
 
-void DrawSkill(HDC hdc, Skill* object)
+static void DrawSkill(HDC hdc, Skill* object)
 {
 	switch (object->Getskilltype())
 	{

@@ -15,7 +15,7 @@ public:
 	MetaknightSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::METAKNIGHTSKILL, COLLIDERTYPE::RECTANGLE, 0, 10, 40, 3., { 0,0 } , { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::METAKNIGHTSKILL, COLLIDERTYPE::RECTANGLE, 0, 10, 40, 2., { 0,0 } , { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		imageaddress(nullptr)
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
@@ -44,7 +44,7 @@ bool SetMetaknightSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].size = skill->Getsize();
 	totalData.sdata[ID].position = skill->Getposition();
 	totalData.sdata[ID].colliderposition = metaknightskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].collidersize = metaknightcollider->GetRadius();
+	totalData.sdata[ID].collidersize = metaknightcollider->GetSize();
 	totalData.sdata[ID].collidertype = skill->Getcollidertype();
 
 	return true;
@@ -63,7 +63,7 @@ void UpdateMetaknightSkill(Skill*& skill)
 
 	metaknightskill->GetCollider()->SetPosition(metaknightskill->Getposition());
 	Rectangle2D* rectangle = dynamic_cast<Rectangle2D*>(metaknightskill->GetCollider());
-	rectangle->SetRadius(metaknightskill->Getsize());
+	rectangle->SetSize(metaknightskill->Getsize());
 
 	metaknightskill->SetCollider(rectangle);
 

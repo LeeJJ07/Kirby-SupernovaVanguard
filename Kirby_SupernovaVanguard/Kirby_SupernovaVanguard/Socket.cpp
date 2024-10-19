@@ -3,8 +3,7 @@
 #include "ActionData.h"
 #include "Multithread.h"
 #include "Camera.h"
-#include "KirbySkill.h"
-#include "MetaknightSkill.h"
+#include "AllSkill.h"
 
 short myID;
 int textreadCount;
@@ -121,8 +120,14 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			case KIRBYSKILL:
 				vSkill[i] = new KirbySkill();
 				break;
+			case DEDEDESKILL:
+				vSkill[i] = new DededeSkill();
+				break;
 			case METAKNIGHTSKILL:
 				vSkill[i] = new MetaknightSkill();
+				break;
+			case MABEROASKILL:
+				vSkill[i] = new MaberoaSkill();
 				break;
 			}
 			CreateObject((Skill*)vSkill[i], i + SKILLINDEX);

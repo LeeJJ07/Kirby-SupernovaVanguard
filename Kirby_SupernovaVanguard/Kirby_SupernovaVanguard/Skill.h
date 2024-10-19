@@ -39,8 +39,14 @@ public:
 		case KIRBYSKILL:
 			this->skilltype = KIRBYSKILL;
 			break;
+		case DEDEDESKILL:
+			this->skilltype = DEDEDESKILL;
+			break;
 		case METAKNIGHTSKILL:
 			this->skilltype = METAKNIGHTSKILL;
+			break;
+		case MABEROASKILL:
+			this->skilltype = MABEROASKILL;
 			break;
 		}
 	}

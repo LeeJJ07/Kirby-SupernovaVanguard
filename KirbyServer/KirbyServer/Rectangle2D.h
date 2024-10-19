@@ -12,9 +12,9 @@ public:
 	Rectangle2D(bool isTrigger, ColliderType type) : Collider2D(isTrigger, type), size(BASESIZE) {}
 	~Rectangle2D() {};
 
-	void SetRadius(int r) { size = r; }
+	void SetSize(int r) { size = r; }
 
-	int GetRadius() { return size; }
+	int GetSize() { return size; }
 
 	void DrawCollider(HDC&);
 };

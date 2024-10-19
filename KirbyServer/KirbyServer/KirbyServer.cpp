@@ -433,8 +433,14 @@ void SetBasisSkillData(int playerIndex)
 	case ECharacterType::KIRBY:
 		basisSkill = new KirbySkill(playerIndex, 0);
 		break;
-	case ECharacterType::METANIHGT:
+	case ECharacterType::DEDEDE:
+		basisSkill = new DededeSkill(playerIndex, 0);
+		break;
+	case ECharacterType::METAKNIGHT:
 		basisSkill = new MetaknightSkill(playerIndex, 0);
+		break;
+	case ECharacterType::MABOROA:
+		basisSkill = new MaberoaSkill(playerIndex, 0);
 		break;
 	}
 	SkillManager* skillmanager = new SkillManager(basisSkill->Getskilltype(), basisSkill->Getcooltime());
@@ -473,10 +479,26 @@ void GenerateSkill()
 							kirbySkill->SetID(s);
 							kirbySkill->Setoffset({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
 							kirbySkill->Setposition({ totalData.udata[i].pos.x + kirbySkill->Getoffset().x, totalData.udata[i].pos.y + kirbySkill->Getoffset().y });
+							kirbySkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = kirbySkill;
 						}
 						break;
+						case SKILLTYPE::DEDEDESKILL:
+						{
+							DededeSkill* dededeSkill = new DededeSkill(i, 0);
+							dededeSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							dededeSkill->Settime_1();
+							dededeSkill->Settime_2();
+							dededeSkill->Setisactivate(true);
+							dededeSkill->SetID(s);
+							dededeSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * 10, (long)totalData.udata[i].lookingDir.second * 10});
+							dededeSkill->Setposition({ totalData.udata[i].pos.x + dededeSkill->Getoffset().x, totalData.udata[i].pos.y + dededeSkill->Getoffset().y });
+							dededeSkill->Setmasternum(i);
+							vSkill[s - SKILLINDEX] = dededeSkill;
+						}
+						break;
 						case SKILLTYPE::METAKNIGHTSKILL:
+						{
 							MetaknightSkill* metaknightSkill = new MetaknightSkill(i, 0);
 							metaknightSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
 							metaknightSkill->Settime_1();
@@ -485,7 +507,23 @@ void GenerateSkill()
 							metaknightSkill->SetID(s);
 							metaknightSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * 10, (long)totalData.udata[i].lookingDir.second * 10 });
 							metaknightSkill->Setposition({ totalData.udata[i].pos.x + metaknightSkill->Getoffset().x, totalData.udata[i].pos.y + metaknightSkill->Getoffset().y });
+							metaknightSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = metaknightSkill;
+						}
+							break;
+						case SKILLTYPE::MABEROASKILL:
+						{
+							MaberoaSkill* maberoaskill = new MaberoaSkill(i, 0);
+							maberoaskill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							maberoaskill->Settime_1();
+							maberoaskill->Settime_2();
+							maberoaskill->Setisactivate(true);
+							maberoaskill->SetID(s);
+							maberoaskill->Setoffset({ 0, -10 });
+							maberoaskill->Setposition({ totalData.udata[i].pos.x + maberoaskill->Getoffset().x, totalData.udata[i].pos.y + maberoaskill->Getoffset().y });
+							maberoaskill->Setmasternum(i);
+							vSkill[s - SKILLINDEX] = maberoaskill;
+						}
 							break;
 						}
 						skillnum++;
@@ -517,13 +555,13 @@ void SetSkillToDatasheet()
 			SetKirbySkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::DEDEDESKILL:
-
+			SetDededeSkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::METAKNIGHTSKILL:
 			SetMetaknightSkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::MABEROASKILL:
-
+			SetMaberoaSkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::ELECTRICFIELDSKILL:
 
@@ -699,14 +737,14 @@ void UpdateSkill()
 		case SKILLTYPE::KIRBYSKILL:
 			UpdateKirbySkill(skill);
 			break;
+		case SKILLTYPE::DEDEDESKILL:
+			UpdateDededeSkill(skill);
+			break;
 		case SKILLTYPE::METAKNIGHTSKILL:
 			UpdateMetaknightSkill(skill);
 			break;
-		case SKILLTYPE::DEDEDESKILL:
-
-			break;
 		case SKILLTYPE::MABEROASKILL:
-
+			UpdateMaberoaSkill(skill);
 			break;
 		case SKILLTYPE::ELECTRICFIELDSKILL:
 
@@ -757,7 +795,6 @@ void UpdateMonster()
 
 void SetMonsterData(MONSTERDATA& mData, Monster*& m)
 {
-	
 	mData.pos = m->GetPosition();
 	mData.lookingDir = m->GetLookingDir();
 	mData.curState = m->GetMonsterState();

@@ -26,9 +26,9 @@ private:
 	int targetnum;
 	int skilltype;
 	int collidertype;
-	int speed;
+	float speed;
 	int damage;
-	int size;
+	double size;
 	int ID = -1;
 	float coolTime;
 	POINT offset;
@@ -47,7 +47,7 @@ public:
 	int Gettargetnum()	{ return targetnum; }
 	int Getskilltype()	{ return skilltype; }
 	int Getcollidertype()	{ return collidertype; }
-	int Getspeed()	{ return speed; }
+	float Getspeed()	{ return speed; }
 	int Getdamage()	{ return damage; }
 	int Getsize()	{ return size; }
 	int GetID()		{ return ID; }
@@ -61,7 +61,7 @@ public:
 	void	Settargetnum(int targetnum) { this->targetnum = targetnum; }
 	void	Setskilltype(int skilltype) { this->skilltype = skilltype; }
 	void	Setcollidertype(int collidertype) { this->collidertype = collidertype; }
-	void	Setspeed(int speed)	{ this->speed = speed; }
+	void	Setspeed(float speed)	{ this->speed = speed; }
 	void	Setdamage(int damage)	{ this->damage = damage; }
 	void	Setsize(int size)	{ this->size = size; }
 	void	SetID(int ID)		{ this->ID = ID; }

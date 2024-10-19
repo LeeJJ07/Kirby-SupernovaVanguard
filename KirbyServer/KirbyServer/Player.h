@@ -6,8 +6,8 @@
 enum ECharacterType
 {
 	KIRBY = 1,
-	DDD,
-	METANIHGT,
+	DEDEDE,
+	METAKNIGHT,
 	MABOROA
 };
 
@@ -39,10 +39,10 @@ public:
 			this->characterType = KIRBY;
 			break;
 		case 2:
-			this->characterType = DDD;
+			this->characterType = DEDEDE;
 			break;
 		case 3:
-			this->characterType = METANIHGT;
+			this->characterType = METAKNIGHT;
 			break;
 		case 4:
 			this->characterType = MABOROA;
