@@ -55,6 +55,7 @@ struct MONSTERDATA :public OBJECTDATA
 
 struct TOTALDATA
 {
+	float nowTime;
 	PLAYERDATA		udata[PLAYERNUM];
 	MONSTERDATA		mdata[MONSTERNUM];
 	SKILLDATA		sdata[SKILLNUM];

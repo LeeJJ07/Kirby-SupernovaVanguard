@@ -10,6 +10,7 @@
 #include "TotalSkill.h"
 
 #pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "winmm.lib")
 
 using namespace std;
 
@@ -181,12 +182,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case TIMER_01:
 		{
 			UpdateMonster();
-
 			SendToAll();
 		}
 		break;
 		case TIMER_GENERATEMONSTER:
 		{
+			totalData.nowTime += 1.0f;
 			if (isAllclientReady)
 			{
 				for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
@@ -208,6 +209,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 				SendToAll();
 			}
+			InvalidateRect(hWnd, NULL, TRUE);
 		}
 		break;
 		case TIMER_GENERATESKILL:
@@ -250,6 +252,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			PAINTSTRUCT ps;
 			HDC hdc = BeginPaint(hWnd, &ps);
 
+			wchar_t buffer[50];
+			swprintf(buffer, 50, L"%f", totalData.nowTime);
+
+			// 화면에 float 값 출력
+			TextOut(hdc, 500, 500, buffer, wcslen(buffer));
+
 			EndPaint(hWnd, &ps);
 		}
 		break;
@@ -288,7 +296,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
