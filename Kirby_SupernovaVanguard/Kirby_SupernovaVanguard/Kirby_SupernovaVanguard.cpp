@@ -28,7 +28,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void DoubleBuffering(HDC, std::vector<Object*>);
 void DrawCamera(HDC);
-void DrawEXP(HDC&,int,int);
+void DrawEXP(HDC&,int&,int&);
 void DrawCollider(HDC&);
 void InitObjArr();
 unsigned __stdcall Paint(HWND);
@@ -106,9 +106,9 @@ static std::chrono::high_resolution_clock::time_point t1_read;
 static std::chrono::high_resolution_clock::time_point t2_read;
 static std::chrono::duration<double> timeSpan_read;
 
-static std::chrono::high_resolution_clock::time_point t1_readCount;
-static std::chrono::high_resolution_clock::time_point t2_readCount;
-static std::chrono::duration<double> timeSpan_readCount;
+std::chrono::high_resolution_clock::time_point t1_readCount;
+std::chrono::high_resolution_clock::time_point t2_readCount;
+std::chrono::duration<double> timeSpan_readCount;
 
 int readCount;
 
@@ -473,7 +473,7 @@ void DrawCamera(HDC hdc)
 	}
 }
 
-void DrawEXP(HDC& hdc, int cameraTop, int cameraLeft)
+void DrawEXP(HDC& hdc, int& cameraTop, int& cameraLeft)
 {
 	RECT MaxExpBar;
 

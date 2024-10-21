@@ -1,6 +1,4 @@
-﻿// KirbyServer.cpp : 애플리케이션에 대한 진입점을 정의합니다.
-//
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
+﻿#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include "framework.h"
 #include "KirbyServer.h"
@@ -209,12 +207,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (isAllclientReady)
 			{
-				for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
+				/*for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
 				{
 					if (totalData.udata[pIdx].dataType == 0)
 						break;
 					GenerateMonster(pIdx);
-				}
+				}*/
 				if(!isGameStart)
 				{
 					for (int i = 0; i < socketList.size(); i++)
@@ -250,10 +248,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		totalData.publicdata.maxExp = 100;
 		totalData.publicdata.exp = 0;
-
-		/*AllocConsole();
-
-		_tfreopen(_T("CONOUT$"), _T("w"), stdout);*/
 
 		return InitServer(hWnd);
 	}
@@ -399,10 +393,10 @@ void ReadData()
 			}*/
 		}
 	}
-	if (socketList.size() == choiceClientNum)
+	/*if (socketList.size() == choiceClientNum)
 	{
 		isAllPlayerChoice = true;
-	}
+	}*/
 
 	if (socketList.size() == readyclientnum)
 	{
