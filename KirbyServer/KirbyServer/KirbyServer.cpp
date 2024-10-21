@@ -27,6 +27,8 @@ DWORD dwThID1, dwThID2;
 HANDLE hThreads[2];
 CRITICAL_SECTION criticalsection;
 unsigned long ulStackSize = 0;
+bool threadEnd_Update;
+bool threadEnd_Send;
 
 unsigned __stdcall Update();
 unsigned __stdcall Send();
@@ -275,6 +277,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			CloseHandle(hThreads[0]);
 		if (hThreads[1])
 			CloseHandle(hThreads[1]);
+
+		threadEnd_Update = true;
+		threadEnd_Send = true;
+
+		Sleep(0);
 
 		DeleteCriticalSection(&criticalsection);
 
@@ -830,6 +837,8 @@ unsigned __stdcall Update()
 	{
 		if(timeSpan_update.count() >= 0.02)
 		{
+			if (threadEnd_Update)
+				return 0;
 			EnterCriticalSection(&criticalsection);
 
 			UpdateMonster();
@@ -849,8 +858,10 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		if(timeSpan_send.count() >= 0.00001)
+		if(timeSpan_send.count() >= 0.0001)
 		{
+			if (threadEnd_Send)
+				return 0;
 			EnterCriticalSection(&criticalsection);
 
 			for (int i = 0; i < PLAYERNUM; i++)

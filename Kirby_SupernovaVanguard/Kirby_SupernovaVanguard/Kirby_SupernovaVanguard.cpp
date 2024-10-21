@@ -40,7 +40,13 @@ Object** objArr;
 static SOCKET cSocket;
 
 // >> : Thread
+DWORD dwThID1, dwThID2, dwThID3;
+HANDLE hThreads[3];
 CRITICAL_SECTION cs;
+
+bool threadEnd_Read;
+bool threadEnd_Send;
+bool threadEnd_Paint;
 // <<
 
 // >> : Map
@@ -121,9 +127,6 @@ static int textsendCount = 0;
 void CountSendNum();
 void DrawSendNum(HDC);
 // <<
-
-DWORD dwThID1, dwThID2, dwThID3;
-HANDLE hThreads[3];
 
 unsigned long ulStackSize = 0;
 
@@ -333,6 +336,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (hThreads[2])
 			CloseHandle(hThreads[2]);
 
+		threadEnd_Read = true;
+		threadEnd_Send = true;
+		threadEnd_Paint = true;
+
+		Sleep(0);
+
 		DeleteCriticalSection(&cs);
 
 		KillTimer(hWnd, TIMER_START);
@@ -447,6 +456,8 @@ unsigned __stdcall Send()
 	{
 		if (timeSpan_send.count() >= 0.01 && cs.DebugInfo != NULL)
 		{
+			if (threadEnd_Send)
+				return 0;
 			aD.id = myID;
 			aD.playerMove = { x,y };
 			aD.cursorMove = { cursorX, cursorY };
@@ -475,8 +486,10 @@ unsigned __stdcall Read()
 {
 	while (TRUE)
 	{
-		if (timeSpan_read.count() >= 0.005)
+		if (timeSpan_read.count() >= 0.0025)
 		{
+			if (threadEnd_Read)
+				return 0;
 			ReadMessage(cSocket, vClient, uData);
 		}
 		Sleep(0);
@@ -495,6 +508,8 @@ unsigned __stdcall Paint(HWND pParam)
 		}
 		if (timeSpan_render.count() >= 0.0075 && cs.DebugInfo != NULL)
 		{
+			if (threadEnd_Paint)
+				return 0;
 			EnterCriticalSection(&cs);
 
 			HDC hdc = BeginPaint(pParam, &ps);
