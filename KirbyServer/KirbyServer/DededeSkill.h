@@ -23,6 +23,10 @@ public:
 		circle2D->SetPosition(this->Getposition());
 		SetCollider(circle2D);
 	}
+	~DededeSkill()
+	{
+		delete collider;
+	}
 
 	Collider2D* GetCollider() { return collider; }
 	float		Getbiggersize() { return biggersize; }

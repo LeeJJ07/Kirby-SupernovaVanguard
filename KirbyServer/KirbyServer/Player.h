@@ -24,6 +24,11 @@ public:
 		Circle2D* c = new Circle2D(true, PLAYER);
 		SetObject(c);
 	}
+	~Player()
+	{
+		for (auto vsm : vSkillManager)
+			delete vsm;
+	}
 
 	ECharacterType	GetCharacterType() { return characterType; }
 	int	GetID() { return ID; }

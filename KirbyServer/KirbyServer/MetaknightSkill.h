@@ -22,6 +22,10 @@ public:
 		rectangle2D->SetPosition(this->Getposition());
 		SetCollider(rectangle2D);
 	}
+	~MetaknightSkill()
+	{
+		delete collider;
+	}
 
 	Collider2D* GetCollider() { return collider; }
 	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }

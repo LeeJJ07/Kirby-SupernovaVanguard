@@ -23,8 +23,8 @@ int InitClient(HWND hWnd, SOCKET &s)
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 
-	int sendBufSize = sizeof(TOTALDATA);  // 송신 버퍼 크기 (예: 8KB)
-	int recvBufSize = sizeof(TOTALDATA);  // 수신 버퍼 크기 (예: 8KB)
+	int sendBufSize = sizeof(TOTALDATA) + 1;  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = sizeof(TOTALDATA) + 1;  // 수신 버퍼 크기 (예: 8KB)
 	
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -107,6 +107,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 		for (int i = 0; i < SKILLNUM; i++)
 		{
+			bool isCorrect = false;
 			if (pD.sdata[i].isactivate == false)
 			{
 				objArr[i + SKILLINDEX] = nullptr;
@@ -127,7 +128,14 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			case MABEROASKILL:
 				vSkill[i] = new MaberoaSkill();
 				break;
+			default:
+				isCorrect = true;
+				break;
 			}
+
+			if (isCorrect)
+				continue;
+
 			CreateObject((Skill*)vSkill[i], i + SKILLINDEX);
 
 			vSkill[i]->ObjectUpdate(pD, i);

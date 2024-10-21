@@ -23,7 +23,32 @@ int curskillindex = SKILLINDEX;
 
 std::vector<Monster*> monsterArr(MONSTERNUM);
 
-// << : skill
+// >> : multithread
+DWORD dwThID1, dwThID2;
+HANDLE hThreads[2];
+CRITICAL_SECTION criticalsection;
+unsigned long ulStackSize = 0;
+bool threadEnd_Update;
+bool threadEnd_Send;
+
+unsigned __stdcall Update();
+unsigned __stdcall Send();
+void UpdateTimer();
+// <<
+
+// >> : send
+static std::chrono::high_resolution_clock::time_point t1_send;
+static std::chrono::high_resolution_clock::time_point t2_send;
+static std::chrono::duration<double> timeSpan_send;
+// <<
+
+// >> : Update
+static std::chrono::high_resolution_clock::time_point t1_update;
+static std::chrono::high_resolution_clock::time_point t2_update;
+static std::chrono::duration<double> timeSpan_update;
+// <<
+
+// >> : skill
 vector<Skill*> vSkill(SKILLNUM);
 void GenerateSkill();
 void UpdateSkill();
@@ -31,7 +56,7 @@ void SetBasisSkillData(int);
 void SetSkillToDatasheet();
 // <<
 
-// << : player
+// >> : player
 std::vector<Player*> vClient;
 // <<
 
@@ -122,6 +147,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		UpdateTimer();
 	}
 
 	return (int) msg.wParam;
@@ -179,12 +206,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_TIMER:
 		switch (wParam)
 		{
-		case TIMER_01:
-		{
-			UpdateMonster();
-			SendToAll();
-		}
-		break;
 		case TIMER_GENERATEMONSTER:
 		{
 			if (isAllclientReady)
@@ -203,32 +224,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						SetBasisSkillData(i);
 					}
 
-					SetTimer(hWnd, TIMER_UPDATESKILL, 5, NULL);
-					SetTimer(hWnd, TIMER_GENERATESKILL, 1, NULL);
+					hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Update, NULL, 0, (unsigned*)&dwThID1);
+
+					t1_update = std::chrono::high_resolution_clock::now();
+
+					if (hThreads[0])
+						ResumeThread(hThreads[0]);
 					isGameStart = true;
 				}
-				SendToAll();
 			}
 			InvalidateRect(hWnd, NULL, TRUE);
-		}
-		break;
-		case TIMER_GENERATESKILL:
-		{
-			GenerateSkill();
-		}
-		break;
-		case TIMER_UPDATESKILL:
-		{
-			UpdateSkill();
-			SetSkillToDatasheet();
 		}
 		break;
 		}
 		break;
 	case WM_CREATE:
 	{
-		SetTimer(hWnd, TIMER_01, 1, NULL);
+		InitializeCriticalSection(&criticalsection);
+
 		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
+		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
+
+		t1_send = std::chrono::high_resolution_clock::now();
+
+		if (hThreads[1])
+			ResumeThread(hThreads[1]);
+
+		/*AllocConsole();
+
+		_tfreopen(_T("CONOUT$"), _T("w"), stdout);*/
 
 		return InitServer(hWnd);
 	}
@@ -262,6 +286,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 	case WM_DESTROY:
+		if (hThreads[0])
+			CloseHandle(hThreads[0]);
+		if (hThreads[1])
+			CloseHandle(hThreads[1]);
+
+		threadEnd_Update = true;
+		threadEnd_Send = true;
+
+		Sleep(0);
+
+		DeleteCriticalSection(&criticalsection);
+
 		PostQuitMessage(0);
 		break;
 	default:
@@ -275,8 +311,8 @@ int InitServer(HWND hWnd)
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	
-	int sendBufSize = sizeof(TOTALDATA);  // 송신 버퍼 크기 (예: 8KB)
-	int recvBufSize = sizeof(TOTALDATA);  // 수신 버퍼 크기 (예: 8KB)
+	int sendBufSize = sizeof(TOTALDATA) + 1;  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = sizeof(TOTALDATA) + 1;  // 수신 버퍼 크기 (예: 8KB)
 
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -366,6 +402,11 @@ void SendToAll()//pair<SOCKET, UserData> cs
 		if (totalData.udata[i].dataType == NULL)
 			break;
 		send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
+
+		/*for (int i = SKILLINDEX; i < FINALINDEX; i++)
+		{
+			printf("%d\n", totalData.sdata[i].isactivate);
+		}*/
 	}
 }
 
@@ -806,4 +847,62 @@ void SetMonsterData(MONSTERDATA& mData, Monster*& m)
 	mData.pos = m->GetPosition();
 	mData.lookingDir = m->GetLookingDir();
 	mData.curState = m->GetMonsterState();
+}
+
+unsigned __stdcall Update()
+{
+	while(TRUE)
+	{
+		if(timeSpan_update.count() >= 0.02)
+		{
+			if (threadEnd_Update)
+				return 0;
+			EnterCriticalSection(&criticalsection);
+
+			UpdateMonster();
+			GenerateSkill();
+			UpdateSkill();
+			SetSkillToDatasheet();
+
+			t1_update = std::chrono::high_resolution_clock::now();
+			timeSpan_update = std::chrono::duration_cast<std::chrono::duration<double>>(t2_update - t1_update);
+
+			LeaveCriticalSection(&criticalsection);
+		}
+		Sleep(0);
+	}
+}
+unsigned __stdcall Send()
+{
+	while (TRUE)
+	{
+		if(timeSpan_send.count() >= 0.0001)
+		{
+			if (threadEnd_Send)
+				return 0;
+			EnterCriticalSection(&criticalsection);
+
+			for (int i = 0; i < PLAYERNUM; i++)
+			{
+				if (totalData.udata[i].dataType == NULL)
+					break;
+				send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
+			}
+
+			t1_send = std::chrono::high_resolution_clock::now();
+			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+
+			LeaveCriticalSection(&criticalsection);
+		}
+		Sleep(0);
+	}
+}
+
+void UpdateTimer()
+{
+	t2_update = std::chrono::high_resolution_clock::now();
+	timeSpan_update = std::chrono::duration_cast<std::chrono::duration<double>>(t2_update - t1_update);
+
+	t2_send = std::chrono::high_resolution_clock::now();
+	timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 }
