@@ -30,6 +30,7 @@ void DrawCollider(HDC&);
 void InitObjArr();
 unsigned __stdcall Paint(HWND);
 unsigned __stdcall Send();
+unsigned __stdcall Read();
 
 std::vector<Object*> vClient(PLAYERNUM);
 std::vector<Object*> vMonster(MONSTERNUM);
@@ -92,6 +93,10 @@ bool isDrawCollider;
 // <<
 
 // >> : ReadCount
+static std::chrono::high_resolution_clock::time_point t1_read;
+static std::chrono::high_resolution_clock::time_point t2_read;
+static std::chrono::duration<double> timeSpan_read;
+
 std::chrono::high_resolution_clock::time_point t1_readCount;
 std::chrono::high_resolution_clock::time_point t2_readCount;
 std::chrono::duration<double> timeSpan_readCount;
@@ -117,8 +122,8 @@ void CountSendNum();
 void DrawSendNum(HDC);
 // <<
 
-DWORD dwThID1, dwThID2;
-HANDLE hThreads[2];
+DWORD dwThID1, dwThID2, dwThID3;
+HANDLE hThreads[3];
 
 unsigned long ulStackSize = 0;
 
@@ -223,6 +228,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			ResumeThread(hThreads[0]);
 		if (hThreads[1])
 			ResumeThread(hThreads[1]);
+		if (hThreads[2])
+			ResumeThread(hThreads[2]);
+
 	}
 	break;
 	case WM_CHAR:
@@ -247,12 +255,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					t1_fps = std::chrono::high_resolution_clock::now();
 					t1_render = std::chrono::high_resolution_clock::now();
 					t1_send = std::chrono::high_resolution_clock::now();
+					t1_read = std::chrono::high_resolution_clock::now();
 					t1_move = std::chrono::high_resolution_clock::now();
 					t1_sendCount = std::chrono::high_resolution_clock::now();
 					t1_readCount = std::chrono::high_resolution_clock::now();
 
 					hThreads[0] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Paint, hWnd, 0, (unsigned*)&dwThID1);
 					hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
+					hThreads[2] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Read, NULL, 0, (unsigned*)&dwThID3);
 
 					curScene = SELECT;
 				}
@@ -315,19 +325,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		break;
-	case WM_ASYNC:
-		switch (lParam)
-		{
-		case FD_READ:
-			ReadMessage(cSocket, vClient, uData);
-			break;
-		}
-		break;
 	case WM_DESTROY:
 		if (hThreads[0])
 			CloseHandle(hThreads[0]);
 		if (hThreads[1])
 			CloseHandle(hThreads[1]);
+		if (hThreads[2])
+			CloseHandle(hThreads[2]);
 
 		DeleteCriticalSection(&cs);
 
@@ -467,6 +471,18 @@ unsigned __stdcall Send()
 	}
 }
 
+unsigned __stdcall Read()
+{
+	while (TRUE)
+	{
+		if (timeSpan_read.count() >= 0.005)
+		{
+			ReadMessage(cSocket, vClient, uData);
+		}
+		Sleep(0);
+	}
+}
+
 unsigned __stdcall Paint(HWND pParam)
 {
 	while (TRUE)
@@ -586,6 +602,7 @@ void Update()
 	t2_render = std::chrono::high_resolution_clock::now();
 	t2_send = std::chrono::high_resolution_clock::now();
 	t2_move = std::chrono::high_resolution_clock::now();
+	t2_read = std::chrono::high_resolution_clock::now();
 	t2_sendCount = std::chrono::high_resolution_clock::now();
 	t2_readCount = std::chrono::high_resolution_clock::now();
 
@@ -593,6 +610,7 @@ void Update()
 	timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
 	timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 	timeSpan_move = std::chrono::duration_cast<std::chrono::duration<double>>(t2_move - t1_move);
+	timeSpan_read = std::chrono::duration_cast<std::chrono::duration<double>>(t2_move - t1_move);
 	timeSpan_sendCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_sendCount - t1_sendCount);
 	timeSpan_readCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_readCount - t1_readCount);
 

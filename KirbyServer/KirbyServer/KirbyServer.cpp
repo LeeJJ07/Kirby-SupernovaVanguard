@@ -849,7 +849,7 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		if(timeSpan_send.count() >= 0.001)
+		if(timeSpan_send.count() >= 0.00001)
 		{
 			EnterCriticalSection(&criticalsection);
 
