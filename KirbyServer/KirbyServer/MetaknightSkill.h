@@ -15,7 +15,7 @@ public:
 	MetaknightSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::METAKNIGHTSKILL, COLLIDERTYPE::RECTANGLE, 0, 10, 40, 2., { 0,0 } , { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::METAKNIGHTSKILL, COLLIDERTYPE::RECTANGLE, 0, 10, 70, 2., { 0,0 } , { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		imageaddress(nullptr)
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
@@ -73,7 +73,7 @@ void UpdateMetaknightSkill(Skill*& skill)
 
 	metaknightskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(metaknightskill->Gettime_2() - metaknightskill->Gettime_1()).count();
-	if (skilldestroytime > TMETAKNIGHTSKILLDESTROY)
+	if (skilldestroytime > 0.2)
 	{
 		metaknightskill->Setisactivate(false);
 		OBJECTIDARR[metaknightskill->GetID()] = false;

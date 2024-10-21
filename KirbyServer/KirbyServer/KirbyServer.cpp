@@ -332,7 +332,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -466,7 +466,7 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 	
 		PAIR lookingdir = { (PlayerX - uData.mousePos.x), (PlayerY - uData.mousePos.y)};
 		double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
-		lookingdir.first /= temp / 5; lookingdir.second /= temp / 5;
+		lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
 
 		uData.lookingDir.first = -lookingdir.first;
 		uData.lookingDir.second = -lookingdir.second;
@@ -554,7 +554,7 @@ void GenerateSkill()
 							metaknightSkill->Settime_2();
 							metaknightSkill->Setisactivate(true);
 							metaknightSkill->SetID(s);
-							metaknightSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * 10, (long)totalData.udata[i].lookingDir.second * 10 });
+							metaknightSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * metaknightSkill->Getsize() / OFFSETADJUST, (long)totalData.udata[i].lookingDir.second * metaknightSkill->Getsize() / OFFSETADJUST });
 							metaknightSkill->Setposition({ totalData.udata[i].pos.x + metaknightSkill->Getoffset().x, totalData.udata[i].pos.y + metaknightSkill->Getoffset().y });
 							metaknightSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = metaknightSkill;

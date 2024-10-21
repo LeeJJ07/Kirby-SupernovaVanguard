@@ -275,7 +275,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					aD.isReady = true;
 				break;
 			}
+			break;
 		}
+		if (wParam == 'c' || wParam == 'C')
+			isDrawCollider = !isDrawCollider;
 		break;
 	case WM_LBUTTONDOWN:
 	{
@@ -385,15 +388,12 @@ void DoubleBuffering(HDC hdc)
 
 	BitBlt(bufferdc, cLeft, cTop, CAMERA_WIDTH, CAMERA_HEIGHT, memdc, cLeft, cTop, SRCCOPY);
 
-
 	CString t;
-
 
 	DrawCamera(bufferdc);
 
 	if (isDrawCollider)
 		DrawCollider(bufferdc);
-
 
 	// >> : 시간
 	{
@@ -664,19 +664,19 @@ void Update()
 
 	if (timeSpan_move.count() >= 0.005)
 	{
-		if (GetAsyncKeyState(VK_LEFT) & 0x8000)
+		if (GetAsyncKeyState('A') & 0x8000)
 		{
 			x -= 1;
 		}
-		if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
+		if (GetAsyncKeyState('D') & 0x8000)
 		{
 			x += 1;
 		}
-		if (GetAsyncKeyState(VK_DOWN) & 0x8000)
+		if (GetAsyncKeyState('S') & 0x8000)
 		{
 			y += 1;
 		}
-		if (GetAsyncKeyState(VK_UP) & 0x8000)
+		if (GetAsyncKeyState('W') & 0x8000)
 		{
 			y -= 1;
 		}
@@ -685,12 +685,12 @@ void Update()
 		}
 		t1_move = std::chrono::high_resolution_clock::now();
 	}
-	if (GetAsyncKeyState('C') & 0x8000)
+	/*if (GetAsyncKeyState('C') & 0x8001)
 	{
 		isDrawCollider = true;
 	}
 	else
-		isDrawCollider = false;
+		isDrawCollider = false;*/
 }
 
 void UpdateSelect()
