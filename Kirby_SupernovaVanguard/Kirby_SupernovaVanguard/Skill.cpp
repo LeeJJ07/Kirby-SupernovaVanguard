@@ -13,11 +13,12 @@ void Skill::ObjectUpdate(TOTALDATA totalData, int i)
 	case RECTANGLEFIGURE:
 		Rectangle2D* skillrectanglecollider;
 		skillrectanglecollider = dynamic_cast<Rectangle2D*>(this->GetCollider());
-		skillrectanglecollider->SetSize(totalData.sdata[i].collidersize);
+		skillrectanglecollider->SetWidth(totalData.sdata[i].collidersize);
+		skillrectanglecollider->SetHeight(totalData.sdata[i].collidersize2);
 		break;
 	}
 	SetPosition(totalData.sdata[i].position);
 	GetCollider()->MovePosition(totalData.sdata[i].colliderposition);
 	Setsize(totalData.sdata[i].size);
-	Setskilltype(totalData.sdata[i].skilltype);
+	Setsize2(totalData.sdata[i].size2);
 }

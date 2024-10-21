@@ -15,7 +15,7 @@ public:
 	MetaknightSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::METAKNIGHTSKILL, COLLIDERTYPE::RECTANGLE, 0, 10, 70, 2., { 0,0 } , { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::METAKNIGHTSKILL, COLLIDERTYPE::RECTANGLE, 0, 10, 50, 70, 2., { 0,0 } , { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		imageaddress(nullptr)
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
@@ -38,24 +38,26 @@ public:
 	void Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
 };
 
+MetaknightSkill* metaknightskill = nullptr;
+
 bool SetMetaknightSkillInDatasheet(Skill*& skill, int& ID)
 {
-	MetaknightSkill* metaknightskill = dynamic_cast<MetaknightSkill*>(skill);
+	metaknightskill = dynamic_cast<MetaknightSkill*>(skill);
 	Rectangle2D* metaknightcollider = dynamic_cast<Rectangle2D*>(metaknightskill->GetCollider());
 
 	totalData.sdata[ID].isactivate = metaknightskill->Getisactivate();
 	totalData.sdata[ID].id = metaknightskill->GetID();
 	totalData.sdata[ID].skilltype = skill->Getskilltype();
 	totalData.sdata[ID].size = skill->Getsize();
+	totalData.sdata[ID].size2 = skill->Getsize2();
 	totalData.sdata[ID].position = skill->Getposition();
 	totalData.sdata[ID].colliderposition = metaknightskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].collidersize = metaknightcollider->GetSize();
+	totalData.sdata[ID].collidersize = metaknightcollider->GetWidth();
+	totalData.sdata[ID].collidersize2 = metaknightcollider->GetHeight();
 	totalData.sdata[ID].collidertype = skill->Getcollidertype();
 
 	return true;
 }
-
-MetaknightSkill* metaknightskill = nullptr;
 
 void UpdateMetaknightSkill(Skill*& skill)
 {
@@ -68,7 +70,8 @@ void UpdateMetaknightSkill(Skill*& skill)
 
 	metaknightskill->GetCollider()->SetPosition(metaknightskill->Getposition());
 	Rectangle2D* rectangle = dynamic_cast<Rectangle2D*>(metaknightskill->GetCollider());
-	rectangle->SetSize(metaknightskill->Getsize());
+	rectangle->SetWidth(metaknightskill->Getsize());
+	rectangle->SetHeight(metaknightskill->Getsize2());
 
 	metaknightskill->SetCollider(rectangle);
 

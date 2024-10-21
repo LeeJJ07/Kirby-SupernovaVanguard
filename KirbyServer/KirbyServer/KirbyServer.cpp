@@ -572,19 +572,19 @@ void SetSkillData(int& playerIndex, int skillnum)
 	switch (skillnum)
 	{
 	case SKILLTYPE::ELECTRICFIELDSKILL:
-
+		basisSkill = new ElectricfieldSkill(playerIndex, 0);
 		break;
 	case SKILLTYPE::KUNAISKILL:
 		basisSkill = new KunaiSkill(playerIndex, 0);
 		break;
 	case SKILLTYPE::MAGICARROWSKILL :
-		
+		basisSkill = new MagicArrowSkill(playerIndex, 0);
 		break;
 	case SKILLTYPE::TORNADOSKILL:
-
+		basisSkill = new TornadoSkill(playerIndex, 0);
 		break;
 	case SKILLTYPE::TRUCKSKILL:
-
+		basisSkill = new TruckSkill(playerIndex, 0);
 		break;
 	}
 	SkillManager* skillmanager = new SkillManager(basisSkill->Getskilltype(), basisSkill->Getcooltime());
@@ -671,6 +671,20 @@ void GenerateSkill()
 							vSkill[s - SKILLINDEX] = maberoaskill;
 						}
 						break;
+						case SKILLTYPE::ELECTRICFIELDSKILL:
+						{
+							ElectricfieldSkill* electricfieldskill = new ElectricfieldSkill(i, 0);
+							electricfieldskill->Setdirection({ 0,0 });
+							electricfieldskill->Settime_1();
+							electricfieldskill->Settime_2();
+							electricfieldskill->Setisactivate(true);
+							electricfieldskill->SetID(s);
+							electricfieldskill->Setoffset({ 0,0 });
+							electricfieldskill->Setposition({ totalData.udata[i].pos.x + electricfieldskill->Getoffset().x, totalData.udata[i].pos.y + electricfieldskill->Getoffset().y });
+							electricfieldskill->Setmasternum(i);
+							vSkill[s - SKILLINDEX] = electricfieldskill;
+						}
+							break;
 						case SKILLTYPE::KUNAISKILL:
 						{
 							KunaiSkill* kunaiSkill = new KunaiSkill(i, 0);
@@ -683,6 +697,48 @@ void GenerateSkill()
 							kunaiSkill->Setposition({ totalData.udata[i].pos.x + kunaiSkill->Getoffset().x, totalData.udata[i].pos.y + kunaiSkill->Getoffset().y });
 							kunaiSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = kunaiSkill;
+						}
+						break;
+						case SKILLTYPE::MAGICARROWSKILL:
+						{
+							MagicArrowSkill* magicarrowSkill = new MagicArrowSkill(i, 0);
+							magicarrowSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							magicarrowSkill->Settime_1();
+							magicarrowSkill->Settime_2();
+							magicarrowSkill->Setisactivate(true);
+							magicarrowSkill->SetID(s);
+							magicarrowSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first , (long)totalData.udata[i].lookingDir.second });
+							magicarrowSkill->Setposition({ totalData.udata[i].pos.x + magicarrowSkill->Getoffset().x, totalData.udata[i].pos.y + magicarrowSkill->Getoffset().y });
+							magicarrowSkill->Setmasternum(i);
+							vSkill[s - SKILLINDEX] = magicarrowSkill;
+						}
+						break;
+						case SKILLTYPE::TORNADOSKILL:
+						{
+							TornadoSkill* tornadoSkill = new TornadoSkill(i, 0);
+							tornadoSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							tornadoSkill->Settime_1();
+							tornadoSkill->Settime_2();
+							tornadoSkill->Setisactivate(true);
+							tornadoSkill->SetID(s);
+							tornadoSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first , (long)totalData.udata[i].lookingDir.second });
+							tornadoSkill->Setposition({ totalData.udata[i].pos.x + tornadoSkill->Getoffset().x, totalData.udata[i].pos.y + tornadoSkill->Getoffset().y });
+							tornadoSkill->Setmasternum(i);
+							vSkill[s - SKILLINDEX] = tornadoSkill;
+						}
+						break;
+						case SKILLTYPE::TRUCKSKILL:
+						{
+							TruckSkill* truckSkill = new TruckSkill(i, 0);
+							truckSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							truckSkill->Settime_1();
+							truckSkill->Settime_2();
+							truckSkill->Setisactivate(true);
+							truckSkill->SetID(s);
+							truckSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first , (long)totalData.udata[i].lookingDir.second });
+							truckSkill->Setposition({ totalData.udata[i].pos.x + truckSkill->Getoffset().x, totalData.udata[i].pos.y + truckSkill->Getoffset().y });
+							truckSkill->Setmasternum(i);
+							vSkill[s - SKILLINDEX] = truckSkill;
 						}
 						break;
 						}
@@ -730,19 +786,19 @@ void SetSkillToDatasheet()
 			SetMaberoaSkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::ELECTRICFIELDSKILL:
-
+			SetElectricfieldSkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::KUNAISKILL:
 			SetKunaiSkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::MAGICARROWSKILL:
-
+			SetMagicArrowSkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::TORNADOSKILL:
-
+			SetTornadoSkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::TRUCKSKILL:
-
+			SetTruckSkillInDatasheet(skill, ID);
 			break;
 		}
 	}
@@ -913,19 +969,19 @@ void UpdateSkill()
 			UpdateMaberoaSkill(skill);
 			break;
 		case SKILLTYPE::ELECTRICFIELDSKILL:
-
+			UpdateElectricfieldSkill(skill);
 			break;
 		case SKILLTYPE::KUNAISKILL:
 			UpdateKunaiSkill(skill);
 			break;
 		case SKILLTYPE::MAGICARROWSKILL:
-
+			UpdateMagicArrowSkill(skill);
 			break;
 		case SKILLTYPE::TORNADOSKILL:
-
+			UpdateTornadoSkill(skill);
 			break;
 		case SKILLTYPE::TRUCKSKILL:
-
+			UpdateTruckSkill(skill);
 			break;
 		}
 	}

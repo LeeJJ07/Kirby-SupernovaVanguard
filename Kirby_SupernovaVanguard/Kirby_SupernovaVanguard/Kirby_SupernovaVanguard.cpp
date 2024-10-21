@@ -578,6 +578,16 @@ unsigned __stdcall Read()
 					aD.newskill = 7;
 					isChoiceSkill = true;
 				}
+				if (GetAsyncKeyState('8') & 0x8000)
+				{
+					aD.newskill = 8;
+					isChoiceSkill = true;
+				}
+				if (GetAsyncKeyState('9') & 0x8000)
+				{
+					aD.newskill = 9;
+					isChoiceSkill = true;
+				}
 			}
 			if (uData.publicdata.islevelUp && isChoiceSkill)
 			{

@@ -20,10 +20,11 @@ enum SKILLTYPE {
 class Skill : public Object {
 private:
 	int size;
+	int size2;
 	SKILLTYPE skilltype;
 
 public:
-	Skill() :size(0),skilltype(KIRBYSKILL)
+	Skill() :size(0),size2(0),skilltype(KIRBYSKILL)
 	{}
 	~Skill() {}
 
@@ -32,24 +33,7 @@ public:
 	SKILLTYPE	Getskilltype() { return skilltype; }
 
 	void	Setsize(int size) { this->size = size; }
-	void	Setskilltype(int i)
-	{
-		switch (i)
-		{
-		case KIRBYSKILL:
-			this->skilltype = KIRBYSKILL;
-			break;
-		case DEDEDESKILL:
-			this->skilltype = DEDEDESKILL;
-			break;
-		case METAKNIGHTSKILL:
-			this->skilltype = METAKNIGHTSKILL;
-			break;
-		case MABEROASKILL:
-			this->skilltype = MABEROASKILL;
-			break;
-		}
-	}
+	void	Setsize2(int size2) { this->size2 = size2; }
 
 	void	ObjectUpdate(TOTALDATA, int i);
 };

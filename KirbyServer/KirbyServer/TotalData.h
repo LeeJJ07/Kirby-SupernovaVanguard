@@ -40,8 +40,10 @@ struct SKILLDATA
 	short id;
 	int skilltype;
 	int size;
+	int size2;
 	int collidertype;
 	int collidersize;
+	int collidersize2;
 	POINT position;
 	POINT colliderposition;
 };

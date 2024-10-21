@@ -5,6 +5,12 @@
 class MagicarrowSkill : public Skill
 {
 private:
-	int penetration;
 	const char* imageaddress;
+public:
+	MagicarrowSkill()
+	{
+		Rectangle2D* rectangle = new Rectangle2D(true, PMISSILE);
+		SetObject(rectangle);
+	}
+	~MagicarrowSkill() {}
 };

@@ -6,15 +6,18 @@
 class Rectangle2D : public Collider2D
 {
 private:
-	int size;
+	int width;
+	int height;
 public:
-	Rectangle2D(int size = BASESIZE) : Collider2D(), size(size) {}
-	Rectangle2D(bool isTrigger, ColliderType type) : Collider2D(isTrigger, type), size(BASESIZE) {}
+	Rectangle2D(int width = 0, int height = 0) : Collider2D(), width(width), height(height) {}
+	Rectangle2D(bool isTrigger, ColliderType type) : Collider2D(isTrigger, type), width(BASESIZE), height(BASESIZE) {}
 	~Rectangle2D() {};
 
-	void SetSize(int r) { size = r; }
+	int GetWidth() { return width; }
+	int GetHeight() { return height; }
 
-	int GetSize() { return size; }
+	void SetWidth(int width) { this->width = width; }
+	void SetHeight(int height) { this->height = height; }
 
 	void DrawCollider(HDC&);
 };

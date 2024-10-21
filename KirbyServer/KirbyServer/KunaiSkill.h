@@ -15,7 +15,7 @@ public:
 	KunaiSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::KUNAISKILL, COLLIDERTYPE::RECTANGLE, 4, 2, 5, 0.4, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::KUNAISKILL, COLLIDERTYPE::RECTANGLE, 4, 2, 5, 8, 0.4, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		imageaddress(nullptr)
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
@@ -51,7 +51,8 @@ bool SetKunaiSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].size = skill->Getsize();
 	totalData.sdata[ID].position = skill->Getposition();
 	totalData.sdata[ID].colliderposition = kunaiskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].collidersize = kunaicollider->GetSize();
+	totalData.sdata[ID].collidersize = kunaicollider->GetWidth();
+	totalData.sdata[ID].collidersize2 = kunaicollider->GetHeight();
 	totalData.sdata[ID].collidertype = skill->Getcollidertype();
 
 	return true;
@@ -68,7 +69,8 @@ void UpdateKunaiSkill(Skill*& skill)
 
 	kunaiskill->GetCollider()->SetPosition(kunaiskill->Getposition());
 	Rectangle2D* rectangle = dynamic_cast<Rectangle2D*>(kunaiskill->GetCollider());
-	rectangle->SetSize(kunaiskill->Getsize());
+	rectangle->SetWidth(kunaiskill->Getsize());
+	rectangle->SetHeight(kunaiskill->Getsize2());
 
 	kunaiskill->SetCollider(rectangle);
 

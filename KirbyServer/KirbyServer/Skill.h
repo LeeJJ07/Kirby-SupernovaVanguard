@@ -29,6 +29,7 @@ private:
 	float speed;
 	int damage;
 	double size;
+	double size2;
 	int ID = -1;
 	float coolTime;
 	POINT offset;
@@ -36,10 +37,10 @@ private:
 	POINT direction;
 public:
 	Skill() :masternum(0), targetnum(0), skilltype(KIRBYSKILL), collidertype(COLLIDERTYPE::CIRCLE),
-		speed(1), damage(1), size(1), coolTime(5.0), offset({ 0,0 }), position({ 0,0 }), direction({ 1,0 }) {}
-	Skill(int masternum, int targetnum, int skilltype, int collidertype, int speed, int damage, int size, float coolTime, POINT offset, POINT position, POINT direction)
+		speed(1), damage(1), size(0), size2(0), coolTime(5.0), offset({0,0}), position({0,0}), direction({1,0}) {}
+	Skill(int masternum, int targetnum, int skilltype, int collidertype, int speed, int damage, int size, int size2, float coolTime, POINT offset, POINT position, POINT direction)
 		:masternum(masternum), targetnum(targetnum), skilltype(skilltype), collidertype(collidertype),
-		speed(speed), damage(damage), size(size), coolTime(coolTime), offset(offset), position(position), direction(direction) {}
+		speed(speed), damage(damage), size(size), size2(size2), coolTime(coolTime), offset(offset), position(position), direction(direction) {}
 	~Skill() {}
 
 	bool	Getisactivate()	{ return isactivate; }
@@ -50,6 +51,7 @@ public:
 	float Getspeed()	{ return speed; }
 	int Getdamage()	{ return damage; }
 	int Getsize()	{ return size; }
+	int Getsize2()	{ return size2; }
 	int GetID()		{ return ID; }
 	float	Getcooltime() { return coolTime; }
 	POINT	Getoffset()	{ return offset; }
@@ -64,6 +66,7 @@ public:
 	void	Setspeed(float speed)	{ this->speed = speed; }
 	void	Setdamage(int damage)	{ this->damage = damage; }
 	void	Setsize(int size)	{ this->size = size; }
+	void	Setsize2(int size2)	{ this->size2 = size2; }
 	void	SetID(int ID)		{ this->ID = ID; }
 	void	Setcooltime(float coolTime)	{ this->coolTime = coolTime; }
 	void	Setoffset(POINT offset) { this->offset = offset; }

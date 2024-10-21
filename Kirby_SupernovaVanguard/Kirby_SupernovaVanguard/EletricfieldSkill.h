@@ -5,6 +5,15 @@
 class ElectircfieldSkill : public Skill
 {
 private:
-	int tick;
 	const char* imageaddress;
+public:
+	ElectircfieldSkill()
+	{
+		Circle2D* c = new Circle2D(true, PMISSILE);
+		SetObject(c);
+	}
+	~ElectircfieldSkill()
+	{
+
+	}
 };

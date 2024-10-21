@@ -10,4 +10,11 @@ private:
 	bool isleftright;
 	const char* imageaddress;
 	Object* target;
+public:
+	TornadoSkill()
+	{
+		Rectangle2D* rectangle = new Rectangle2D(true, PMISSILE);
+		SetObject(rectangle);
+	}
+	~TornadoSkill() {}
 };

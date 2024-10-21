@@ -19,7 +19,7 @@ public:
 	KirbySkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::KIRBYSKILL, COLLIDERTYPE::CIRCLE, 1, 10, 5, 3., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::KIRBYSKILL, COLLIDERTYPE::CIRCLE, 1, 10, 5, 0, 3., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		biggersize(1),
 		decelerationrate(0.01),
 		imageaddress(nullptr)
