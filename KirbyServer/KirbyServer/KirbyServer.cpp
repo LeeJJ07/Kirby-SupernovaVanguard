@@ -187,9 +187,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 		case TIMER_GENERATEMONSTER:
 		{
-			totalData.nowTime += 1.0f;
 			if (isAllclientReady)
 			{
+				totalData.nowTime += 1.0f;
 				for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
 				{
 					if (totalData.udata[pIdx].dataType == 0)

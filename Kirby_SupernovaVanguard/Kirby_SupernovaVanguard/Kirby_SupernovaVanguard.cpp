@@ -66,8 +66,6 @@ SceneState curScene;
 StartScene startScene;
 SelectScene selectScene;
 
-float gameTime;
-
 void DrawMousePosition(HDC);
 void Update();
 void UpdateSelect();
@@ -313,10 +311,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						break;
 				}
 				if (i == vClient.size())
-				{
 					curScene = GAME;
-					gameTime = uData.nowTime;
-				}
 			}
 		}
 		break;
@@ -389,8 +384,8 @@ void DoubleBuffering(HDC hdc)
 
 	// >> : 시간
 	{
-		int minutes = static_cast<int>(uData.nowTime - gameTime) / 60;
-		int seconds = static_cast<int>(uData.nowTime - gameTime) % 60;
+		int minutes = static_cast<int>(uData.nowTime) / 60;
+		int seconds = static_cast<int>(uData.nowTime) % 60;
 
 		t.Format(_T("%02d : %02d"), minutes, seconds);  // 두 자리의 분과 초로 출력
 
