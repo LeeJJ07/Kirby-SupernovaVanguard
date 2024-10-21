@@ -24,6 +24,7 @@ public:
 	}
 	~MetaknightSkill()
 	{
+		delete imageaddress;
 		delete collider;
 	}
 

@@ -25,6 +25,7 @@ public:
 	}
 	~DededeSkill()
 	{
+		delete imageaddress;
 		delete collider;
 	}
 

@@ -27,6 +27,7 @@ public:
 	}
 	~MaberoaSkill()
 	{
+		delete imageaddress;
 		delete collider;
 	}
 

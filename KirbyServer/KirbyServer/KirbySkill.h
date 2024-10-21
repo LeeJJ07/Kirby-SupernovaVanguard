@@ -30,6 +30,7 @@ public:
 	}
 	~KirbySkill()
 	{
+		delete imageaddress;
 		delete collider;
 	}
 
@@ -50,9 +51,11 @@ public:
 	void KirbySkillSlower();
 };
 
+static KirbySkill* kirbyskill = nullptr;
+
 bool SetKirbySkillInDatasheet(Skill*& skill, int& ID)
 {
-	KirbySkill*	kirbyskill = dynamic_cast<KirbySkill*>(skill);
+	kirbyskill = dynamic_cast<KirbySkill*>(skill);
 	Circle2D*	kirbycollider = dynamic_cast<Circle2D*>(kirbyskill->GetCollider());
 
 	totalData.sdata[ID].isactivate = kirbyskill->Getisactivate();
@@ -67,7 +70,6 @@ bool SetKirbySkillInDatasheet(Skill*& skill, int& ID)
 	return true;
 }
 
-KirbySkill* kirbyskill = nullptr;
 
 void UpdateKirbySkill(Skill* &skill)
 {
