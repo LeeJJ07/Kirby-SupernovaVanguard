@@ -372,7 +372,7 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 void ReadData()
 {
 	readyclientnum = 0;
-	int choiceClientNum = 0;
+	static int choiceClientNum = 0;
 	static int a[4];
 	for (int i = 0; i < socketList.size(); i++) {
 		ReceiveData temp = {};
@@ -391,7 +391,6 @@ void ReadData()
 			else if (temp.isChoice && a[i] == 0)
 			{
 				choiceClientNum++;
-				totalData.publicdata.islevelUp = false;
 				a[i] = temp.newskill;
 				SetSkillData(i, a[i]);
 			}
@@ -400,8 +399,10 @@ void ReadData()
 	if (socketList.size() == choiceClientNum)
 	{
 		isAllPlayerChoice = true;
+		totalData.publicdata.islevelUp = false;
 		for (int i = 0; i < 4; i++)
 			a[i] = 0;
+		choiceClientNum = 0;
 	}
 
 	if (socketList.size() == readyclientnum)
