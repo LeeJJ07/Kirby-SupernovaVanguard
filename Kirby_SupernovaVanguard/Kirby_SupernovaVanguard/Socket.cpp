@@ -60,14 +60,12 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 	int bytesReceived = recv(s, (char*)&pD, sizeof(TOTALDATA), 0);
 
-	if (bytesReceived > sizeof(TOTALDATA) - 50)
+	if (bytesReceived >= sizeof(TOTALDATA))
 	{
 		readCount++;
 
 		for (int i = 0; i < PLAYERNUM; i++)
 		{
-			static int j = 0;
-
 			if (pD.udata[i].dataType == 0)
 			{
 				if (i == 0)
