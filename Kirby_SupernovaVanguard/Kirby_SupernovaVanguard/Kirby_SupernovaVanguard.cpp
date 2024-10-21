@@ -420,7 +420,7 @@ void DoubleBuffering(HDC hdc)
 		SIZE textSize;
 		GetTextExtentPoint32(bufferdc, t, t.GetLength(), &textSize);
 		int centerX = cLeft + (CAMERA_WIDTH - textSize.cx) / 2;  // 카메라 좌표 기준 중앙 X
-		TextOut(bufferdc, centerX, cTop + 10, t, t.GetLength());  // Y 좌표는 상단에 10픽셀 여백
+		TextOut(bufferdc, centerX, cTop + 60, t, t.GetLength());  // Y 좌표는 상단에 10픽셀 여백
 
 		// 기존 글꼴 및 색상 복원
 		SelectObject(bufferdc, oldFont);

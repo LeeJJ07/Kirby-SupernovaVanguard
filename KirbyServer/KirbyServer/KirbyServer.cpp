@@ -366,7 +366,7 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 	Player* player = new Player(userID);
 	vClient.push_back(player);
 
-	SendToAll();//{ cs , userData }
+	SendToAll(); // { cs , userData }
 
 	return cs;
 }
