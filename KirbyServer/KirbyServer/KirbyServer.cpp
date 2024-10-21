@@ -237,6 +237,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_CREATE:
 	{
+		srand(NULL);
 		InitializeCriticalSection(&criticalsection);
 
 		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
@@ -260,7 +261,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			AcceptSocket(hWnd, s, c_addr, userID++);
 			break;
 		case FD_READ:
+			EnterCriticalSection(&criticalsection);
 			ReadData();
+			LeaveCriticalSection(&criticalsection);
 			break;
 		case FD_CLOSE:
 			CloseClient(wParam);
@@ -330,7 +333,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("211.235.59.106");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -716,7 +719,8 @@ void GenerateSkill()
 						break;
 						case SKILLTYPE::TORNADOSKILL:
 						{
-							TornadoSkill* tornadoSkill = new TornadoSkill(i, 0);
+							int monsterIndex = FindCloseMonster(i);
+							TornadoSkill* tornadoSkill = new TornadoSkill(i, monsterIndex);
 							tornadoSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
 							tornadoSkill->Settime_1();
 							tornadoSkill->Settime_2();
@@ -736,7 +740,7 @@ void GenerateSkill()
 							truckSkill->Settime_2();
 							truckSkill->Setisactivate(true);
 							truckSkill->SetID(s);
-							truckSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first , (long)totalData.udata[i].lookingDir.second });
+							truckSkill->Setoffset({ rand() % SCREEN_SIZE_X , rand() % SCREEN_SIZE_Y });
 							truckSkill->Setposition({ totalData.udata[i].pos.x + truckSkill->Getoffset().x, totalData.udata[i].pos.y + truckSkill->Getoffset().y });
 							truckSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = truckSkill;
@@ -803,6 +807,45 @@ void SetSkillToDatasheet()
 			break;
 		}
 	}
+}
+
+int FindCloseMonster(int& playerIndex)
+{
+	int x = totalData.udata[playerIndex].pos.x;
+	int y = totalData.udata[playerIndex].pos.y;
+
+	int monsternum = -1;
+	int min = 99999999;
+
+	for (int i = 0; i < MONSTERNUM; i++)
+	{
+		if (totalData.mdata[i].dataType == 0)
+			continue;
+
+		int value = pow(x - totalData.mdata[i].pos.x, 2) + pow(y - totalData.mdata[i].pos.y, 2);
+
+		if (value < min)
+		{
+			min = value;
+			monsternum = i;
+		}
+	}
+	return monsternum;
+}
+
+POINT GetNormalizationRange(POINT& player, POINT& monster)
+{
+	int newX = monster.x - player.x;
+	int newY = monster.y - player.y;
+	POINT newPos;
+
+	double temp = sqrt(pow(newX, 2) + pow(newY, 2));
+	newPos.x = newX / temp * OFFSETADJUST;
+	newPos.y = newY / temp * OFFSETADJUST;
+	if (newPos.x <= -100 && newPos.y <= -100)
+		return { 0,0 };
+
+	return newPos;
 }
 
 void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
