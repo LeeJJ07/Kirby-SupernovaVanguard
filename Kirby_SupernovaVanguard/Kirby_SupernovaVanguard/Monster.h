@@ -3,7 +3,7 @@
 #include "PlayerData.h"
 
 enum EMonsterType { RUNNER, SPEAR, WINGBUG,  FIREMAN, LANDMINE };
-enum EMonsterState { CHASE, ATTACK, DEATH };
+enum EMonsterState { MONSTER_CHASE, MONSTER_ATTACK, MONSTER_DEATH };
 
 class Monster : public Object
 {
@@ -19,7 +19,7 @@ protected:
 	int drawIndex;
 
 public:
-	Monster() : monsterType(RUNNER), curState(CHASE), Object(), drawIndex(0)
+	Monster() : monsterType(RUNNER), curState(MONSTER_CHASE), Object(), drawIndex(0)
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
@@ -29,7 +29,7 @@ public:
 		this->curHealth = this->maxHealth;
 		this->speed = BASE_SPEED;
 	}
-	Monster(POINT p) : monsterType(RUNNER), curState(CHASE), Object(p), drawIndex(0)
+	Monster(POINT p) : monsterType(RUNNER), curState(MONSTER_CHASE), Object(p), drawIndex(0)
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);

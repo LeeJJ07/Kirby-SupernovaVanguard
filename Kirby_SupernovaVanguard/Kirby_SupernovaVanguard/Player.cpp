@@ -11,26 +11,50 @@ void Player::ObjectUpdate(TOTALDATA pData, int i)
 
 void Player::DrawPlayer(HDC& hdc)
 {
-    if (position.x < 1000)
+    characterState = ATTACK;
+
+    Animation* tempAni = nullptr;
+    
+    switch (characterType)
     {
-        int xxxxx = 10000;
-        return;
+    case KIRBY:
+        if (characterState == IDLE)  tempAni = imageDatas[kirby_Idle];
+        else if(characterState == WALK) tempAni = imageDatas[kirby_Walk];
+        else if(characterState == ATTACK) tempAni = imageDatas[kirby_Attack];
+        break;
+    case DDD:
+        if (characterState == IDLE)  tempAni = imageDatas[ddd_Idle];
+        else if (characterState == WALK) tempAni = imageDatas[ddd_Walk];
+        else if (characterState == ATTACK) tempAni = imageDatas[ddd_Attack];
+        break;
+    case METANIHGT:
+        if (characterState == IDLE)  tempAni = imageDatas[meta_Idle];
+        else if (characterState == WALK) tempAni = imageDatas[meta_Walk];
+        else if (characterState == ATTACK) tempAni = imageDatas[meta_Attack];
+        break;
+    case MABOROA:
+        if (characterState == IDLE)  tempAni = imageDatas[maboroa_Idle];
+        else if (characterState == WALK) tempAni = imageDatas[maboroa_Walk];
+        else if (characterState == ATTACK) tempAni = imageDatas[maboroa_Attack];
+        break;
     }
-    // 색상 설정을 위한 브러시 핸들
-    HBRUSH brush;
-    brush = CreateSolidBrush(RGB(255, 255, 255)); // 기본 색상 (흰색)
 
-    // 브러시 선택
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
+    HDC hMemDC = CreateCompatibleDC(hdc);
+    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, tempAni->GetBitmap());
 
-    // 원 그리기
-    int left = GetPosition().x - 10;
-    int right = GetPosition().x + 10;
-    int top = GetPosition().y - 10;
-    int bottom = GetPosition().y + 10;
-    Ellipse(hdc, left, top, right, bottom);
+    tempAni->IncreaseIdx();
 
-    // 이전 브러시 복원 및 브러시 삭제
-    SelectObject(hdc, oldBrush);
-    DeleteObject(brush);
+    int left = GetPosition().x - tempAni->GetCurCog().x + tempAni->GetPrevWidth();
+    int top = GetPosition().y - tempAni->GetCurCog().y;
+    TransparentBlt(
+        hdc, left, top,
+        tempAni->GetCurWidth() + tempAni->GetSpacingX(),      //크기
+        tempAni->GetHeight() - 1,        //크기
+        hMemDC,
+        tempAni->GetPrevWidth(), 0, tempAni->GetCurWidth() + tempAni->GetSpacingX(), tempAni->Height() - 1,
+        RGB(tempAni->GetR(), tempAni->GetG(), tempAni->GetB())
+    );
+
+    SelectObject(hMemDC, hOldBitmap);
+    DeleteDC(hMemDC);
 }

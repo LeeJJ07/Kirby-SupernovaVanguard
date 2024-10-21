@@ -8,8 +8,8 @@ class Collider2D;
 void InitMap(Collider2D*** &);
 
 template<class T>
-void Create(T* t, Collider2D***& map)
+void Create(T* t, Collider2D***& _map)
 {
-	map[t->GetPos().y][t->GetPos().x] = new T();
-	map[t->GetPos().y][t->GetPos().x] = t;
+	_map[t->GetPos().y][t->GetPos().x] = new T();
+	_map[t->GetPos().y][t->GetPos().x] = t;
 }

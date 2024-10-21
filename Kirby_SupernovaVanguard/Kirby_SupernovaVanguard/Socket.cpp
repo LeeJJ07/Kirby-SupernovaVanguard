@@ -51,6 +51,7 @@ int InitClient(HWND hWnd, SOCKET &s)
 	}
 
 	WSAAsyncSelect(s, hWnd, WM_ASYNC, FD_READ);
+	
 	return 1;
 }
 

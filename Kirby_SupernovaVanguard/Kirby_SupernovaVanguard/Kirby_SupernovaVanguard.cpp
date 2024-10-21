@@ -8,10 +8,18 @@
 #include "Socket.h"
 #include "Map.h"
 #include "Multithread.h"
+#include "Animation.h"
 
 #define MAX_LOADSTRING 100
 #define TIMER_START 1
 #define TIMER_SELECT 2
+
+// >> : animation
+std::map<ObjectImage, Animation*> imageDatas;
+void LoadImages();
+void CleanUpImageDatas();
+
+// <<
 
 enum SceneState { START, SELECT, GAME };
 RECT        rectView;
@@ -37,6 +45,8 @@ std::vector<Object*> vSkill(SKILLNUM);
 TOTALDATA uData;
 Object** objArr;
 static SOCKET cSocket;
+
+
 
 // >> : Thread
 CRITICAL_SECTION cs;
@@ -193,9 +203,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 		0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, nullptr, nullptr, hInstance, nullptr);
 
 	if (!hWnd)
-	{
 		return FALSE;
-	}
 
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
@@ -211,6 +219,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		InitializeCriticalSection(&cs);
 		GetClientRect(hWnd, &rectView);
+
+		LoadImages(); // 이미지 로드
 
 		curScene = START;
 
@@ -631,4 +641,66 @@ void UpdateSelect()
 {
 	t2_render = std::chrono::high_resolution_clock::now();
 	timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
+}
+void LoadImages()
+{
+	std::ifstream file("Datas/imageDatas.txt");
+	if (!file.is_open())
+	{
+		MessageBox(NULL, _T("이미지 데이터 파일을 열 수 없습니다."), _T("에러"), MB_OK);
+		return;
+	}
+
+	std::string line;
+	int i = 0;
+	while (std::getline(file, line))
+	{
+		std::stringstream ss(line);
+
+		// 파일 경로 읽기
+		std::string filePath;
+		ss >> filePath;
+
+		// cnt와 spacingX 값 읽기
+		int cnt, spacingX, R, G, B, height;
+		ss >> cnt >> spacingX >> R >> G >> B;
+
+		std::vector<POINT> frames(cnt);
+		std::vector<int> lengths(cnt);
+
+		// 프레임 좌표 및 길이 읽기
+		for (int j = 0; j < cnt; j++)
+		{
+			int x, y;
+			ss >> x >> y;
+			frames[j] = { x, y };
+		}
+		for (int j = 0; j < cnt; j++)
+		{
+			int length;
+			ss >> length;
+			lengths[j] = length;
+		}
+		ss >> height;
+
+		// Animation 객체 생성
+		Animation* ani = new Animation(cnt, spacingX, R, G, B, frames, lengths, height);
+		ani->Load(std::wstring(filePath.begin(), filePath.end()));
+
+		// Enum에 맞춰 맵에 저장
+		imageDatas.insert({ (ObjectImage)i, ani });
+		i++;
+	}
+
+	file.close();
+}
+
+void CleanUpImageDatas()
+{
+	for (auto& pair : imageDatas)
+	{
+		delete pair.second;  // 각 Animation 객체를 delete
+		pair.second = nullptr;  // 안전하게 포인터를 nullptr로 설정
+	}
+	imageDatas.clear();  // map을 비움
 }
