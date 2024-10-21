@@ -1,4 +1,5 @@
-﻿#include "Kirby_SupernovaVanguard.h"
+﻿#define _CRT_SECURE_NO_WARNINGS
+#include "Kirby_SupernovaVanguard.h"
 #include "PlayerData.h"
 #include "ActionData.h"
 #include "StartScene.h"
@@ -233,7 +234,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			ResumeThread(hThreads[1]);
 		if (hThreads[2])
 			ResumeThread(hThreads[2]);
-
 	}
 	break;
 	case WM_CHAR:
@@ -486,7 +486,7 @@ unsigned __stdcall Read()
 {
 	while (TRUE)
 	{
-		if (timeSpan_read.count() >= 0.0025)
+		if (timeSpan_read.count() >= 0.005)
 		{
 			if (threadEnd_Read)
 				return 0;

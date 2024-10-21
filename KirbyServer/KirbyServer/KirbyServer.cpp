@@ -247,6 +247,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		if (hThreads[1])
 			ResumeThread(hThreads[1]);
+
+		/*AllocConsole();
+
+		_tfreopen(_T("CONOUT$"), _T("w"), stdout);*/
+
 		return InitServer(hWnd);
 	}
 		break;
@@ -298,8 +303,8 @@ int InitServer(HWND hWnd)
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	
-	int sendBufSize = sizeof(TOTALDATA);  // 송신 버퍼 크기 (예: 8KB)
-	int recvBufSize = sizeof(TOTALDATA);  // 수신 버퍼 크기 (예: 8KB)
+	int sendBufSize = sizeof(TOTALDATA) + 1;  // 송신 버퍼 크기 (예: 8KB)
+	int recvBufSize = sizeof(TOTALDATA) + 1;  // 수신 버퍼 크기 (예: 8KB)
 
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -389,6 +394,11 @@ void SendToAll()//pair<SOCKET, UserData> cs
 		if (totalData.udata[i].dataType == NULL)
 			break;
 		send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
+
+		/*for (int i = SKILLINDEX; i < FINALINDEX; i++)
+		{
+			printf("%d\n", totalData.sdata[i].isactivate);
+		}*/
 	}
 }
 
