@@ -133,6 +133,9 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			case MABEROASKILL:
 				vSkill[i] = new MaberoaSkill();
 				break;
+			case KUNAISKILL:
+				vSkill[i] = new KunaiSkill();
+				break;
 			default:
 				isCorrect = true;
 				break;

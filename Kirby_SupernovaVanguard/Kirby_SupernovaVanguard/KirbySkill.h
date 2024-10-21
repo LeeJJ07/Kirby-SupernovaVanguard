@@ -12,5 +12,8 @@ public:
 		Circle2D* c = new Circle2D(true, PMISSILE);
 		SetObject(c);
 	}
-	~KirbySkill() {}
+	~KirbySkill()
+	{
+		
+	}
 };

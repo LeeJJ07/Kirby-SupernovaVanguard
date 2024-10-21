@@ -563,8 +563,19 @@ unsigned __stdcall Read()
 
 			if (uData.publicdata.islevelUp && !isChoiceSkill)
 			{
-				if (GetAsyncKeyState('1') & 0x8000)
+				if (GetAsyncKeyState('5') & 0x8000)
 				{
+					aD.newskill = 5;
+					isChoiceSkill = true;
+				}
+				if (GetAsyncKeyState('6') & 0x8000)
+				{
+					aD.newskill = 6;
+					isChoiceSkill = true;
+				}
+				if (GetAsyncKeyState('7') & 0x8000)
+				{
+					aD.newskill = 7;
 					isChoiceSkill = true;
 				}
 			}
@@ -577,6 +588,7 @@ unsigned __stdcall Read()
 				aD.isChoice = false;
 				isChoiceSkill = false;
 			}
+			t1_read = std::chrono::high_resolution_clock::now();
 		}
 		Sleep(0);
 	}

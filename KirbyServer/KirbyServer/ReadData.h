@@ -2,10 +2,11 @@
 
 typedef struct receiveData
 {
-	short	id;
 	POINT	playerMove;
 	POINT	cursorMove;
+	short	id;
 	short	charactertype;
+	short	newskill;
 	bool	isReady;
 	bool	isChoice;
 }ReceiveData;

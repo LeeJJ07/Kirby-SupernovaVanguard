@@ -30,8 +30,8 @@ public:
 	}
 	~KirbySkill()
 	{
-		delete imageaddress;
-		delete collider;
+		/*delete imageaddress;
+		delete collider;*/
 	}
 
 	Collider2D* GetCollider()	{ return collider; }

@@ -18,7 +18,7 @@ public:
 	~SkillManager() {}
 
 	int Gettype()		{ return type; }
-	int Getcooltime()	{ return cooltime; }
+	double Getcooltime()	{ return cooltime; }
 	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }
 	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_activate; }
 

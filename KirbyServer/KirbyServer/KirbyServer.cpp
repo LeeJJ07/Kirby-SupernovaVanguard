@@ -53,7 +53,8 @@ vector<Skill*> vSkill(SKILLNUM);
 void GenerateSkill();
 void UpdateSkill();
 void UpdateUi();
-void SetBasisSkillData(int);
+void SetBasisSkillData(int&);
+void SetSkillData(int&, int);
 void SetSkillToDatasheet();
 // <<
 
@@ -207,12 +208,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (isAllclientReady)
 			{
-				/*for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
+				for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
 				{
 					if (totalData.udata[pIdx].dataType == 0)
 						break;
 					GenerateMonster(pIdx);
-				}*/
+				}
 				if(!isGameStart)
 				{
 					for (int i = 0; i < socketList.size(); i++)
@@ -291,7 +292,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		Sleep(0);
 
-		delete kirbyskill;
+		//delete kirbyskill;
 
 		DeleteCriticalSection(&criticalsection);
 
@@ -372,31 +373,36 @@ void ReadData()
 {
 	readyclientnum = 0;
 	int choiceClientNum = 0;
+	static int a[4];
 	for (int i = 0; i < socketList.size(); i++) {
 		ReceiveData temp = {};
 		int dataLen = recv(socketList[i], (char*)&temp, sizeof(ReceiveData), 0);
 		if(dataLen > 0)
 		{
-			/*if (isAllPlayerChoice)
-			{*/
+			if (isAllPlayerChoice)
+			{
 				SetUserData(totalData.udata[temp.id], temp);
 
 				if (totalData.udata[temp.id].inGameStart)
 				{
 					readyclientnum++;
 				}
-			/*}
-			else if (temp.isChoice)
+			}
+			else if (temp.isChoice && a[i] == 0)
 			{
 				choiceClientNum++;
 				totalData.publicdata.islevelUp = false;
-			}*/
+				a[i] = temp.newskill;
+				SetSkillData(i, a[i]);
+			}
 		}
 	}
-	/*if (socketList.size() == choiceClientNum)
+	if (socketList.size() == choiceClientNum)
 	{
 		isAllPlayerChoice = true;
-	}*/
+		for (int i = 0; i < 4; i++)
+			a[i] = 0;
+	}
 
 	if (socketList.size() == readyclientnum)
 	{
@@ -437,15 +443,15 @@ unsigned __stdcall Update()
 				return 0;
 			EnterCriticalSection(&criticalsection);
 
-			/*if (isAllPlayerChoice)
-			{*/
+			if (isAllPlayerChoice)
+			{
 				UpdateTimer();
 				UpdateMonster();
 				GenerateSkill();
 				UpdateSkill();
 				UpdateUi();
 				SetSkillToDatasheet();
-			//}
+			}
 
 			t1_update = std::chrono::high_resolution_clock::now();
 			timeSpan_update = std::chrono::duration_cast<std::chrono::duration<double>>(t2_update - t1_update);
@@ -533,7 +539,7 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 	// <<
 }
 
-void SetBasisSkillData(int playerIndex)
+void SetBasisSkillData(int& playerIndex)
 {
 	vClient[playerIndex]->SetCharacterType(totalData.udata[playerIndex].charactertype);
 	Skill* basisSkill = nullptr;
@@ -559,22 +565,53 @@ void SetBasisSkillData(int playerIndex)
 	vClient[playerIndex]->SetSkillManager(sm);
 }
 
+
+void SetSkillData(int& playerIndex, int skillnum)
+{
+	Skill* basisSkill = nullptr;
+	switch (skillnum)
+	{
+	case SKILLTYPE::ELECTRICFIELDSKILL:
+
+		break;
+	case SKILLTYPE::KUNAISKILL:
+		basisSkill = new KunaiSkill(playerIndex, 0);
+		break;
+	case SKILLTYPE::MAGICARROWSKILL :
+		
+		break;
+	case SKILLTYPE::TORNADOSKILL:
+
+		break;
+	case SKILLTYPE::TRUCKSKILL:
+
+		break;
+	}
+	SkillManager* skillmanager = new SkillManager(basisSkill->Getskilltype(), basisSkill->Getcooltime());
+
+	std::vector<SkillManager*> sm = vClient[playerIndex]->GetSkillManager();
+	sm.push_back(skillmanager);
+	vClient[playerIndex]->SetSkillManager(sm);
+}
+
 void GenerateSkill()
 {
-	for (int s = SKILLINDEX; s < FINALINDEX; s++)
+	for (int i = 0; i < socketList.size(); i++)
 	{
-		if (!OBJECTIDARR[s])
+		std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
+		for (int j = 0; j < temp.size(); j++)
 		{
-			for (int i = 0; i < socketList.size(); i++)
+			temp[j]->Settime_2();
+
+			double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(temp[j]->Gettime_2() - temp[j]->Gettime_1()).count();
+
+			if (skillcooltime > temp[j]->Getcooltime())
 			{
-				std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
-				for (int j = 0; j < temp.size(); j++)
+				int s;
+				bool isGenerateSkill = false;
+				for (s = SKILLINDEX; s < FINALINDEX; s++)
 				{
-					temp[j]->Settime_2();
-
-					double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(temp[j]->Gettime_2() - temp[j]->Gettime_1()).count();
-
-					if (skillcooltime > temp[j]->Getcooltime())
+					if (!OBJECTIDARR[s])
 					{
 						switch (temp[j]->Gettype())
 						{
@@ -600,7 +637,7 @@ void GenerateSkill()
 							dededeSkill->Settime_2();
 							dededeSkill->Setisactivate(true);
 							dededeSkill->SetID(s);
-							dededeSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * 10, (long)totalData.udata[i].lookingDir.second * 10});
+							dededeSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * 10, (long)totalData.udata[i].lookingDir.second * 10 });
 							dededeSkill->Setposition({ totalData.udata[i].pos.x + dededeSkill->Getoffset().x, totalData.udata[i].pos.y + dededeSkill->Getoffset().y });
 							dededeSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = dededeSkill;
@@ -619,7 +656,7 @@ void GenerateSkill()
 							metaknightSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = metaknightSkill;
 						}
-							break;
+						break;
 						case SKILLTYPE::MABEROASKILL:
 						{
 							MaberoaSkill* maberoaskill = new MaberoaSkill(i, 0);
@@ -633,14 +670,34 @@ void GenerateSkill()
 							maberoaskill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = maberoaskill;
 						}
-							break;
+						break;
+						case SKILLTYPE::KUNAISKILL:
+						{
+							KunaiSkill* kunaiSkill = new KunaiSkill(i, 0);
+							kunaiSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							kunaiSkill->Settime_1();
+							kunaiSkill->Settime_2();
+							kunaiSkill->Setisactivate(true);
+							kunaiSkill->SetID(s);
+							kunaiSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * kunaiSkill->Getsize() / OFFSETADJUST, (long)totalData.udata[i].lookingDir.second * kunaiSkill->Getsize() / OFFSETADJUST });
+							kunaiSkill->Setposition({ totalData.udata[i].pos.x + kunaiSkill->Getoffset().x, totalData.udata[i].pos.y + kunaiSkill->Getoffset().y });
+							kunaiSkill->Setmasternum(i);
+							vSkill[s - SKILLINDEX] = kunaiSkill;
+						}
+						break;
 						}
 						skillnum++;
 						temp[j]->Settime_1();
 
 						OBJECTIDARR[s] = true;
-						return;
+						isGenerateSkill = true;
+
+						break;
 					}
+				}
+				if (s == FINALINDEX && !isGenerateSkill)
+				{
+					return;
 				}
 			}
 		}
@@ -676,7 +733,7 @@ void SetSkillToDatasheet()
 
 			break;
 		case SKILLTYPE::KUNAISKILL:
-
+			SetKunaiSkillInDatasheet(skill, ID);
 			break;
 		case SKILLTYPE::MAGICARROWSKILL:
 
@@ -859,7 +916,7 @@ void UpdateSkill()
 
 			break;
 		case SKILLTYPE::KUNAISKILL:
-
+			UpdateKunaiSkill(skill);
 			break;
 		case SKILLTYPE::MAGICARROWSKILL:
 
@@ -907,7 +964,7 @@ void UpdateUi()
 	totalData.publicdata.exp++;
 	if (totalData.publicdata.exp >= totalData.publicdata.maxExp)
 	{
-		totalData.publicdata.maxExp *= 2;
+		totalData.publicdata.maxExp *= 100;
 		totalData.publicdata.exp = 0;
 		totalData.publicdata.islevelUp = true;
 		isAllPlayerChoice = false;
