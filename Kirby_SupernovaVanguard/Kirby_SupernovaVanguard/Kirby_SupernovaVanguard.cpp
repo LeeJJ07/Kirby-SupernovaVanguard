@@ -9,6 +9,7 @@
 #include "Socket.h"
 #include "Map.h"
 #include "Multithread.h"
+#include "Exp.h"
 
 #define MAX_LOADSTRING 100
 #define TIMER_START 1
@@ -27,6 +28,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void DoubleBuffering(HDC, std::vector<Object*>);
 void DrawCamera(HDC);
+void DrawEXP(HDC&,int,int);
 void DrawCollider(HDC&);
 void InitObjArr();
 unsigned __stdcall Paint(HWND);
@@ -104,9 +106,9 @@ static std::chrono::high_resolution_clock::time_point t1_read;
 static std::chrono::high_resolution_clock::time_point t2_read;
 static std::chrono::duration<double> timeSpan_read;
 
-std::chrono::high_resolution_clock::time_point t1_readCount;
-std::chrono::high_resolution_clock::time_point t2_readCount;
-std::chrono::duration<double> timeSpan_readCount;
+static std::chrono::high_resolution_clock::time_point t1_readCount;
+static std::chrono::high_resolution_clock::time_point t2_readCount;
+static std::chrono::duration<double> timeSpan_readCount;
 
 int readCount;
 
@@ -127,6 +129,10 @@ static int textsendCount = 0;
 
 void CountSendNum();
 void DrawSendNum(HDC);
+// <<
+
+// >> : LevelUp
+static bool isChoiceSkill;
 // <<
 
 unsigned long ulStackSize = 0;
@@ -392,13 +398,15 @@ void DoubleBuffering(HDC hdc)
 
 	DrawCamera(bufferdc);
 
+	DrawEXP(bufferdc, cTop, cLeft);
+
 	if (isDrawCollider)
 		DrawCollider(bufferdc);
 
 	// >> : 시간
 	{
-		int minutes = static_cast<int>(uData.nowTime) / 60;
-		int seconds = static_cast<int>(uData.nowTime) % 60;
+		int minutes = static_cast<int>(uData.publicdata.currentTime) / 60;
+		int seconds = static_cast<int>(uData.publicdata.currentTime) % 60;
 
 		t.Format(_T("%02d : %02d"), minutes, seconds);  // 두 자리의 분과 초로 출력
 
@@ -465,6 +473,34 @@ void DrawCamera(HDC hdc)
 	}
 }
 
+void DrawEXP(HDC& hdc, int cameraTop, int cameraLeft)
+{
+	RECT MaxExpBar;
+
+	MaxExpBar.left = cameraLeft + MAXEXP_OFFSET_LEFT;
+	MaxExpBar.right = cameraLeft + CAMERA_WIDTH - MAXEXP_OFFSET_RIGHT;
+	MaxExpBar.top = cameraTop + CAMERA_HEIGHT - MAXEXP_OFFSET_TOP;
+	MaxExpBar.bottom = cameraTop + CAMERA_HEIGHT - MAXEXP_OFFSET_BOTTOM;
+	Rectangle(hdc, MaxExpBar.left, MaxExpBar.top, MaxExpBar.right, MaxExpBar.bottom);
+
+	HBRUSH brush;
+	brush = CreateSolidBrush(RGB(255, 0, 0));
+	HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
+
+	float expPer = ((float)uData.publicdata.exp / uData.publicdata.maxExp);
+
+	RECT ExpBar;
+
+	ExpBar.left = cameraLeft + EXP_OFFSET_LEFT;
+	ExpBar.right = ExpBar.left + (CAMERA_WIDTH - EXP_OFFSET_RIGHT) * expPer;
+	ExpBar.top = cameraTop + CAMERA_HEIGHT - EXP_OFFSET_TOP;
+	ExpBar.bottom = cameraTop + CAMERA_HEIGHT - EXP_OFFSET_BOTTOM;
+	Rectangle(hdc, ExpBar.left, ExpBar.top, ExpBar.right, ExpBar.bottom);
+
+	SelectObject(hdc, oldBrush);
+	DeleteObject(brush);
+}
+
 void DrawCollider(HDC& hdc)
 {
 	for (int i = 0; i < OBJECTNUM; i++)
@@ -524,6 +560,23 @@ unsigned __stdcall Read()
 			if (threadEnd_Read)
 				return 0;
 			ReadMessage(cSocket, vClient, uData);
+
+			if (uData.publicdata.islevelUp && !isChoiceSkill)
+			{
+				if (GetAsyncKeyState('1') & 0x8000)
+				{
+					isChoiceSkill = true;
+				}
+			}
+			if (uData.publicdata.islevelUp && isChoiceSkill)
+			{
+				aD.isChoice = true;
+			}
+			if (!uData.publicdata.islevelUp)
+			{
+				aD.isChoice = false;
+				isChoiceSkill = false;
+			}
 		}
 		Sleep(0);
 	}
@@ -658,7 +711,7 @@ void Update()
 	timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
 	timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 	timeSpan_move = std::chrono::duration_cast<std::chrono::duration<double>>(t2_move - t1_move);
-	timeSpan_read = std::chrono::duration_cast<std::chrono::duration<double>>(t2_move - t1_move);
+	timeSpan_read = std::chrono::duration_cast<std::chrono::duration<double>>(t2_read - t1_read);
 	timeSpan_sendCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_sendCount - t1_sendCount);
 	timeSpan_readCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_readCount - t1_readCount);
 
@@ -685,12 +738,6 @@ void Update()
 		}
 		t1_move = std::chrono::high_resolution_clock::now();
 	}
-	/*if (GetAsyncKeyState('C') & 0x8001)
-	{
-		isDrawCollider = true;
-	}
-	else
-		isDrawCollider = false;*/
 }
 
 void UpdateSelect()

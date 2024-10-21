@@ -53,9 +53,17 @@ struct MONSTERDATA :public OBJECTDATA
 	EMonsterState curState;
 };
 
+struct PUBLICDATA
+{
+	float	currentTime;
+	int		exp;
+	int		maxExp;
+	bool	islevelUp;
+};
+
 struct TOTALDATA
 {
-	float nowTime;
+	PUBLICDATA		publicdata;
 	PLAYERDATA		udata[PLAYERNUM];
 	MONSTERDATA		mdata[MONSTERNUM];
 	SKILLDATA		sdata[SKILLNUM];

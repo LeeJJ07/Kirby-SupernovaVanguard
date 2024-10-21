@@ -135,6 +135,9 @@
     <ClInclude Include="EletricfieldSkill.h">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClInclude>
+    <ClInclude Include="Exp.h">
+      <Filter>클래스파일\UI\Exp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Kirby_SupernovaVanguard.ico">
@@ -195,6 +198,12 @@
     </Filter>
     <Filter Include="클래스파일\Objects\Skill">
       <UniqueIdentifier>{8bdb0f94-66f5-40fc-a2f5-63f9b956c960}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\UI">
+      <UniqueIdentifier>{739bc25e-6390-4f93-9e3f-fe573368f95f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스파일\UI\Exp">
+      <UniqueIdentifier>{1f9bb86d-b916-4e04-b6a3-d6c285c48a1f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

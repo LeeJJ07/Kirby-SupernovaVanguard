@@ -127,7 +127,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ActionData.h" />
     <ClInclude Include="Boss.h" />
     <ClInclude Include="Circle2D.h" />
     <ClInclude Include="Collider2D.h" />
@@ -148,6 +147,7 @@
     <ClInclude Include="Multithread.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="ReadData.h" />
     <ClInclude Include="Rectangle2D.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RunnerMonster.h" />

@@ -64,6 +64,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 	{
 		readCount++;
 
+		// >> : playerdata
 		for (int i = 0; i < PLAYERNUM; i++)
 		{
 			if (pD.udata[i].dataType == 0)
@@ -89,7 +90,9 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			
 			camera.PositionUpdate();
 		}
+		// <<
 
+		// >> : monsterdata
 		for (int i = 0; i < MONSTERNUM; i++)
 		{
 			if (pD.mdata[i].dataType == 0)
@@ -104,7 +107,9 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			vMonster[i]->ObjectUpdate(pD, i);
 			vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
 		}
+		// <<
 
+		// >> : skilldata
 		for (int i = 0; i < SKILLNUM; i++)
 		{
 			bool isCorrect = false;
@@ -141,6 +146,13 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			vSkill[i]->ObjectUpdate(pD, i);
 			vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());
 		}
+		// <<
+
+		// >> publicdata
+		{
+			//pD.publicdata.Exp;
+		}
+		// <<
 
 		if (timeSpan_readCount.count() >= 1)
 		{

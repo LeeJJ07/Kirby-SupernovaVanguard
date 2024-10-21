@@ -7,6 +7,7 @@
 #include <WinSock2.h>
 #include "Object.h"
 #include "TotalData.h"
+#include "ReadData.h"
 #include "TotalSkill.h"
 
 #pragma comment(lib, "ws2_32.lib")
@@ -34,6 +35,7 @@ bool threadEnd_Send;
 unsigned __stdcall Update();
 unsigned __stdcall Send();
 void UpdateTimer();
+void UpdateThread();
 // <<
 
 // >> : send
@@ -52,23 +54,21 @@ static std::chrono::duration<double> timeSpan_update;
 vector<Skill*> vSkill(SKILLNUM);
 void GenerateSkill();
 void UpdateSkill();
+void UpdateUi();
 void SetBasisSkillData(int);
 void SetSkillToDatasheet();
 // <<
 
 // >> : player
 std::vector<Player*> vClient;
+bool isAllPlayerChoice = true;
 // <<
 
-// 클라이언트 ActionData와 형식 같음
-typedef struct receiveData
-{
-	short id;
-	POINT playerMove;
-	POINT cursorMove;
-	short charactertype;
-	bool isReady;
-}ReceiveData;
+// >> : UI
+static std::chrono::high_resolution_clock::time_point t1_UI;
+static std::chrono::high_resolution_clock::time_point t2_UI;
+static std::chrono::duration<double> timeSpan_UI;
+// <<
 
 #define MAX_LOADSTRING 100
 #define WM_ASYNC WM_USER + 1
@@ -147,8 +147,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-
-		UpdateTimer();
+		UpdateThread();
 	}
 
 	return (int) msg.wParam;
@@ -210,7 +209,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (isAllclientReady)
 			{
-				totalData.nowTime += 1.0f;
 				for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
 				{
 					if (totalData.udata[pIdx].dataType == 0)
@@ -250,6 +248,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (hThreads[1])
 			ResumeThread(hThreads[1]);
 
+		totalData.publicdata.maxExp = 100;
+		totalData.publicdata.exp = 0;
+
 		/*AllocConsole();
 
 		_tfreopen(_T("CONOUT$"), _T("w"), stdout);*/
@@ -277,7 +278,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			HDC hdc = BeginPaint(hWnd, &ps);
 
 			wchar_t buffer[50];
-			swprintf(buffer, 50, L"%f", totalData.nowTime);
+			swprintf(buffer, 50, L"%f", totalData.publicdata.currentTime);
 
 			// 화면에 float 값 출력
 			TextOut(hdc, 500, 500, buffer, wcslen(buffer));
@@ -376,19 +377,32 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 void ReadData()
 {
 	readyclientnum = 0;
+	int choiceClientNum = 0;
 	for (int i = 0; i < socketList.size(); i++) {
 		ReceiveData temp = {};
 		int dataLen = recv(socketList[i], (char*)&temp, sizeof(ReceiveData), 0);
 		if(dataLen > 0)
 		{
-			SetUserData(totalData.udata[temp.id], temp);
+			/*if (isAllPlayerChoice)
+			{*/
+				SetUserData(totalData.udata[temp.id], temp);
 
-			if (totalData.udata[temp.id].inGameStart)
+				if (totalData.udata[temp.id].inGameStart)
+				{
+					readyclientnum++;
+				}
+			/*}
+			else if (temp.isChoice)
 			{
-				readyclientnum++;
-			}
+				choiceClientNum++;
+				totalData.publicdata.islevelUp = false;
+			}*/
 		}
-	}	
+	}
+	if (socketList.size() == choiceClientNum)
+	{
+		isAllPlayerChoice = true;
+	}
 
 	if (socketList.size() == readyclientnum)
 	{
@@ -404,11 +418,6 @@ void SendToAll()//pair<SOCKET, UserData> cs
 		if (totalData.udata[i].dataType == NULL)
 			break;
 		send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
-
-		/*for (int i = SKILLINDEX; i < FINALINDEX; i++)
-		{
-			printf("%d\n", totalData.sdata[i].isactivate);
-		}*/
 	}
 }
 
@@ -421,6 +430,61 @@ void CloseClient(SOCKET socket)
 			socketList.erase(socketList.begin() + i);
 			break;
 		}
+	}
+}
+
+unsigned __stdcall Update()
+{
+	while (TRUE)
+	{
+		if (timeSpan_update.count() >= 0.02)
+		{
+			if (threadEnd_Update)
+				return 0;
+			EnterCriticalSection(&criticalsection);
+
+			/*if (isAllPlayerChoice)
+			{*/
+				UpdateTimer();
+				UpdateMonster();
+				GenerateSkill();
+				UpdateSkill();
+				UpdateUi();
+				SetSkillToDatasheet();
+			//}
+
+			t1_update = std::chrono::high_resolution_clock::now();
+			timeSpan_update = std::chrono::duration_cast<std::chrono::duration<double>>(t2_update - t1_update);
+
+			LeaveCriticalSection(&criticalsection);
+		}
+		Sleep(0);
+	}
+}
+
+unsigned __stdcall Send()
+{
+	while (TRUE)
+	{
+		if (timeSpan_send.count() >= 0.0001)
+		{
+			if (threadEnd_Send)
+				return 0;
+			EnterCriticalSection(&criticalsection);
+
+			for (int i = 0; i < PLAYERNUM; i++)
+			{
+				if (totalData.udata[i].dataType == NULL)
+					break;
+				send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
+			}
+
+			t1_send = std::chrono::high_resolution_clock::now();
+			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+
+			LeaveCriticalSection(&criticalsection);
+		}
+		Sleep(0);
 	}
 }
 
@@ -844,6 +908,24 @@ void UpdateMonster()
 	}
 }
 
+void UpdateUi()
+{
+	totalData.publicdata.exp++;
+	if (totalData.publicdata.exp >= totalData.publicdata.maxExp)
+	{
+		totalData.publicdata.maxExp *= 2;
+		totalData.publicdata.exp = 0;
+		totalData.publicdata.islevelUp = true;
+		isAllPlayerChoice = false;
+	}
+	if (timeSpan_UI.count() >= 1)
+	{
+		totalData.publicdata.currentTime += 1;
+		t1_UI = std::chrono::high_resolution_clock::now();
+		timeSpan_UI = std::chrono::duration_cast<std::chrono::duration<double>>(t2_UI - t1_UI);
+	}
+}
+
 void SetMonsterData(MONSTERDATA& mData, Monster*& m)
 {
 	mData.pos = m->GetPosition();
@@ -851,60 +933,19 @@ void SetMonsterData(MONSTERDATA& mData, Monster*& m)
 	mData.curState = m->GetMonsterState();
 }
 
-unsigned __stdcall Update()
-{
-	while(TRUE)
-	{
-		if(timeSpan_update.count() >= 0.02)
-		{
-			if (threadEnd_Update)
-				return 0;
-			EnterCriticalSection(&criticalsection);
-
-			UpdateMonster();
-			GenerateSkill();
-			UpdateSkill();
-			SetSkillToDatasheet();
-
-			t1_update = std::chrono::high_resolution_clock::now();
-			timeSpan_update = std::chrono::duration_cast<std::chrono::duration<double>>(t2_update - t1_update);
-
-			LeaveCriticalSection(&criticalsection);
-		}
-		Sleep(0);
-	}
-}
-unsigned __stdcall Send()
-{
-	while (TRUE)
-	{
-		if(timeSpan_send.count() >= 0.0001)
-		{
-			if (threadEnd_Send)
-				return 0;
-			EnterCriticalSection(&criticalsection);
-
-			for (int i = 0; i < PLAYERNUM; i++)
-			{
-				if (totalData.udata[i].dataType == NULL)
-					break;
-				send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
-			}
-
-			t1_send = std::chrono::high_resolution_clock::now();
-			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
-
-			LeaveCriticalSection(&criticalsection);
-		}
-		Sleep(0);
-	}
-}
 
 void UpdateTimer()
+{
+	t2_UI = std::chrono::high_resolution_clock::now();
+	timeSpan_UI = std::chrono::duration_cast<std::chrono::duration<double>>(t2_UI - t1_UI);
+}
+
+void UpdateThread()
 {
 	t2_update = std::chrono::high_resolution_clock::now();
 	timeSpan_update = std::chrono::duration_cast<std::chrono::duration<double>>(t2_update - t1_update);
 
 	t2_send = std::chrono::high_resolution_clock::now();
+
 	timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 }

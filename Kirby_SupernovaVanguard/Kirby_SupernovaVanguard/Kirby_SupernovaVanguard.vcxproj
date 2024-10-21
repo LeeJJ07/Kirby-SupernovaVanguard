@@ -133,6 +133,7 @@
     <ClInclude Include="Circle2D.h" />
     <ClInclude Include="DededeSkill.h" />
     <ClInclude Include="EletricfieldSkill.h" />
+    <ClInclude Include="Exp.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Collider2D.h" />
     <ClInclude Include="GameScene.h" />

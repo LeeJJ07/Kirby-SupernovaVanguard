@@ -1,6 +1,5 @@
 #include "Socket.h"
 #include "TotalData.h"
-#include "ActionData.h"
 #include "Multithread.h"
 
 static std::chrono::duration<double> timeSpan_readCount;
