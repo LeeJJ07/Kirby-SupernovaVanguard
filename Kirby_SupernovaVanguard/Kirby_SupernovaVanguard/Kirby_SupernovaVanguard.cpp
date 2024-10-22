@@ -345,7 +345,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (i == vClient.size())
 				{
 					curScene = GAME;
-
+					for (int j = 0; j < PLAYERNUM; j++)
+					{
+						if (vClient[j] == NULL)
+							break;
+						dynamic_cast<Player*>(vClient[myID])->SetPlayerAni();
+					}
 				}
 			}
 		}

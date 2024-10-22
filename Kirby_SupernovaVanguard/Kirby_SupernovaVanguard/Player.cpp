@@ -7,7 +7,6 @@ void Player::ObjectUpdate(TOTALDATA& pData, int i)
 	SetLookingDir(pData.udata[i].lookingDir);
 	SetIsInGame(pData.udata[i].inGameStart);
 	SetMousePosition(pData.udata[i].mousePos);
-    SetPlayerAni();
 }
 
 void Player::SetPlayerAni()
