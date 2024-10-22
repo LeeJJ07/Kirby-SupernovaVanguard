@@ -2,14 +2,10 @@
 
 #include "Skill.h"
 
-#define WALL 5
-
 class TornadoSkill : public Skill
 {
 private:
 	const char* imageaddress;
-	short	turnAround;
-	short	wall;
 
 	Collider2D* collider;
 
@@ -19,8 +15,8 @@ public:
 	TornadoSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::TORNADOSKILL, COLLIDERTYPE::RECTANGLE, 2, 10, 20, 40, 8., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
-		imageaddress(nullptr), turnAround(1), wall(0)
+		: Skill(masternum, targetnum, SKILLTYPE::TORNADOSKILL, COLLIDERTYPE::RECTANGLE, 2, 10, 30, 60, 6, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		imageaddress(nullptr)
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
 		rectangle2D->SetPosition(this->Getposition());
@@ -32,14 +28,10 @@ public:
 		delete collider;
 	}
 
-	short	GetTurnAround() { return turnAround; }
-	short	GetWall() { return wall; }
 	Collider2D* GetCollider() { return collider; }
 	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }
 	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_activate; }
 
-	void	SetTurnAround(short turnAround) { this->turnAround = turnAround; }
-	void	SetWall(short wall) { this->wall = wall; }
 	void	SetCollider(Collider2D* collider) override { this->collider = collider; }
 	void	Settime_1() { t1_activate = std::chrono::high_resolution_clock::now(); }
 	void	Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
@@ -62,33 +54,30 @@ bool SetTornadoSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].collidersize	= tornadocollider->GetWidth();
 	totalData.sdata[ID].collidersize2	= tornadocollider->GetHeight();
 	totalData.sdata[ID].collidertype	= skill->Getcollidertype();
+	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 
 	return true;
 }
 
 void UpdateTornadoSkill(Skill*& skill)
 {
-	int playerindex = skill->Getmasternum();
-	int monsterIndex = FindCloseMonster(playerindex);
 	tornadoskill = dynamic_cast<TornadoSkill*>(skill);
 
-	if (monsterIndex != -1)
+	POINT myposition = skill->Getposition();
+
+	if (skill->Gettargetnum() == 0)
 	{
-		POINT direction = GetNormalizationRange(totalData.udata[playerindex].pos, totalData.mdata[monsterIndex].pos);
+		int monsterIndex = FindCloseMonster(myposition);
+		tornadoskill->Settargetnum(monsterIndex);
+	}
 
-		if (abs(tornadoskill->GetWall()) == WALL)
-		{
-			tornadoskill->SetTurnAround(-tornadoskill->GetTurnAround());
-		}
-
-		tornadoskill->SetWall(tornadoskill->GetWall() + tornadoskill->GetTurnAround());
+	if (tornadoskill->Gettargetnum() != -1)
+	{
+		POINT direction = GetNormalizationRange(myposition, totalData.mdata[tornadoskill->Gettargetnum()].pos);
 
 		if (direction.x == 0 && direction.y == 0)
 		{
-			POINT newpos;
-			newpos.x = tornadoskill->Getposition().x + tornadoskill->GetTurnAround() * tornadoskill->Getspeed();
-			newpos.y = tornadoskill->Getposition().y;
-			tornadoskill->Setposition(newpos);
+			tornadoskill->Setposition(totalData.mdata[tornadoskill->Gettargetnum()].pos);
 		}
 		else
 		{

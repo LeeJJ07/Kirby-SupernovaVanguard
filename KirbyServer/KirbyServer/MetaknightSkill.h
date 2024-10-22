@@ -55,6 +55,7 @@ bool SetMetaknightSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].collidersize = metaknightcollider->GetWidth();
 	totalData.sdata[ID].collidersize2 = metaknightcollider->GetHeight();
 	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 
 	return true;
 }

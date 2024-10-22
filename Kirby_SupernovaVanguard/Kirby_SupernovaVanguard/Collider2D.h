@@ -41,7 +41,7 @@ public:
 	void	MovePosition(POINT targetPos) { position.x = targetPos.x + offset.x; position.y = targetPos.y + offset.y; }
 	void	SetOffset(POINT newoffset) { offset = newoffset; }
 
-	virtual void DrawCollider(HDC&) = 0;
+	virtual void DrawCollider(HDC&, int& ID) = 0;
 };
 
 extern Object** objArr;

@@ -15,7 +15,7 @@ public:
 	KunaiSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::KUNAISKILL, COLLIDERTYPE::RECTANGLE, 4, 2, 5, 8, 0.4, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::KUNAISKILL, COLLIDERTYPE::RECTANGLE, 8, 2, 5, 8, 0.25, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		imageaddress(nullptr)
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);

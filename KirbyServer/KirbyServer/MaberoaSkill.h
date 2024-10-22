@@ -58,6 +58,7 @@ bool SetMaberoaSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].colliderposition = maberoaskill->GetCollider()->GetPosition();
 	totalData.sdata[ID].collidersize = maberoacollider->GetRadius();
 	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 
 	return true;
 }

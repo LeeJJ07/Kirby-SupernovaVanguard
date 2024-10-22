@@ -19,5 +19,5 @@ public:
 	void SetWidth(int width) { this->width = width; }
 	void SetHeight(int height) { this->height = height; }
 
-	void DrawCollider(HDC&);
+	void DrawCollider(HDC&, int&);
 };

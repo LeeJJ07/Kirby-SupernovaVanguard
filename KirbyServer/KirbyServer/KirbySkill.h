@@ -66,6 +66,7 @@ bool SetKirbySkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].colliderposition = kirbyskill->GetCollider()->GetPosition();
 	totalData.sdata[ID].collidersize = kirbycollider->GetRadius();
 	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 
 	return true;
 }

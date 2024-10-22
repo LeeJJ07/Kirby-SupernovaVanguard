@@ -42,7 +42,7 @@ int InitClient(HWND hWnd, SOCKET &s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("211.235.59.106");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
@@ -82,6 +82,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			{
 				pData = new Player();
 				CreateObject(pData, i + PLAYERINDEX);
+				pData->Setid(i + PLAYERINDEX);
 			}
 			pData->ObjectUpdate(pD, i);
 			pData->GetCollider()->MovePosition(pData->GetPosition());
@@ -103,6 +104,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 			vMonster[i] = new Monster;
 			CreateObject((Monster*)vMonster[i], i + MONSTERINDEX);
+			vMonster[i]->Setid(i);
 
 			vMonster[i]->ObjectUpdate(pD, i);
 			vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
@@ -157,6 +159,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 				continue;
 
 			CreateObject((Skill*)vSkill[i], i + SKILLINDEX);
+			vSkill[i]->Setid(pD.sdata[i].targetnum);
 
 			vSkill[i]->ObjectUpdate(pD, i);
 			vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());

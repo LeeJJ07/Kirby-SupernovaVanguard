@@ -61,6 +61,7 @@ void SetSkillToDatasheet();
 // >> : player
 std::vector<Player*> vClient;
 bool isAllPlayerChoice = true;
+bool isLockOn = true;
 // <<
 
 // >> : UI
@@ -333,7 +334,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("211.235.59.106");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -385,6 +386,7 @@ void ReadData()
 			if (isAllPlayerChoice)
 			{
 				SetUserData(totalData.udata[temp.id], temp);
+				vClient[temp.id]->SetisLockOn(temp.isLockOn);
 
 				if (totalData.udata[temp.id].inGameStart)
 				{
@@ -621,8 +623,19 @@ void GenerateSkill()
 						{
 						case SKILLTYPE::KIRBYSKILL:
 						{
-							KirbySkill* kirbySkill = new KirbySkill(i, 0);
-							kirbySkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
+
+							KirbySkill* kirbySkill = new KirbySkill(i, monsterIndex);
+							if (vClient[i]->GetisLockOn())
+								kirbySkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							else
+							{
+								PAIR lookingdir = { (kirbySkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (kirbySkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+
+								kirbySkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+							}
 							kirbySkill->Settime_1();
 							kirbySkill->Settime_2();
 							kirbySkill->Setisactivate(true);
@@ -635,8 +648,19 @@ void GenerateSkill()
 						break;
 						case SKILLTYPE::DEDEDESKILL:
 						{
-							DededeSkill* dededeSkill = new DededeSkill(i, 0);
-							dededeSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
+
+							DededeSkill* dededeSkill = new DededeSkill(i, monsterIndex);
+							if (vClient[i]->GetisLockOn())
+								dededeSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							else
+							{
+								PAIR lookingdir = { (dededeSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (dededeSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+
+								dededeSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+							}
 							dededeSkill->Settime_1();
 							dededeSkill->Settime_2();
 							dededeSkill->Setisactivate(true);
@@ -649,8 +673,19 @@ void GenerateSkill()
 						break;
 						case SKILLTYPE::METAKNIGHTSKILL:
 						{
-							MetaknightSkill* metaknightSkill = new MetaknightSkill(i, 0);
-							metaknightSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
+
+							MetaknightSkill* metaknightSkill = new MetaknightSkill(i, monsterIndex);
+							if (vClient[i]->GetisLockOn())
+								metaknightSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							else
+							{
+								PAIR lookingdir = { (metaknightSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (metaknightSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+
+								metaknightSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+							}
 							metaknightSkill->Settime_1();
 							metaknightSkill->Settime_2();
 							metaknightSkill->Setisactivate(true);
@@ -663,16 +698,27 @@ void GenerateSkill()
 						break;
 						case SKILLTYPE::MABEROASKILL:
 						{
-							MaberoaSkill* maberoaskill = new MaberoaSkill(i, 0);
-							maberoaskill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
-							maberoaskill->Settime_1();
-							maberoaskill->Settime_2();
-							maberoaskill->Setisactivate(true);
-							maberoaskill->SetID(s);
-							maberoaskill->Setoffset({ 0, -10 });
-							maberoaskill->Setposition({ totalData.udata[i].pos.x + maberoaskill->Getoffset().x, totalData.udata[i].pos.y + maberoaskill->Getoffset().y });
-							maberoaskill->Setmasternum(i);
-							vSkill[s - SKILLINDEX] = maberoaskill;
+							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
+
+							MaberoaSkill* maberoaSkill = new MaberoaSkill(i, monsterIndex);
+							if (vClient[i]->GetisLockOn())
+								maberoaSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							else
+							{
+								PAIR lookingdir = { (maberoaSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (maberoaSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+
+								maberoaSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+							}
+							maberoaSkill->Settime_1();
+							maberoaSkill->Settime_2();
+							maberoaSkill->Setisactivate(true);
+							maberoaSkill->SetID(s);
+							maberoaSkill->Setoffset({ 0, -10 });
+							maberoaSkill->Setposition({ totalData.udata[i].pos.x + maberoaSkill->Getoffset().x, totalData.udata[i].pos.y + maberoaSkill->Getoffset().y });
+							maberoaSkill->Setmasternum(i);
+							vSkill[s - SKILLINDEX] = maberoaSkill;
 						}
 						break;
 						case SKILLTYPE::ELECTRICFIELDSKILL:
@@ -691,8 +737,19 @@ void GenerateSkill()
 							break;
 						case SKILLTYPE::KUNAISKILL:
 						{
-							KunaiSkill* kunaiSkill = new KunaiSkill(i, 0);
-							kunaiSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
+
+							KunaiSkill* kunaiSkill = new KunaiSkill(i, monsterIndex);
+							if (vClient[i]->GetisLockOn())
+								kunaiSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							else
+							{
+								PAIR lookingdir = { (kunaiSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (kunaiSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+
+								kunaiSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+							}
 							kunaiSkill->Settime_1();
 							kunaiSkill->Settime_2();
 							kunaiSkill->Setisactivate(true);
@@ -705,8 +762,15 @@ void GenerateSkill()
 						break;
 						case SKILLTYPE::MAGICARROWSKILL:
 						{
+							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
+
 							MagicArrowSkill* magicarrowSkill = new MagicArrowSkill(i, 0);
-							magicarrowSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							PAIR lookingdir = { (magicarrowSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (magicarrowSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+							double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+							lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+
+							magicarrowSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+							
 							magicarrowSkill->Settime_1();
 							magicarrowSkill->Settime_2();
 							magicarrowSkill->Setisactivate(true);
@@ -719,7 +783,7 @@ void GenerateSkill()
 						break;
 						case SKILLTYPE::TORNADOSKILL:
 						{
-							int monsterIndex = FindCloseMonster(i);
+							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 							TornadoSkill* tornadoSkill = new TornadoSkill(i, monsterIndex);
 							tornadoSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
 							tornadoSkill->Settime_1();
@@ -729,19 +793,27 @@ void GenerateSkill()
 							tornadoSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first , (long)totalData.udata[i].lookingDir.second });
 							tornadoSkill->Setposition({ totalData.udata[i].pos.x + tornadoSkill->Getoffset().x, totalData.udata[i].pos.y + tornadoSkill->Getoffset().y });
 							tornadoSkill->Setmasternum(i);
+							tornadoSkill->Settargetnum(monsterIndex);
 							vSkill[s - SKILLINDEX] = tornadoSkill;
 						}
 						break;
 						case SKILLTYPE::TRUCKSKILL:
 						{
-							TruckSkill* truckSkill = new TruckSkill(i, 0);
-							truckSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
+							
+							TruckSkill* truckSkill = new TruckSkill(i, monsterIndex);
+							truckSkill->Setoffset({ (rand() % SCREEN_SIZE_X) / 2 , (rand() % SCREEN_SIZE_Y) / 2 });
+							truckSkill->Setposition({ totalData.udata[i].pos.x + truckSkill->Getoffset().x, totalData.udata[i].pos.y + truckSkill->Getoffset().y });
+
+							PAIR lookingdir = { (truckSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (truckSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+							double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+							lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+
+							truckSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
 							truckSkill->Settime_1();
 							truckSkill->Settime_2();
 							truckSkill->Setisactivate(true);
 							truckSkill->SetID(s);
-							truckSkill->Setoffset({ rand() % SCREEN_SIZE_X , rand() % SCREEN_SIZE_Y });
-							truckSkill->Setposition({ totalData.udata[i].pos.x + truckSkill->Getoffset().x, totalData.udata[i].pos.y + truckSkill->Getoffset().y });
 							truckSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = truckSkill;
 						}
@@ -809,10 +881,10 @@ void SetSkillToDatasheet()
 	}
 }
 
-int FindCloseMonster(int& playerIndex)
+int FindCloseMonster(POINT& myposition)
 {
-	int x = totalData.udata[playerIndex].pos.x;
-	int y = totalData.udata[playerIndex].pos.y;
+	int x = myposition.x;
+	int y = myposition.y;
 
 	int monsternum = -1;
 	int min = 99999999;
@@ -833,16 +905,19 @@ int FindCloseMonster(int& playerIndex)
 	return monsternum;
 }
 
-POINT GetNormalizationRange(POINT& player, POINT& monster)
+POINT GetNormalizationRange(POINT& skill, POINT& monster)
 {
-	int newX = monster.x - player.x;
-	int newY = monster.y - player.y;
+	int newX = monster.x - skill.x;
+	int newY = monster.y - skill.y;
 	POINT newPos;
 
 	double temp = sqrt(pow(newX, 2) + pow(newY, 2));
 	newPos.x = newX / temp * OFFSETADJUST;
 	newPos.y = newY / temp * OFFSETADJUST;
 	if (newPos.x <= -100 && newPos.y <= -100)
+		return { 0,0 };
+
+	if (temp <= 10)
 		return { 0,0 };
 
 	return newPos;

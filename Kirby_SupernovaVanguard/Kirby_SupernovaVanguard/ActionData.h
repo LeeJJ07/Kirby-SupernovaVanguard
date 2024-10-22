@@ -9,4 +9,5 @@ struct ActionData
 	short	newskill;
 	bool	isReady;
 	bool	isChoice;
+	bool	isLockOn;
 };

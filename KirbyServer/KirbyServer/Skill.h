@@ -76,5 +76,5 @@ public:
 	virtual	void SetCollider(Collider2D* collider) = 0;
 };
 
-static int FindCloseMonster(int&);
+static int FindCloseMonster(POINT&);
 static POINT GetNormalizationRange(POINT&, POINT&);
