@@ -343,7 +343,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						break;
 				}
 				if (i == vClient.size())
+				{
 					curScene = GAME;
+
+				}
 			}
 		}
 		break;
@@ -374,6 +377,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		DeleteObject(mapBit);
 		DeleteObject(bufferBitmap);
+
+		CleanUpImageDatas();
 
 		PostQuitMessage(0);
 		break;
@@ -819,8 +824,8 @@ void LoadImages()
 		ss >> height;
 
 		// Animation 객체 생성
-		Animation* ani = new Animation(cnt, spacingX, R, G, B, frames, lengths, height);
-		ani->Load(std::wstring(filePath.begin(), filePath.end()));
+		Animation* ani = new Animation(cnt, spacingX, R, G, B, frames, lengths, height, filePath);
+		ani->Load();
 
 		// Enum에 맞춰 맵에 저장
 		imageDatas.insert({ (ObjectImage)i, ani });

@@ -35,5 +35,5 @@ public:
 	void	Setsize(int size) { this->size = size; }
 	void	Setsize2(int size2) { this->size2 = size2; }
 
-	void	ObjectUpdate(TOTALDATA, int i);
+	void	ObjectUpdate(TOTALDATA&, int i);
 };

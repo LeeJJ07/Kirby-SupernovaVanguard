@@ -82,5 +82,5 @@ public:
 	}
 
 	void Draw(HDC&);
-	void ObjectUpdate(TOTALDATA, int i);
+	void ObjectUpdate(TOTALDATA&, int i);
 };

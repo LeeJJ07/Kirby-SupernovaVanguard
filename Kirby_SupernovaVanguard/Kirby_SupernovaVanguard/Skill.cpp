@@ -1,6 +1,6 @@
 #include "Skill.h"
 
-void Skill::ObjectUpdate(TOTALDATA totalData, int i)
+void Skill::ObjectUpdate(TOTALDATA& totalData, int i)
 {
 	
 	switch (totalData.sdata[i].collidertype)

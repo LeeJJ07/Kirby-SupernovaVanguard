@@ -4,7 +4,7 @@
 
 
 
-Animation::Animation(int cnt, int spacingX, int R, int G, int B, std::vector<POINT>& m, std::vector<int>& lengths, int height)
+Animation::Animation(int cnt, int spacingX, int R, int G, int B, std::vector<POINT> m, std::vector<int> lengths, int height, std::string filePath)
 	:m_hBit(0)
 	, m_bitInfo{}
 {
@@ -26,15 +26,16 @@ Animation::Animation(int cnt, int spacingX, int R, int G, int B, std::vector<POI
 		this->lengths[i] = lengths[i];
 	}
 	this->height = height;
+	this->filePath = filePath;
 }
 
 Animation::~Animation()
 {
 	DeleteObject(m_hBit);
 }
-void Animation::Load(const std::wstring& _strFilePath)
+void Animation::Load()
 {
-	m_hBit = (HBITMAP)LoadImage(nullptr, _strFilePath.c_str(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	m_hBit = (HBITMAP)LoadImage(nullptr, std::wstring(filePath.begin(), filePath.end()).c_str(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 	if (m_hBit == NULL)
 	{
 		DWORD dwError = GetLastError();

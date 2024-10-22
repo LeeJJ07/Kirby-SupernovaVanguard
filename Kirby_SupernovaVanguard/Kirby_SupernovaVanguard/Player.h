@@ -15,7 +15,6 @@ private:
 	ECharacterState characterState;
 
 	POINT mousePosition;
-
 public:
 	Player() : characterType(KIRBY),characterState(IDLE), mousePosition({ 0,0 }), Object()
 	{
@@ -29,7 +28,8 @@ public:
 	void			SetCharacterType(ECharacterType characterType) { this->characterType = characterType; }
 	void			SetMousePosition(POINT mousePos) { mousePosition = mousePos; }
 
-	void			ObjectUpdate(TOTALDATA, int i);
+	void			ObjectUpdate(TOTALDATA&, int i);
+	void			SetPlayerAni();
 	void			DrawPlayer(HDC&);
 };
 

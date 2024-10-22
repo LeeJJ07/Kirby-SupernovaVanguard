@@ -37,11 +37,9 @@ void Monster::Draw(HDC& hdc)
     SelectObject(hdc, oldBrush);
     DeleteObject(brush);
 
-    // �߰� �ڵ� index ����
-    // drawIndex = (drawIndex + 1)% (���� �ִϸ��̼��� ũ��)
 }
 
-void Monster::ObjectUpdate(TOTALDATA totalData, int i)
+void Monster::ObjectUpdate(TOTALDATA& totalData, int i)
 {
 	SetPosition(totalData.mdata[i].pos);
 	GetCollider()->SetOffset(totalData.mdata[i].offset);

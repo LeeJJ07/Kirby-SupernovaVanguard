@@ -4,9 +4,10 @@
 
 class Animation
 {
-public:
+private:
 	HBITMAP			m_hBit;
 	BITMAP			m_bitInfo;
+	std::string		filePath;
 
 	int curIdx;
 	int increaseIdx;
@@ -19,13 +20,14 @@ public:
 	int height;
 	
 public:
-	void Load(const std::wstring& _strFilePath);
+	void Load();
 
 	UINT Width() { return m_bitInfo.bmWidth; }
 	UINT Height() { return m_bitInfo.bmHeight; }
 
 	HBITMAP GetBitmap() { return m_hBit; }
 
+	int GetCnt() { return cnt; }
 	int GetIndex() { return curIdx; }
 	void SetIndex(int idx) { curIdx = idx; }
 	void IncreaseIdx() 
@@ -51,8 +53,12 @@ public:
 	int GetG() { return G; }
 	int GetB() { return B; }
 
+	std::vector<POINT> GetCog() { return m; }
+	std::vector<int> GetLengths() { return lengths; }
+	std::string GetFilePath() { return filePath; }
+
 public: 
-	Animation(int cnt, int spacingX, int R, int G, int B, std::vector<POINT>& m, std::vector<int>& lengths, int height);
+	Animation(int cnt, int spacingX, int R, int G, int B, std::vector<POINT> m, std::vector<int> lengths, int height, std::string filePath);
 	~Animation();
 };
 
