@@ -349,7 +349,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					{
 						if (vClient[j] == NULL)
 							break;
-						dynamic_cast<Player*>(vClient[myID])->SetPlayerAni();
+						dynamic_cast<Player*>(vClient[j])->SetPlayerAni();
 					}
 				}
 			}
