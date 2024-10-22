@@ -1,18 +1,23 @@
 #pragma once
 #include "Object.h"
 #include "PlayerData.h"
+#include "Animation.h"
 
-enum ECharacterType;
+
+extern std::map<ObjectImage, Animation*> imageDatas;
+
+class Animation;
 
 class Player : public Object
 {
 private:
 	ECharacterType characterType;
+	ECharacterState characterState;
 
 	POINT mousePosition;
 
 public:
-	Player() : characterType(ECharacterType::KIRBY), mousePosition({ 0,0 }), Object()
+	Player() : characterType(KIRBY),characterState(IDLE), mousePosition({ 0,0 }), Object()
 	{
 		Circle2D* c = new Circle2D(true, PLAYER);
 		SetObject(c);

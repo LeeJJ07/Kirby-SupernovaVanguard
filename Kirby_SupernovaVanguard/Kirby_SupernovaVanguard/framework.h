@@ -14,6 +14,11 @@
 #include <condition_variable>
 #include <chrono>
 #include <iostream>
+#include <string>
+#include <cassert>
+#include <map>
+#include <fstream>
+#include <sstream>
 
 #pragma comment(lib, "msimg32.lib")
 
@@ -24,8 +29,13 @@
 #define OBJECTNUM PLAYERNUM + MONSTERNUM + SKILLNUM
 #define SKILLARR 6
 
-static enum ECharacterType { KIRBY = 1, DDD, METANIHGT, MABEOROA };
-
+static enum ECharacterType { KIRBY = 1, DDD, METANIHGT, MABOROA };
+static enum ECharacterState { IDLE, WALK, ATTACK };
+static enum ObjectImage
+{
+	kirby_Idle,		 kirby_Walk,		kirby_Attack,		 ddd_Idle,			ddd_Walk,			 ddd_Attack,
+	meta_Idle,		 meta_Walk,			meta_Attack,		 maboroa_Idle,		maboroa_Walk,		 maboroa_Attack
+};
 enum OBJECTINDEX
 {
 	PLAYERINDEX = 0,

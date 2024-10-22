@@ -1,0 +1,27 @@
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\kirby_Idle.bmp  1 -1 255 255 255 11 13 25 25
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\kirby_Walk.bmp  10 -1 255 255 255 10 13 32 13 56 13 77 13 98 13 117 13 139 13 160 13 183 13 203 12 23 24 24 23 20 21 25 24 23 22 25
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\kirby_Attack.bmp  8 -1 255 255 255 13 19 36 18 61 19 84 19 109 19 133 21 157 20 182 20 24 26 26 25 26 25 26 27 30
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\ddd_Idle.bmp  4 -1 84 110 140 29 39 93 41 162 40 225 40 63 67 68 67 60
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\ddd_Walk.bmp  4 -1 84 110 140 35 70 102 71 164 70 233 70 70 62 66 70 90
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\ddd_Attack.bmp  7 -1 84 110 140 48 105 127 104 192 102 251 113 344 115 452 114 558 113 82 77 69 95 107 108 110 160
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\meta_Idle.bmp  1 -1 255 0 255 18 29 45 45
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\meta_Walk.bmp  7 -1 255 0 255 19 27 68 28 116 29 169 30 224 29 282 29 345 28 50 50 50 55 58 60 60 50
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\meta_Attack.bmp  8 -1 255 0 255 26 36 75 35 127 35 179 35 257 35 333 36 394 36 439 35 50 56 56 76 80 55 55 50 65
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\maboroa_Idle.bmp  4 -1 72 104 112 20 23 61 23 100 24 140 23 40 42 41 42 40
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\maboroa_Walk.bmp  4 -1 72 104 112 25 23 68 24 107 22 146 23 42 42 41 42 40
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\maboroa_Attack.bmp  3 -1 72 104 112 26 25 72 25 123 28 50 50 50 50
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\runner_Walk.bmp  5 0 121 255 188 16 18 43 17 72 20 105 18 137 18 30 30 30 30 30 30
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\spear_Walk.bmp  4 0 121 255 188 18 17 46 16 73 17 105 18 30 30 30 30 30
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\spear_Attack.bmp  7 5 121 255 188 15 23 57 25 93 25 135 26 177 25 213 26 242 28 35 35 38 35 33 29 28 42
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\wingbug_Walk.bmp  3 4 128 128 255 11 13 38 13 64 15 24 24 24 24
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\fireman_Walk.bmp  3 0 121 255 188 18 17 45 18 74 18 30 30 30 30
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\fireman_Attack.bmp  12 0 255 255 255 9 17 33 16 57 17 83 17 109 16 133 14 159 14 181 14 206 14 232 15 260 16 282 15 23 24 24 25 26 26 25 26 26 25 25 25 27
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\landmine_Idle.bmp  3 3 121 255 188 15 17 52 17 83 17 32 32 32 33
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\KFM_Attack.bmp  12 0 136 160 56 41 55 124 59 209 60 298 62 382 63 471 62 559 62 644 63 731 63 818 64 909 64 1004 63 85 84 88 90 88 86 85 89 88 87 90 92 108
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\gaogao_Attack.bmp  4 1 136 160 88 52 26 173 24 272 22 380 21 110 110 110 110 50
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\boss_eye.bmp  1 1 168 184 144 15 16 30 30
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\boss_mode1.bmp  4 5 168 184 144 29 36 103 36 167 36 238 38 65 65 65 65 68
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\boss_mode2.bmp  4 5 168 184 144 31 36 101 37 170 34 235 39 65 65 65 65 68
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\boss_Attack1.bmp  3 12 168 184 144 31 75 98 75 175 74 60 60 60 140
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\boss_Attack2.bmp  4 3 168 184 144 20 21 69 24 123 23 177 22 45 45 55 55 45
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\boss_Attack3.bmp  3 0 168 184 144 14 16 36 16 58 15 25 25 25 25

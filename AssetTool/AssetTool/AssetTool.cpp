@@ -233,8 +233,6 @@ void DrawAnimation(HDC hdc)
     int xStart = 0;
     for (int i = 0; i < curFrame; i++)
         xStart += widths[i] + spacingX;
-    if(curFrame != 0)
-        xStart -= spacingX;
     int yStart = 0;
 
     int diffX = xStart + widths[curFrame] / 2 - pos[curFrame].x;
