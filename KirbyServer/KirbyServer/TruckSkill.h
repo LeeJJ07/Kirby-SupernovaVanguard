@@ -57,6 +57,7 @@ bool SetTruckSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].collidersize2 = tornadocollider->GetHeight();
 	totalData.sdata[ID].collidertype = skill->Getcollidertype();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
+	totalData.sdata[ID].angle = skill->Getangle();
 
 	return true;
 }

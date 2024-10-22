@@ -56,6 +56,7 @@ void UpdateUi();
 void SetBasisSkillData(int&);
 void SetSkillData(int&, int);
 void SetSkillToDatasheet();
+float UpdateAngle(PAIR&);
 // <<
 
 // >> : player
@@ -521,17 +522,17 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 		// >> : SetPlayerPosition
 		int PlayerX, PlayerY;
 
-		if (uData.pos.x >= SCREEN_SIZE_X / 2)
-			PlayerX = SCREEN_SIZE_X / 2;
-		else if (uData.pos.x >= (MAX_MAP_SIZE_X - SCREEN_SIZE_X / 2))
+		if (uData.pos.x >= (MAX_MAP_SIZE_X - SCREEN_SIZE_X / 2))
 			PlayerX = uData.pos.x - (MAX_MAP_SIZE_X - SCREEN_SIZE_X);
+		else if (uData.pos.x >= SCREEN_SIZE_X / 2)
+			PlayerX = SCREEN_SIZE_X / 2;
 		else
 			PlayerX = uData.pos.x;
 
-		if (uData.pos.y >= SCREEN_SIZE_Y / 2)
-			PlayerY = SCREEN_SIZE_Y / 2;
-		else if (uData.pos.y >= (MAX_MAP_SIZE_Y - SCREEN_SIZE_Y / 2))
+		if (uData.pos.y >= (MAX_MAP_SIZE_Y - SCREEN_SIZE_Y / 2))
 			PlayerY = uData.pos.y - (MAX_MAP_SIZE_Y - SCREEN_SIZE_Y);
+		else if (uData.pos.y >= SCREEN_SIZE_Y / 2)
+			PlayerY = SCREEN_SIZE_Y / 2;
 		else
 			PlayerY = uData.pos.y;
 		// <<
@@ -690,7 +691,7 @@ void GenerateSkill()
 							metaknightSkill->Settime_2();
 							metaknightSkill->Setisactivate(true);
 							metaknightSkill->SetID(s);
-							metaknightSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * metaknightSkill->Getsize() / OFFSETADJUST, (long)totalData.udata[i].lookingDir.second * metaknightSkill->Getsize() / OFFSETADJUST });
+							metaknightSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)metaknightSkill->Getsize() / OFFSETADJUST, (long)totalData.udata[i].lookingDir.second * (long)metaknightSkill->Getsize() / OFFSETADJUST });
 							metaknightSkill->Setposition({ totalData.udata[i].pos.x + metaknightSkill->Getoffset().x, totalData.udata[i].pos.y + metaknightSkill->Getoffset().y });
 							metaknightSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = metaknightSkill;
@@ -754,7 +755,7 @@ void GenerateSkill()
 							kunaiSkill->Settime_2();
 							kunaiSkill->Setisactivate(true);
 							kunaiSkill->SetID(s);
-							kunaiSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * kunaiSkill->Getsize() / OFFSETADJUST, (long)totalData.udata[i].lookingDir.second * kunaiSkill->Getsize() / OFFSETADJUST });
+							kunaiSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)kunaiSkill->Getsize() / OFFSETADJUST, (long)totalData.udata[i].lookingDir.second * (long)kunaiSkill->Getsize() / OFFSETADJUST });
 							kunaiSkill->Setposition({ totalData.udata[i].pos.x + kunaiSkill->Getoffset().x, totalData.udata[i].pos.y + kunaiSkill->Getoffset().y });
 							kunaiSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = kunaiSkill;
@@ -807,14 +808,14 @@ void GenerateSkill()
 
 							PAIR lookingdir = { (truckSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (truckSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
 							double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
-							lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
-
-							truckSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+							lookingdir.first /= -temp / OFFSETADJUST; lookingdir.second /= -temp / OFFSETADJUST;
+							truckSkill->Setdirection({ (long)(lookingdir.first),(long)(lookingdir.second) });
 							truckSkill->Settime_1();
 							truckSkill->Settime_2();
 							truckSkill->Setisactivate(true);
 							truckSkill->SetID(s);
 							truckSkill->Setmasternum(i);
+							truckSkill->Setangle(UpdateAngle(lookingdir));
 							vSkill[s - SKILLINDEX] = truckSkill;
 						}
 						break;
@@ -1174,4 +1175,15 @@ void UpdateThread()
 	t2_send = std::chrono::high_resolution_clock::now();
 
 	timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+}
+
+float UpdateAngle(PAIR& lookingdir)
+{
+	double angleRadians = atan2(-lookingdir.second, lookingdir.first);
+
+	// 라디안 값을 도(degree)로 변환하려면
+ 	double angleDegrees = angleRadians * 180.0 / 3.14;
+	if (angleDegrees < 0)
+		angleDegrees = abs(angleDegrees) + 180;
+	return angleDegrees;
 }

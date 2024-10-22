@@ -44,6 +44,7 @@ struct SKILLDATA
 	int collidertype;
 	int	collidersize;
 	int	collidersize2;
+	int angle;
 	short	id;
 	short	targetnum;
 	bool	isactivate;

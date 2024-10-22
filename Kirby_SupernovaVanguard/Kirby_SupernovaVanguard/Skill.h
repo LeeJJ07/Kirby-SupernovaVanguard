@@ -21,6 +21,7 @@ class Skill : public Object {
 private:
 	int size;
 	int size2;
+	float angle;
 	SKILLTYPE skilltype;
 
 public:
@@ -29,9 +30,11 @@ public:
 	~Skill() {}
 
 	
+	int	Getangle() { return angle; }
 	int	Getsize() { return size; }
 	SKILLTYPE	Getskilltype() { return skilltype; }
 
+	void	Setangle(int angle) { this->angle = angle; }
 	void	Setsize(int size) { this->size = size; }
 	void	Setsize2(int size2) { this->size2 = size2; }
 
