@@ -1,8 +1,4 @@
-
-
 #include "Animation.h"
-
-
 
 Animation::Animation(int cnt, int spacingX, int R, int G, int B, std::vector<POINT> m, std::vector<int> lengths, int height, std::string filePath)
 	:m_hBit(0)

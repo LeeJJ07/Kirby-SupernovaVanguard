@@ -14,6 +14,7 @@ void Rectangle2D::DrawCollider(HDC& hdc, int& ID)
 	degree[1] = atan((float)height / width) * 2 * 180 / 3.1415926;
 	degree[0] = 180 - degree[1];
 	 
+	int angle = this->Getangle();
 	angle += degree[1] / 2;
 
 	float angleOffset = 0;

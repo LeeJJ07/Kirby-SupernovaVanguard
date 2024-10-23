@@ -25,6 +25,7 @@ private:
 	POINT position;
 	POINT offset;
 	ColliderType type;
+	int angle;
 	bool isTrigger;
 
 public:
@@ -35,11 +36,13 @@ public:
 
 	POINT	GetPosition()const { return position; }
 	POINT	GetOffset()const { return offset; }
+	int		Getangle() { return angle; }
 	short	GetType()const { return type; }
 	bool	GetisTrigger()const { return isTrigger; }
 
 	void	MovePosition(POINT targetPos) { position.x = targetPos.x + offset.x; position.y = targetPos.y + offset.y; }
 	void	SetOffset(POINT newoffset) { offset = newoffset; }
+	void	Setangle(int angle) { this->angle = angle; }
 
 	virtual void DrawCollider(HDC&, int& ID) = 0;
 };

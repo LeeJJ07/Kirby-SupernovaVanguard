@@ -115,52 +115,19 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		// >> : skilldata
 		for (int i = 0; i < SKILLNUM; i++)
 		{
-			bool isCorrect = false;
-			if (pD.sdata[i].isactivate == false)
+			if (pD.sdata[i].isactivate == false || pD.sdata[i].skilltype > TRUCKSKILL)
 			{
 				objArr[i + SKILLINDEX] = nullptr;
+				vSkill[i] = nullptr;
 				continue;
 			}
 
-			switch (pD.sdata[i].skilltype)
+			if(vSkill[i] == nullptr)
 			{
-			case KIRBYSKILL:
-				vSkill[i] = new KirbySkill();
-				break;
-			case DEDEDESKILL:
-				vSkill[i] = new DededeSkill();
-				break;
-			case METAKNIGHTSKILL:
-				vSkill[i] = new MetaknightSkill();
-				break;
-			case MABEROASKILL:
-				vSkill[i] = new MaberoaSkill();
-				break;
-			case ELECTRICFIELDSKILL:
-				vSkill[i] = new ElectircfieldSkill();
-				break;
-			case KUNAISKILL:
-				vSkill[i] = new KunaiSkill();
-				break;
-			case MAGICARROWSKILL:
-				vSkill[i] = new MagicarrowSkill();
-				break;
-			case TORNADOSKILL:
-				vSkill[i] = new TornadoSkill();
-				break;
-			case TRUCKSKILL:
-				vSkill[i] = new TornadoSkill();
-				break;
-			default:
-				isCorrect = true;
-				break;
+				vSkill[i] = new Skill((ESKILLTYPE)pD.sdata[i].skilltype);
+				CreateObject((Skill*)vSkill[i], i + SKILLINDEX);
+				vSkill[i]->Setid(pD.sdata[i].targetnum);
 			}
-
-			if (isCorrect)
-				continue;
-
-			CreateObject((Skill*)vSkill[i], i + SKILLINDEX);
-			vSkill[i]->Setid(pD.sdata[i].targetnum);
 
 			vSkill[i]->ObjectUpdate(pD, i);
 			vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());

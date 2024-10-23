@@ -250,7 +250,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (hThreads[1])
 			ResumeThread(hThreads[1]);
 
-		totalData.publicdata.maxExp = 100;
+		totalData.publicdata.maxExp = 10000;
 		totalData.publicdata.exp = 0;
 
 		return InitServer(hWnd);

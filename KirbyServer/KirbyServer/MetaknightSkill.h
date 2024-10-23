@@ -15,7 +15,7 @@ public:
 	MetaknightSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::METAKNIGHTSKILL, COLLIDERTYPE::RECTANGLE, 0, 10, 160, 140, 2., { 0,0 } , { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::METAKNIGHTSKILL, COLLIDERTYPE::RECTANGLE, 0, 10, 100, 80, 2., { 0,0 } , { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		imageaddress(nullptr)
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
@@ -65,9 +65,14 @@ void UpdateMetaknightSkill(Skill*& skill)
 {
 	metaknightskill = dynamic_cast<MetaknightSkill*>(skill);
 
+	/*POINT newpos;
+	newpos.x = metaknightskill->Getposition().x + metaknightskill->Getdirection().x;
+	newpos.y = metaknightskill->Getposition().y + metaknightskill->Getdirection().y;
+	metaknightskill->Setposition(newpos);*/
+
 	POINT newpos;
-	newpos.x = metaknightskill->Getposition().x + metaknightskill->Getdirection().x * metaknightskill->Getspeed();
-	newpos.y = metaknightskill->Getposition().y + metaknightskill->Getdirection().y * metaknightskill->Getspeed();
+	newpos.x = totalData.udata[metaknightskill->Getmasternum()].pos.x + metaknightskill->Getoffset().x;
+	newpos.y = totalData.udata[metaknightskill->Getmasternum()].pos.y + metaknightskill->Getoffset().y;
 	metaknightskill->Setposition(newpos);
 
 	metaknightskill->GetCollider()->SetPosition(metaknightskill->Getposition());
@@ -79,7 +84,7 @@ void UpdateMetaknightSkill(Skill*& skill)
 
 	metaknightskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(metaknightskill->Gettime_2() - metaknightskill->Gettime_1()).count();
-	if (skilldestroytime > 0.2)
+	if (skilldestroytime > 0.5)
 	{
 		metaknightskill->Setisactivate(false);
 		OBJECTIDARR[metaknightskill->GetID()] = false;
