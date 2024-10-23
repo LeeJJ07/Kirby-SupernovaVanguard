@@ -37,17 +37,33 @@ struct PLAYERDATA :public OBJECTDATA
 struct SKILLDATA
 {
 	POINT	position;
-	POINT	colliderposition;
-	int skilltype;
+	POINT	colliderPosition;
+	int skillType;
 	int size;
 	int size2;
-	int collidertype;
-	int	collidersize;
-	int	collidersize2;
+	int colliderType;
+	int	colliderSize;
+	int	colliderSize2;
 	int angle;
 	short	id;
 	short	targetnum;
-	bool	isactivate;
+	bool	isActivate;
+};
+
+struct MONSTERSKILLDATA
+{
+	POINT position;
+	POINT colliderPosition;
+	int skillType;
+	int size;
+	int size2;
+	int colliderType;
+	int colliderSize;
+	int colliderSize2;
+	int angle;
+	short id;
+	short targetnum;
+	bool isActivate;
 };
 
 struct MONSTERDATA :public OBJECTDATA
@@ -67,10 +83,11 @@ struct PUBLICDATA
 
 struct TOTALDATA
 {
-	PUBLICDATA		publicdata;
-	PLAYERDATA		udata[PLAYERNUM];
-	MONSTERDATA		mdata[MONSTERNUM];
-	SKILLDATA		sdata[SKILLNUM];
+	PUBLICDATA			publicdata;
+	PLAYERDATA			udata[PLAYERNUM];
+	MONSTERDATA			mdata[MONSTERNUM];
+	SKILLDATA			sdata[SKILLNUM];
+	MONSTERSKILLDATA	msdata[MONSTERSKILLNUM];
 };
 
 static TOTALDATA totalData;

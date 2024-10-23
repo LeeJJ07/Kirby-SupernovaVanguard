@@ -45,16 +45,16 @@ bool SetMetaknightSkillInDatasheet(Skill*& skill, int& ID)
 	metaknightskill = dynamic_cast<MetaknightSkill*>(skill);
 	Rectangle2D* metaknightcollider = dynamic_cast<Rectangle2D*>(metaknightskill->GetCollider());
 
-	totalData.sdata[ID].isactivate = metaknightskill->Getisactivate();
+	totalData.sdata[ID].isActivate = metaknightskill->Getisactivate();
 	totalData.sdata[ID].id = metaknightskill->GetID();
-	totalData.sdata[ID].skilltype = skill->Getskilltype();
+	totalData.sdata[ID].skillType = skill->Getskilltype();
 	totalData.sdata[ID].size = skill->Getsize();
 	totalData.sdata[ID].size2 = skill->Getsize2();
 	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderposition = metaknightskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].collidersize = metaknightcollider->GetWidth();
-	totalData.sdata[ID].collidersize2 = metaknightcollider->GetHeight();
-	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].colliderPosition = metaknightskill->GetCollider()->GetPosition();
+	totalData.sdata[ID].colliderSize = metaknightcollider->GetWidth();
+	totalData.sdata[ID].colliderSize2 = metaknightcollider->GetHeight();
+	totalData.sdata[ID].colliderType = skill->Getcollidertype();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 	totalData.sdata[ID].angle = skill->Getangle();
 

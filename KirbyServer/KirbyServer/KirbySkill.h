@@ -58,14 +58,14 @@ bool SetKirbySkillInDatasheet(Skill*& skill, int& ID)
 	kirbyskill = dynamic_cast<KirbySkill*>(skill);
 	Circle2D*	kirbycollider = dynamic_cast<Circle2D*>(kirbyskill->GetCollider());
 
-	totalData.sdata[ID].isactivate = kirbyskill->Getisactivate();
+	totalData.sdata[ID].isActivate = kirbyskill->Getisactivate();
 	totalData.sdata[ID].id = kirbyskill->GetID();
-	totalData.sdata[ID].skilltype = skill->Getskilltype();
+	totalData.sdata[ID].skillType = skill->Getskilltype();
 	totalData.sdata[ID].size = skill->Getsize();
 	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderposition = kirbyskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].collidersize = kirbycollider->GetRadius();
-	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].colliderPosition = kirbyskill->GetCollider()->GetPosition();
+	totalData.sdata[ID].colliderSize = kirbycollider->GetRadius();
+	totalData.sdata[ID].colliderType = skill->Getcollidertype();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 
 	return true;

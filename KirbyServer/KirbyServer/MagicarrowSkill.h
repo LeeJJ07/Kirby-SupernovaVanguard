@@ -45,16 +45,16 @@ bool SetMagicArrowSkillInDatasheet(Skill*& skill, int& ID)
 	magicarrowskill = dynamic_cast<MagicArrowSkill*>(skill);
 	Rectangle2D* magicarrowcollider = dynamic_cast<Rectangle2D*>(magicarrowskill->GetCollider());
 
-	totalData.sdata[ID].isactivate = magicarrowskill->Getisactivate();
+	totalData.sdata[ID].isActivate = magicarrowskill->Getisactivate();
 	totalData.sdata[ID].id = magicarrowskill->GetID();
-	totalData.sdata[ID].skilltype = skill->Getskilltype();
+	totalData.sdata[ID].skillType = skill->Getskilltype();
 	totalData.sdata[ID].size = skill->Getsize();
 	totalData.sdata[ID].size2 = skill->Getsize2();
 	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderposition = magicarrowskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].collidersize = magicarrowcollider->GetWidth();
-	totalData.sdata[ID].collidersize2 = magicarrowcollider->GetHeight();
-	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].colliderPosition = magicarrowskill->GetCollider()->GetPosition();
+	totalData.sdata[ID].colliderSize = magicarrowcollider->GetWidth();
+	totalData.sdata[ID].colliderSize2 = magicarrowcollider->GetHeight();
+	totalData.sdata[ID].colliderType = skill->Getcollidertype();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 	totalData.sdata[ID].angle = skill->Getangle();
 

@@ -21,5 +21,4 @@ public:
 
 	void StateUpdate() override;
 	void Update() override;
-
 };

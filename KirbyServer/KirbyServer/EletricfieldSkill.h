@@ -46,14 +46,14 @@ bool SetElectricfieldSkillInDatasheet(Skill*& skill, int& ID)
 	electricfieldskill = dynamic_cast<ElectricfieldSkill*>(skill);
 	Circle2D* electriccollider = dynamic_cast<Circle2D*>(electricfieldskill->GetCollider());
 
-	totalData.sdata[ID].isactivate = electricfieldskill->Getisactivate();
+	totalData.sdata[ID].isActivate = electricfieldskill->Getisactivate();
 	totalData.sdata[ID].id = electricfieldskill->GetID();
-	totalData.sdata[ID].skilltype = skill->Getskilltype();
+	totalData.sdata[ID].skillType = skill->Getskilltype();
 	totalData.sdata[ID].size = skill->Getsize();
 	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderposition = electricfieldskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].collidersize = electriccollider->GetRadius();
-	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].colliderPosition = electricfieldskill->GetCollider()->GetPosition();
+	totalData.sdata[ID].colliderSize = electriccollider->GetRadius();
+	totalData.sdata[ID].colliderType = skill->Getcollidertype();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 
 	return true;

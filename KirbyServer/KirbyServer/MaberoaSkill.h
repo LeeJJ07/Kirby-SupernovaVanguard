@@ -50,14 +50,14 @@ bool SetMaberoaSkillInDatasheet(Skill*& skill, int& ID)
 	MaberoaSkill* maberoaskill = dynamic_cast<MaberoaSkill*>(skill);
 	Circle2D* maberoacollider = dynamic_cast<Circle2D*>(maberoaskill->GetCollider());
 
-	totalData.sdata[ID].isactivate = maberoaskill->Getisactivate();
+	totalData.sdata[ID].isActivate = maberoaskill->Getisactivate();
 	totalData.sdata[ID].id = maberoaskill->GetID();
-	totalData.sdata[ID].skilltype = skill->Getskilltype();
+	totalData.sdata[ID].skillType = skill->Getskilltype();
 	totalData.sdata[ID].size = skill->Getsize();
 	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderposition = maberoaskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].collidersize = maberoacollider->GetRadius();
-	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].colliderPosition = maberoaskill->GetCollider()->GetPosition();
+	totalData.sdata[ID].colliderSize = maberoacollider->GetRadius();
+	totalData.sdata[ID].colliderType = skill->Getcollidertype();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 
 	return true;

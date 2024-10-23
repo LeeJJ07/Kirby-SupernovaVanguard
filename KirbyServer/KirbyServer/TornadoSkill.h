@@ -44,16 +44,16 @@ bool SetTornadoSkillInDatasheet(Skill*& skill, int& ID)
 	tornadoskill = dynamic_cast<TornadoSkill*>(skill);
 	Rectangle2D* tornadocollider = dynamic_cast<Rectangle2D*>(tornadoskill->GetCollider());
 
-	totalData.sdata[ID].isactivate	= tornadoskill->Getisactivate();
+	totalData.sdata[ID].isActivate	= tornadoskill->Getisactivate();
 	totalData.sdata[ID].id	= tornadoskill->GetID();
-	totalData.sdata[ID].skilltype	= skill->Getskilltype();
+	totalData.sdata[ID].skillType	= skill->Getskilltype();
 	totalData.sdata[ID].size	= skill->Getsize();
 	totalData.sdata[ID].size2	= skill->Getsize2();
 	totalData.sdata[ID].position	= skill->Getposition();
-	totalData.sdata[ID].colliderposition	= tornadoskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].collidersize	= tornadocollider->GetWidth();
-	totalData.sdata[ID].collidersize2	= tornadocollider->GetHeight();
-	totalData.sdata[ID].collidertype	= skill->Getcollidertype();
+	totalData.sdata[ID].colliderPosition	= tornadoskill->GetCollider()->GetPosition();
+	totalData.sdata[ID].colliderSize	= tornadocollider->GetWidth();
+	totalData.sdata[ID].colliderSize2	= tornadocollider->GetHeight();
+	totalData.sdata[ID].colliderType	= skill->Getcollidertype();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 
 	return true;

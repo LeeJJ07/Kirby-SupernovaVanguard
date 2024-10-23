@@ -37,6 +37,7 @@
 #define MONSTERNUM					500
 #define SKILLNUM					100
 #define SKILLARR					6
+#define MONSTERSKILLNUM				200
 
 #define RETARGETINGTIME				1
 
@@ -53,7 +54,7 @@ enum OBJECTINDEX
 #define BASE_HEALTH					50
 #define BASE_SPEED					1.5	
 
-#define NORMAL_MONSTER_TYPE_COUNT	5
+#define NORMAL_MONSTER_TYPE_COUNT	4
 
 #define RUNNER_BASE_DAMAGE			20
 #define RUNNER_BASE_HEALTH			50

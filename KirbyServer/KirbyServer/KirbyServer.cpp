@@ -91,6 +91,9 @@ void ReadData();
 void UpdateMonster();
 void SetMonsterData(MONSTERDATA& mData, Monster*& m);
 void GenerateMonster(int playerIdx);
+void GenerateBoss();
+void GenerateLandMine(int cx, int cy, int r);
+void InitLandMine(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos);
 void CloseClient(SOCKET socket);
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID);
 bool IsValidSpawnPos(int playerIdx, POINT pos);
@@ -98,6 +101,8 @@ POINT SetRandomSpawnPos(int playerIdx, EMonsterType mType);
 void InitUserData(PLAYERDATA& userData, int id);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx);
+
+bool testLandMine = false;
 
 WSADATA wsaData;
 SOCKET s, cs;
@@ -210,6 +215,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (isAllclientReady)
 			{
+				if (!testLandMine)
+				{
+					testLandMine = true;
+					GenerateLandMine(2000, 1000, 600);
+				}
 				for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
 				{
 					if (totalData.udata[pIdx].dataType == 0)
@@ -335,7 +345,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -571,7 +581,6 @@ void SetBasisSkillData(int& playerIndex)
 	sm.push_back(skillmanager);
 	vClient[playerIndex]->SetSkillManager(sm);
 }
-
 
 void SetSkillData(int& playerIndex, int skillnum)
 {
@@ -1010,10 +1019,6 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 		m = new FireManMonster(generatePos, mType, CHASE, { 0, 0 },
 			FIREMAN_BASE_DAMAGE, FIREMAN_BASE_HEALTH, FIREMAN_BASE_SPEED, TRUE);
 		break;
-	case LANDMINE:
-		m = new LandMineMonster(generatePos, mType, CHASE, { 0, 0 },
-			LANDMINE_BASE_DAMAGE, LANDMINE_BASE_HEALTH, LANDMINE_BASE_SPEED, TRUE);
-		break;
 	}
 
 	monsterCount++;
@@ -1022,6 +1027,18 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 	mData.pos = m->GetPosition();
 	mData.monsterType = mType;
 	mData.id = ID;                                                                                                                   
+}
+void InitLandMine(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
+{
+	m = new LandMineMonster(generatePos, LANDMINE, CHASE, { 0, 0 },
+		LANDMINE_BASE_DAMAGE, LANDMINE_BASE_HEALTH, LANDMINE_BASE_SPEED, TRUE);
+
+	monsterCount++;
+
+	mData.dataType = MONSTERTYPE;
+	mData.pos = m->GetPosition();
+	mData.monsterType = LANDMINE;
+	mData.id = ID;
 }
 
 bool IsValidSpawnPos(int playerIdx, POINT pos)
@@ -1082,10 +1099,6 @@ POINT SetRandomSpawnPos(int playerIdx, EMonsterType mType)
 		else generatePos.x += -(SCREEN_SIZE_X + DEFAULT_SPAWN_SIZE_X);
 	}
 		break;
-	case LANDMINE:
-		//#####################################
-		//위치 다시 세팅
-		break;
 	}
 	return generatePos;
 }
@@ -1099,6 +1112,42 @@ void GenerateMonster(int playerIdx)
 			InitMonsterData(totalData.mdata[i - MONSTERINDEX], monsterArr[i - MONSTERINDEX], playerIdx, i);
 			OBJECTIDARR[i] = true;
 			return;
+		}
+	}
+}
+
+void GenerateBoss()
+{
+
+}
+
+void GenerateLandMine(int cx, int cy, int r)
+{
+	int mineCount = 160;
+	double pi = 3.141592;
+	double radian = 360 / mineCount * 180 / pi;
+
+	for (int i = 0; i < PLAYERNUM; i++)
+	{
+		if (totalData.udata[i].dataType == 0) continue;
+		totalData.udata[i].pos.x = cx - 100 + 200 * i;
+		totalData.udata[i].pos.y = cy + 250;
+
+		vClient[i]->SetPosition(totalData.udata[i].pos);
+	}
+
+	for (int i = 0; i < mineCount; i++)
+	{
+		POINT generatePos = { cx + cos(radian * i) * r, cy + sin(radian * i) * r};
+		
+		for (int i = MONSTERINDEX; i < SKILLINDEX; i++)
+		{
+			if (!OBJECTIDARR[i])
+			{
+				InitLandMine(totalData.mdata[i - MONSTERINDEX], monsterArr[i - MONSTERINDEX], i, generatePos);
+				OBJECTIDARR[i] = true;
+				break;
+			}
 		}
 	}
 }
