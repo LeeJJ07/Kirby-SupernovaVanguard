@@ -1,41 +1,95 @@
 #include "Monster.h"
 
-void Monster::Draw(HDC& hdc)
+void Monster::SetMonsterAni()
 {
-    HBRUSH brush;
-
+    Animation* tempAni[3] = { nullptr };
     switch (monsterType)
     {
     case RUNNER:
-        brush = CreateSolidBrush(RGB(255, 0, 0));
+        tempAni[0] = imageDatas[runner_Walk];
+        tempAni[1] = nullptr;
+        tempAni[2] = nullptr;
         break;
     case SPEAR:
-        brush = CreateSolidBrush(RGB(255, 165, 0));
+        tempAni[0] = imageDatas[spear_Walk];
+        tempAni[1] = imageDatas[spear_Attack];
+        tempAni[2] = nullptr;
         break;
     case WINGBUG:
-        brush = CreateSolidBrush(RGB(255, 255, 0));
+        tempAni[0] = imageDatas[wingbug_Walk];
+        tempAni[1] = nullptr;
+        tempAni[2] = nullptr;
         break;
     case FIREMAN:
-        brush = CreateSolidBrush(RGB(0, 255, 0));
+        tempAni[0] = imageDatas[fireman_Walk];
+        tempAni[1] = imageDatas[fireman_Attack];
+        tempAni[2] = nullptr;
         break;
     case LANDMINE:
-        brush = CreateSolidBrush(RGB(0, 0, 255));
-        break;
-    default:
-        brush = CreateSolidBrush(RGB(255, 255, 255));
+        tempAni[0] = imageDatas[landmine_Idle];
+        tempAni[1] = nullptr;
+        tempAni[2] = nullptr;
         break;
     }
 
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
+    for (int i = 0; i < 3; i++)
+    {
+        if (tempAni[i] == nullptr) 
+            continue;
+        Animation* temp = new Animation(tempAni[i]->GetCnt(), tempAni[i]->GetSpacingX(),
+            tempAni[i]->GetR(), tempAni[i]->GetG(), tempAni[i]->GetB(), tempAni[i]->GetCog(),
+            tempAni[i]->GetLengths(), tempAni[i]->Height(), tempAni[i]->GetFilePath());
+        temp->Load();
 
-    int left = GetPosition().x - 10;
-    int right = GetPosition().x + 10;
-    int top = GetPosition().y - 10;
-    int bottom = GetPosition().y + 10;
-    Ellipse(hdc, left, top, right, bottom);
+        ani.insert({ (EMonsterState)i, temp });
+    }
+}
 
-    SelectObject(hdc, oldBrush);
-    DeleteObject(brush);
+void Monster::Draw(HDC& hdc)
+{
+    HDC hMemDC = CreateCompatibleDC(hdc);
+    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, ani[curState]->GetBitmap());
+
+    ani[curState]->IncreaseIdx();
+
+    int width = ani[curState]->GetCurWidth();
+    int height = ani[curState]->GetHeight() - 1;
+    int left = GetPosition().x - ani[curState]->GetCurCog().x + ani[curState]->GetPrevWidth();
+    int top = GetPosition().y - ani[curState]->GetCurCog().y;
+
+    HDC hTempDC = CreateCompatibleDC(hdc);
+    HBITMAP hTempBitmap = CreateCompatibleBitmap(hdc, width, height);
+    SelectObject(hTempDC, hTempBitmap);
+
+    if (lookingDirection.first < 0)
+    {
+        StretchBlt(
+            hTempDC, 0, 0, width, height,
+            hMemDC, ani[curState]->GetPrevWidth(), 0, width, height,
+            SRCCOPY
+        );
+    }
+    else
+    {
+        StretchBlt(
+            hTempDC, width, 0, - (width + 1), height,
+            hMemDC, ani[curState]->GetPrevWidth(), 0, width, height,
+            SRCCOPY
+        );
+    }
+
+    TransparentBlt(
+        hdc, left, top, width, height,
+        hTempDC, 0, 0, width, height,
+        RGB(ani[curState]->GetR(), ani[curState]->GetG(), ani[curState]->GetB())
+    );
+
+    SelectObject(hTempDC, hOldBitmap);
+    DeleteDC(hTempDC);
+    DeleteObject(hTempBitmap);
+
+    SelectObject(hMemDC, hOldBitmap);
+    DeleteDC(hMemDC);
 
 }
 
@@ -48,7 +102,6 @@ void Monster::ObjectUpdate(TOTALDATA& totalData, int i)
     
     if (curState != totalData.mdata[i].curState)
     {
-        drawIndex = 0;
         SetMonsterState(totalData.mdata[i].curState);
     }
 }

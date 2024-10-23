@@ -16,10 +16,10 @@ protected:
 	int curHealth;
 	float speed;
 
-	int drawIndex;
+	std::map<EMonsterState, Animation*> ani;
 
 public:
-	Monster() : monsterType(RUNNER), curState(MONSTER_CHASE), Object(), drawIndex(0)
+	Monster() : monsterType(RUNNER), curState(MONSTER_CHASE), Object()
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
@@ -29,7 +29,17 @@ public:
 		this->curHealth = this->maxHealth;
 		this->speed = BASE_SPEED;
 	}
-	Monster(POINT p) : monsterType(RUNNER), curState(MONSTER_CHASE), Object(p), drawIndex(0)
+	Monster(POINT p) : monsterType(RUNNER), curState(MONSTER_CHASE), Object(p)
+	{
+		Circle2D* c = new Circle2D(true, MONSTER);
+		SetObject(c);
+
+		this->damage = BASE_DAMAGE;
+		this->maxHealth = BASE_HEALTH;
+		this->curHealth = this->maxHealth;
+		this->speed = BASE_SPEED;
+	}
+	Monster(EMonsterType type) : monsterType(type), curState(MONSTER_CHASE), Object()
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
@@ -39,9 +49,10 @@ public:
 		this->curHealth = this->maxHealth;
 		this->speed = BASE_SPEED;
 
+		SetMonsterAni();
 	}
 	Monster(POINT p, EMonsterType a, EMonsterState s, int damage, int maxHealth, float speed)
-		: monsterType(a), curState(s), Object(p), drawIndex(0)
+		: monsterType(a), curState(s), Object(p)
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
@@ -50,7 +61,12 @@ public:
 		this->maxHealth = maxHealth;
 		this->curHealth = this->maxHealth;
 		this->speed = speed;
-
+	}
+	~Monster()
+	{
+		for (auto it = ani.begin(); it != ani.end(); it++)
+			delete (*it).second;
+		ani.clear();
 	}
 
 	EMonsterType GetMonsterType() { return monsterType; }
@@ -68,8 +84,7 @@ public:
 	void SetCurHealth(int curHealth) { this->curHealth = curHealth; }
 	void SetSpeed(float speed) { this->speed = speed; }
 
-	int GetDrawIndex() { return drawIndex; }
-	void SetDrawIndex(int idx) { this->drawIndex = idx; }
+	void SetMonsterAni();
 
 	void OnHit(int playerDamage)
 	{

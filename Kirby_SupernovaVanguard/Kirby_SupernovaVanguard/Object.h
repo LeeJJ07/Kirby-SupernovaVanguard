@@ -15,20 +15,18 @@ protected:
 
 	bool isInGame;
 	
-	Animation* curAni;
 	Collider2D* collider;
 public:
-	Object() :position({ 0,0 }), lookingDirection({ 1,0 }), isInGame(false), collider(nullptr), curAni(nullptr)
+	Object() :position({ 0,0 }), lookingDirection({ 1,0 }), isInGame(false), collider(nullptr)
 	{
 	
 	}
-	Object(POINT p) :position(p), lookingDirection({ 1,0 }), isInGame(false), collider(nullptr), curAni(nullptr) {}
-	~Object() { delete collider; delete curAni; }
+	Object(POINT p) :position(p), lookingDirection({ 1,0 }), isInGame(false), collider(nullptr) {}
+	~Object() { delete collider; }
 
 	PAIR			GetLookingDir() { return lookingDirection; }
 	POINT			GetPosition() { return position; }
 	bool			GetIsInGame() { return isInGame; }
-	Animation*		GetAnimation() { return curAni; }
 	Collider2D*		GetCollider() { return collider; }
 
 
@@ -36,7 +34,6 @@ public:
 	void			SetLookingDir(PAIR p) { lookingDirection = p; }
 	void			SetIsInGame(bool _isInGame) { isInGame = _isInGame; }
 	void			SetObject(Collider2D* c) { collider = c; }
-	void			SetAnimation(Animation* ani) { curAni = ani; }
 
 	virtual void	ObjectUpdate(TOTALDATA&, int i) = 0;
 };

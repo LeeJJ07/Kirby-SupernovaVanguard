@@ -101,10 +101,11 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 				objArr[i + MONSTERINDEX] = nullptr;
 				continue;
 			}
-
-			vMonster[i] = new Monster;
-			CreateObject((Monster*)vMonster[i], i + MONSTERINDEX);
-
+			if (vMonster[i] == nullptr)
+			{
+				vMonster[i] = new Monster(pD.mdata[i].monsterType);
+				CreateObject((Monster*)vMonster[i], i + MONSTERINDEX);
+			}
 			vMonster[i]->ObjectUpdate(pD, i);
 			vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
 		}

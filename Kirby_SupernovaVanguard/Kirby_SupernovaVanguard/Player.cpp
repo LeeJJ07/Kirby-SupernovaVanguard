@@ -11,77 +11,53 @@ void Player::ObjectUpdate(TOTALDATA& pData, int i)
 
 void Player::SetPlayerAni()
 {
-    Animation* tempAni = nullptr;
+    Animation* tempAni[3] = { nullptr };
 
     switch (characterType)
     {
     case KIRBY:
-        if (characterState == IDLE)  tempAni = imageDatas[kirby_Idle];
-        else if (characterState == WALK) tempAni = imageDatas[kirby_Walk];
-        else if (characterState == ATTACK) tempAni = imageDatas[kirby_Attack];
+        tempAni[0] = imageDatas[kirby_Idle];
+        tempAni[1] = imageDatas[kirby_Walk];
+        tempAni[2] = imageDatas[kirby_Attack];
         break;
     case DDD:
-        if (characterState == IDLE)  tempAni = imageDatas[ddd_Idle];
-        else if (characterState == WALK) tempAni = imageDatas[ddd_Walk];
-        else if (characterState == ATTACK) tempAni = imageDatas[ddd_Attack];
+        tempAni[0] = imageDatas[ddd_Idle];
+        tempAni[1] = imageDatas[ddd_Walk];
+        tempAni[2] = imageDatas[ddd_Attack];
         break;
     case METANIHGT:
-        if (characterState == IDLE)  tempAni = imageDatas[meta_Idle];
-        else if (characterState == WALK) tempAni = imageDatas[meta_Walk];
-        else if (characterState == ATTACK) tempAni = imageDatas[meta_Attack];
+        tempAni[0] = imageDatas[meta_Idle];
+        tempAni[1] = imageDatas[meta_Walk];
+        tempAni[2] = imageDatas[meta_Attack];
         break;
     case MABOROA:
-        if (characterState == IDLE)  tempAni = imageDatas[maboroa_Idle];
-        else if (characterState == WALK) tempAni = imageDatas[maboroa_Walk];
-        else if (characterState == ATTACK) tempAni = imageDatas[maboroa_Attack];
+        tempAni[0] = imageDatas[maboroa_Idle];
+        tempAni[1] = imageDatas[maboroa_Walk];
+        tempAni[2] = imageDatas[maboroa_Attack];
         break;
     }
+    for (int i = 0; i < 3; i++)
+    {
+        Animation* temp = new Animation(tempAni[i]->GetCnt(), tempAni[i]->GetSpacingX(), 
+            tempAni[i]->GetR(), tempAni[i]->GetG(), tempAni[i]->GetB(), tempAni[i]->GetCog(), 
+            tempAni[i]->GetLengths(), tempAni[i]->Height(), tempAni[i]->GetFilePath());
+        temp->Load();
 
-
-    Animation* ani = new Animation(tempAni->GetCnt(), tempAni->GetSpacingX(), tempAni->GetR(), 
-        tempAni->GetG(), tempAni->GetB(), tempAni->GetCog(), tempAni->GetLengths(), tempAni->Height(), tempAni->GetFilePath());
-    ani->Load();
+        ani.insert({ (ECharacterState)i, temp });
+    }
 }
 
 void Player::DrawPlayer(HDC& hdc)
 {
-    characterState = ATTACK;
-
-    Animation* tempAni = nullptr;
-    
-    switch (characterType)
-    {
-    case KIRBY:
-        if (characterState == IDLE)  tempAni = imageDatas[kirby_Idle];
-        else if(characterState == WALK) tempAni = imageDatas[kirby_Walk];
-        else if(characterState == ATTACK) tempAni = imageDatas[kirby_Attack];
-        break;
-    case DDD:
-        if (characterState == IDLE)  tempAni = imageDatas[ddd_Idle];
-        else if (characterState == WALK) tempAni = imageDatas[ddd_Walk];
-        else if (characterState == ATTACK) tempAni = imageDatas[ddd_Attack];
-        break;
-    case METANIHGT:
-        if (characterState == IDLE)  tempAni = imageDatas[meta_Idle];
-        else if (characterState == WALK) tempAni = imageDatas[meta_Walk];
-        else if (characterState == ATTACK) tempAni = imageDatas[meta_Attack];
-        break;
-    case MABOROA:
-        if (characterState == IDLE)  tempAni = imageDatas[maboroa_Idle];
-        else if (characterState == WALK) tempAni = imageDatas[maboroa_Walk];
-        else if (characterState == ATTACK) tempAni = imageDatas[maboroa_Attack];
-        break;
-    }
-
     HDC hMemDC = CreateCompatibleDC(hdc);
-    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, tempAni->GetBitmap());
+    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, ani[characterState]->GetBitmap());
 
-    tempAni->IncreaseIdx();
+    ani[characterState]->IncreaseIdx();
 
-    int width = tempAni->GetCurWidth() + tempAni->GetSpacingX();
-    int height = tempAni->GetHeight() - 1;
-    int left = GetPosition().x - tempAni->GetCurCog().x + tempAni->GetPrevWidth();
-    int top = GetPosition().y - tempAni->GetCurCog().y;
+    int width = ani[characterState]->GetCurWidth();
+    int height = ani[characterState]->GetHeight() - 1;
+    int left = GetPosition().x - ani[characterState]->GetCurCog().x + ani[characterState]->GetPrevWidth();
+    int top = GetPosition().y - ani[characterState]->GetCurCog().y;
 
     HDC hTempDC = CreateCompatibleDC(hdc);
     HBITMAP hTempBitmap = CreateCompatibleBitmap(hdc, width, height);
@@ -91,7 +67,7 @@ void Player::DrawPlayer(HDC& hdc)
     {
         StretchBlt(
             hTempDC, 0, 0, width, height,
-            hMemDC, tempAni->GetPrevWidth(), 0, width, height,
+            hMemDC, ani[characterState]->GetPrevWidth(), 0, width, height,
             SRCCOPY
         );
     }
@@ -99,7 +75,7 @@ void Player::DrawPlayer(HDC& hdc)
     {
         StretchBlt(
             hTempDC, width, 0, -width, height,
-            hMemDC, tempAni->GetPrevWidth(), 0, width, height,
+            hMemDC, ani[characterState]->GetPrevWidth(), 0, width, height,
             SRCCOPY
         );
     }
@@ -107,7 +83,7 @@ void Player::DrawPlayer(HDC& hdc)
     TransparentBlt(
         hdc, left, top, width, height,        
         hTempDC, 0, 0, width, height,         
-        RGB(tempAni->GetR(), tempAni->GetG(), tempAni->GetB()) 
+        RGB(ani[characterState]->GetR(), ani[characterState]->GetG(), ani[characterState]->GetB())
     );
 
     SelectObject(hTempDC, hOldBitmap);

@@ -15,11 +15,18 @@ private:
 	ECharacterState characterState;
 
 	POINT mousePosition;
+	std::map<ECharacterState, Animation* > ani;
 public:
 	Player() : characterType(KIRBY),characterState(IDLE), mousePosition({ 0,0 }), Object()
 	{
 		Circle2D* c = new Circle2D(true, PLAYER);
 		SetObject(c);
+	}
+	~Player()
+	{
+		for (auto it = ani.begin(); it != ani.end(); it++)
+			delete (*it).second;
+		ani.clear();
 	}
 
 	ECharacterType	GetCharacterType() { return characterType; }

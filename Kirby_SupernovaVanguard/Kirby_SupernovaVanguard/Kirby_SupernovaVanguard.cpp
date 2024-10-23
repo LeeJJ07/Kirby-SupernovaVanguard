@@ -466,6 +466,8 @@ void DrawCamera(HDC hdc)
 		if (objArr[i] == nullptr)
 			continue;
 
+		//#######################################################
+		//이부분 수정 필요 -> 카메라의 중심을 기준으로 그리기
 		if (objArr[i]->GetPosition().x < vClient[myID]->GetPosition().x - 1000
 			|| objArr[i]->GetPosition().x > vClient[myID]->GetPosition().x + 1000
 			|| objArr[i]->GetPosition().y < vClient[myID]->GetPosition().y - 650
