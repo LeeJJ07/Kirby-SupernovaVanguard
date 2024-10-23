@@ -22,6 +22,9 @@
 
 #pragma comment(lib, "msimg32.lib")
 
+#define SCREEN_SIZE_X				1920
+#define SCREEN_SIZE_Y				1200
+
 #define PAIR std::pair<double,double>
 #define PLAYERNUM 4
 #define MONSTERNUM 500
