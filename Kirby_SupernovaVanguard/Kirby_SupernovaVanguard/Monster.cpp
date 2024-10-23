@@ -61,7 +61,7 @@ void Monster::Draw(HDC& hdc)
     HBITMAP hTempBitmap = CreateCompatibleBitmap(hdc, width, height);
     SelectObject(hTempDC, hTempBitmap);
 
-    if (lookingDirection.first < 0)
+    if (lookingDirection.first > 0)
     {
         StretchBlt(
             hTempDC, 0, 0, width, height,
@@ -96,6 +96,7 @@ void Monster::Draw(HDC& hdc)
 void Monster::ObjectUpdate(TOTALDATA& totalData, int i)
 {
 	SetPosition(totalData.mdata[i].pos);
+    SetLookingDir(totalData.mdata[i].lookingDir);
 	GetCollider()->SetOffset(totalData.mdata[i].offset);
     
     SetMonsterType(totalData.mdata[i].monsterType);

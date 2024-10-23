@@ -18,5 +18,5 @@ void WingBugMonster::Update()
 		this->SetEnabled(false);
 		return;
 	}
-	position.x += (int)round(lookingDirection.first * speed);
+	position.x += (int)round( -lookingDirection.first * speed);
 }

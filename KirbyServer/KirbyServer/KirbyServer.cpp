@@ -822,9 +822,9 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 			distance = newdistance;
 
 			mData.targetnum = i;
-			monsterArr[monsterIdx]->SetTargetPos(tData.udata[mData.targetnum].pos);
 		}
 	}
+	monsterArr[monsterIdx]->SetTargetPos(tData.udata[mData.targetnum].pos);
 }
 
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
@@ -848,8 +848,8 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 	case WINGBUG:
 		m = new WingBugMonster(generatePos, mType, CHASE, { 0, 0 },
 			WINGBUG_BASE_DAMAGE, WINGBUG_BASE_HEALTH, WINGBUG_BASE_SPEED, TRUE);
-		if (generatePos.x < totalData.udata[playerIdx].pos.x) m->SetLookingDir({ 1, 0 });
-		else m->SetLookingDir({ -1, 0 });
+		if (generatePos.x < totalData.udata[playerIdx].pos.x) m->SetLookingDir({ -1, 0 });
+		else m->SetLookingDir({ 1, 0 });
 		break;
 	case FIREMAN:
 		m = new FireManMonster(generatePos, mType, CHASE, { 0, 0 },

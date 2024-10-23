@@ -83,7 +83,7 @@ public:
 	void SetMaxHealth(int maxHealth) { this->maxHealth = maxHealth;}
 	void SetCurHealth(int curHealth) { this->curHealth = curHealth; }
 	void SetSpeed(float speed) { this->speed = speed; }
-
+	void SetLookingDir(PAIR lookingDir) { this->lookingDirection = lookingDir; }
 	void SetMonsterAni();
 
 	void OnHit(int playerDamage)

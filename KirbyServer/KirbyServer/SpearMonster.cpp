@@ -30,7 +30,7 @@ void SpearMonster::Update()
 	}
 	else if (curState == ATTACK)
 	{
-
+		lookingDirection = NormalizationDir(targetPos);
 	}
 	else
 	{
