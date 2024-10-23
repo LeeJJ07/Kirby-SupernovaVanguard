@@ -9,5 +9,5 @@
 #include "TornadoSkill.h"
 #include "TruckSkill.h"
 
-static float skilloffsetX = 0.001f;
-static float skilloffsetY = 0.001f;
+static float skilloffsetX = 0.1f;
+static float skilloffsetY = 0.1f;

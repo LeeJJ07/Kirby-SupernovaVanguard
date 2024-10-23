@@ -15,7 +15,7 @@ public:
 	MetaknightSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::METAKNIGHTSKILL, COLLIDERTYPE::RECTANGLE, 0, 10, 100, 140, 2., { 0,0 } , { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::METAKNIGHTSKILL, COLLIDERTYPE::RECTANGLE, 0, 10, 160, 140, 2., { 0,0 } , { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		imageaddress(nullptr)
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);

@@ -694,15 +694,16 @@ void GenerateSkill()
 
 								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
 								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+								lookingdir.first = -lookingdir.first; lookingdir.second = -lookingdir.second;
 
-								metaknightSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+								metaknightSkill->Setdirection({ (long)lookingdir.first,(long)lookingdir.second });
 							}
 							metaknightSkill->Setangle(UpdateAngle(lookingdir));
 							metaknightSkill->Settime_1();
 							metaknightSkill->Settime_2();
 							metaknightSkill->Setisactivate(true);
 							metaknightSkill->SetID(s);
-							metaknightSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)metaknightSkill->Getsize() / OFFSETADJUST / 2, (long)totalData.udata[i].lookingDir.second * (long)metaknightSkill->Getsize() / OFFSETADJUST / 2 });
+							metaknightSkill->Setoffset({ (long)lookingdir.first * (long)metaknightSkill->Getsize() / OFFSETADJUST / 2, (long)lookingdir.second * (long)metaknightSkill->Getsize() / OFFSETADJUST / 2 });
 							metaknightSkill->Setposition({ totalData.udata[i].pos.x + metaknightSkill->Getoffset().x, totalData.udata[i].pos.y + metaknightSkill->Getoffset().y });
 							metaknightSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = metaknightSkill;
@@ -760,18 +761,25 @@ void GenerateSkill()
 							}
 							else
 							{
-								PAIR lookingdir = { (kunaiSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (kunaiSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+								lookingdir = { (kunaiSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (kunaiSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+								
+								if (lookingdir.first == 0)
+									lookingdir.first = skilloffsetX;
+								if (lookingdir.second == 0)
+									lookingdir.second = skilloffsetX;
+
 								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
 								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+								lookingdir.first = -lookingdir.first; lookingdir.second = -lookingdir.second;
 
-								kunaiSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+								kunaiSkill->Setdirection({ (long)lookingdir.first,(long)lookingdir.second });
 							}
 							kunaiSkill->Setangle(UpdateAngle(lookingdir));
 							kunaiSkill->Settime_1();
 							kunaiSkill->Settime_2();
 							kunaiSkill->Setisactivate(true);
 							kunaiSkill->SetID(s);
-							kunaiSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)kunaiSkill->Getsize() / OFFSETADJUST, (long)totalData.udata[i].lookingDir.second * (long)kunaiSkill->Getsize() / OFFSETADJUST });
+							kunaiSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)kunaiSkill->Getsize() / OFFSETADJUST / 2, (long)totalData.udata[i].lookingDir.second * (long)kunaiSkill->Getsize() / OFFSETADJUST / 2 });
 							kunaiSkill->Setposition({ totalData.udata[i].pos.x + kunaiSkill->Getoffset().x, totalData.udata[i].pos.y + kunaiSkill->Getoffset().y });
 							kunaiSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = kunaiSkill;
@@ -782,8 +790,16 @@ void GenerateSkill()
 							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 
 							MagicArrowSkill* magicarrowSkill = new MagicArrowSkill(i, 0);
+
 							PAIR lookingdir = { (magicarrowSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (magicarrowSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+							
+							if (lookingdir.first == 0)
+								lookingdir.first = skilloffsetX;
+							if (lookingdir.second == 0)
+								lookingdir.second = skilloffsetX;
+
 							double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+							
 							lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
 
 							magicarrowSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
@@ -793,7 +809,7 @@ void GenerateSkill()
 							magicarrowSkill->Settime_2();
 							magicarrowSkill->Setisactivate(true);
 							magicarrowSkill->SetID(s);
-							magicarrowSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first , (long)totalData.udata[i].lookingDir.second });
+							magicarrowSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)magicarrowSkill->Getsize() / OFFSETADJUST / 2, (long)totalData.udata[i].lookingDir.second * (long)magicarrowSkill->Getsize() / OFFSETADJUST / 2 });
 							magicarrowSkill->Setposition({ totalData.udata[i].pos.x + magicarrowSkill->Getoffset().x, totalData.udata[i].pos.y + magicarrowSkill->Getoffset().y });
 							magicarrowSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = magicarrowSkill;

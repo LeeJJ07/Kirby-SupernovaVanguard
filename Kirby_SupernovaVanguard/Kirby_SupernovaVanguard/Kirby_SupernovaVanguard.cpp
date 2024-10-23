@@ -301,15 +301,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		cursorY = HIWORD(lParam);
 	}
 	break;
-	/*case WM_MOUSEMOVE:
-	{
-		if (curScene == GAME)
-		{
-			cursorX = LOWORD(lParam);
-			cursorY = HIWORD(lParam);
-		}
-	}
-		break;*/
 	case WM_PAINT:
 		if (curScene == START)
 		{
