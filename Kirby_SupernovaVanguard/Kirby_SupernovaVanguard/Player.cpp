@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Camera.h"
 
 void Player::ObjectUpdate(TOTALDATA& pData, int i)
 {
@@ -63,7 +64,7 @@ void Player::DrawPlayer(HDC& hdc)
     HBITMAP hTempBitmap = CreateCompatibleBitmap(hdc, width, height);
     SelectObject(hTempDC, hTempBitmap);
 
-    if (mousePosition.x > position.x)
+    if (mousePosition.x + (camera.GetCameraPos().x - SCREEN_SIZE_X / 2) >  position.x)
     {
         StretchBlt(
             hTempDC, 0, 0, width, height,
