@@ -54,6 +54,7 @@ bool SetElectricfieldSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].colliderposition = electricfieldskill->GetCollider()->GetPosition();
 	totalData.sdata[ID].collidersize = electriccollider->GetRadius();
 	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 
 	return true;
 }

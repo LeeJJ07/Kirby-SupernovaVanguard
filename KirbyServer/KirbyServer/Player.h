@@ -15,11 +15,12 @@ class Player : public Object
 {
 private:
 	ECharacterType characterType;
-	int ID;
+	int	ID;
+	bool	isLockOn;
 
 	std::vector<SkillManager*> vSkillManager;
 public:
-	Player(int ID) : characterType(KIRBY), Object(), ID(ID)
+	Player(int ID) : characterType(KIRBY), Object(), ID(ID), isLockOn(true)
 	{
 		Circle2D* c = new Circle2D(true, PLAYER);
 		SetObject(c);
@@ -31,11 +32,12 @@ public:
 	}
 
 	ECharacterType	GetCharacterType() { return characterType; }
-	int	GetID() { return ID; }
+	int	GetID()	{ return ID; }
+	bool	GetisLockOn()	{ return isLockOn; }
 	std::vector<SkillManager*> GetSkillManager() { return vSkillManager; }
 
+	void	SetisLockOn(bool isLockOn) { this->isLockOn = isLockOn; }
 	void	SetSkillManager(std::vector<SkillManager*> vSkillManager) { this->vSkillManager = vSkillManager; }
-
 	void	SetCharacterType(int characterType)
 	{
 		switch (characterType)

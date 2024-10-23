@@ -15,6 +15,7 @@ void Skill::ObjectUpdate(TOTALDATA& totalData, int i)
 		skillrectanglecollider = dynamic_cast<Rectangle2D*>(this->GetCollider());
 		skillrectanglecollider->SetWidth(totalData.sdata[i].collidersize);
 		skillrectanglecollider->SetHeight(totalData.sdata[i].collidersize2);
+		skillrectanglecollider->Setangle(totalData.sdata[i].angle);
 		break;
 	}
 	SetPosition(totalData.sdata[i].position);

@@ -15,7 +15,7 @@ public:
 	MagicArrowSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::MAGICARROWSKILL, COLLIDERTYPE::RECTANGLE, 2, 5, 5, 15, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::MAGICARROWSKILL, COLLIDERTYPE::RECTANGLE, 0.6, 5, 50, 15, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		imageaddress(nullptr)
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
@@ -55,6 +55,8 @@ bool SetMagicArrowSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].collidersize = magicarrowcollider->GetWidth();
 	totalData.sdata[ID].collidersize2 = magicarrowcollider->GetHeight();
 	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].targetnum = skill->Gettargetnum();
+	totalData.sdata[ID].angle = skill->Getangle();
 
 	return true;
 }

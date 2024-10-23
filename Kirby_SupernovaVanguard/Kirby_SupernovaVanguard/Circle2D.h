@@ -16,5 +16,5 @@ public:
 
 	int GetRadius() { return radius; }
 
-	void DrawCollider(HDC&);
+	void DrawCollider(HDC&, int& ID);
 };

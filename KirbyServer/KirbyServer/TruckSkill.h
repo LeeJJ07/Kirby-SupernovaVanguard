@@ -16,7 +16,7 @@ public:
 	TruckSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::TRUCKSKILL, COLLIDERTYPE::RECTANGLE, 2, 50, 100, 40, 8., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::TRUCKSKILL, COLLIDERTYPE::RECTANGLE, 0.2, 50, 200, 100, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		imageaddress(nullptr)
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
@@ -56,6 +56,8 @@ bool SetTruckSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].collidersize = tornadocollider->GetWidth();
 	totalData.sdata[ID].collidersize2 = tornadocollider->GetHeight();
 	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].targetnum = skill->Gettargetnum();
+	totalData.sdata[ID].angle = skill->Getangle();
 
 	return true;
 }

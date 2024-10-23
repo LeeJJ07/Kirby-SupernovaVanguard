@@ -82,11 +82,12 @@ static std::chrono::high_resolution_clock::time_point t2_move;
 static std::chrono::duration<double> timeSpan_move;
 
 bool canGoToNext;
+bool isLockOn;
 SceneState curScene;
 StartScene startScene;
 SelectScene selectScene;
 
-void DrawMousePosition(HDC);
+void DrawPlayerPosition(HDC);
 void Update();
 void UpdateSelect();
 // <<
@@ -294,23 +295,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		if (wParam == 'c' || wParam == 'C')
+		{
 			isDrawCollider = !isDrawCollider;
-		break;
+			break;
+		}
+		if (wParam == 'z' || wParam == 'Z')
+		{
+			isLockOn = !isLockOn;
+			aD.isLockOn = isLockOn;
+			break;
+		}
 	case WM_LBUTTONDOWN:
 	{
 		cursorX = LOWORD(lParam);
 		cursorY = HIWORD(lParam);
 	}
 	break;
-	case WM_MOUSEMOVE:
-	{
-		if (curScene == GAME)
-		{
-			cursorX = LOWORD(lParam);
-			cursorY = HIWORD(lParam);
-		}
-	}
-		break;
 	case WM_PAINT:
 		if (curScene == START)
 		{
@@ -528,7 +528,10 @@ void DrawCollider(HDC& hdc)
 	for (int i = 0; i < OBJECTNUM; i++)
 	{
 		if (objArr[i] != nullptr)
-			objArr[i]->GetCollider()->DrawCollider(hdc);
+		{
+			int id = objArr[i]->Getid();
+			objArr[i]->GetCollider()->DrawCollider(hdc, id);
+		}
 	}
 }
 
@@ -549,6 +552,15 @@ unsigned __stdcall Send()
 		{
 			if (threadEnd_Send)
 				return 0;
+			if (curScene == GAME)
+			{
+				POINT cursorPos;
+				GetCursorPos(&cursorPos);
+
+				cursorX = cursorPos.x;
+				cursorY = cursorPos.y;
+			}
+
 			aD.id = myID;
 			aD.playerMove = { x,y };
 			aD.cursorMove = { cursorX, cursorY };
@@ -667,7 +679,7 @@ unsigned __stdcall Paint(HWND pParam)
 						CountFPS();
 					}
 
-					DrawMousePosition(hdc);
+					DrawPlayerPosition(hdc);
 					DrawFPS(hdc);
 					DrawSendNum(hdc);
 					DrawReadNum(hdc);
@@ -731,7 +743,7 @@ void DrawReadNum(HDC hdc)
 	TextOut(hdc, 350, 200, t, t.GetLength());
 }
 
-void DrawMousePosition(HDC hdc)
+void DrawPlayerPosition(HDC hdc)
 {
 	CString t;
 

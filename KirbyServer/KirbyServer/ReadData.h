@@ -9,4 +9,5 @@ typedef struct receiveData
 	short	newskill;
 	bool	isReady;
 	bool	isChoice;
+	bool	isLockOn;
 }ReceiveData;
