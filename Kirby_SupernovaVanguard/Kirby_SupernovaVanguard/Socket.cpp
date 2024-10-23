@@ -80,14 +80,9 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 			if (!p[i])
 			{
-<<<<<<< HEAD
-				p[i] = new Player();
-				CreateObject(p[i], i + PLAYERINDEX);
-=======
 				pData = new Player();
 				CreateObject(pData, i + PLAYERINDEX);
 				pData->Setid(i + PLAYERINDEX);
->>>>>>> Collider
 			}
 			p[i]->ObjectUpdate(pD, i);
 			p[i]->GetCollider()->MovePosition(p[i]->GetPosition());
@@ -104,19 +99,11 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 				objArr[i + MONSTERINDEX] = nullptr;
 				continue;
 			}
-<<<<<<< HEAD
-			if (vMonster[i] == nullptr)
-			{
-				vMonster[i] = new Monster(pD.mdata[i].monsterType);
-				CreateObject((Monster*)vMonster[i], i + MONSTERINDEX);
-			}
-=======
 
 			vMonster[i] = new Monster;
 			CreateObject((Monster*)vMonster[i], i + MONSTERINDEX);
 			vMonster[i]->Setid(i);
 
->>>>>>> Collider
 			vMonster[i]->ObjectUpdate(pD, i);
 			vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
 		}
