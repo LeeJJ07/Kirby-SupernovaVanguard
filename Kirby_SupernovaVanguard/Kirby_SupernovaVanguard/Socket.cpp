@@ -78,6 +78,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 				break;;
 			}
 
+			Player* pData = dynamic_cast<Player*>(p[i]);
 			if (!p[i])
 			{
 				pData = new Player();
