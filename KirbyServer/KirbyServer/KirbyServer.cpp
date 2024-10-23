@@ -627,7 +627,7 @@ void GenerateSkill()
 							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 
 							KirbySkill* kirbySkill = new KirbySkill(i, monsterIndex);
-							if (vClient[i]->GetisLockOn())
+							if (!(vClient[i]->GetisLockOn()))
 								kirbySkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
 							else
 							{
@@ -652,7 +652,7 @@ void GenerateSkill()
 							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 
 							DededeSkill* dededeSkill = new DededeSkill(i, monsterIndex);
-							if (vClient[i]->GetisLockOn())
+							if (!(vClient[i]->GetisLockOn()))
 								dededeSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
 							else
 							{
@@ -677,21 +677,32 @@ void GenerateSkill()
 							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 
 							MetaknightSkill* metaknightSkill = new MetaknightSkill(i, monsterIndex);
-							if (vClient[i]->GetisLockOn())
-								metaknightSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							PAIR lookingdir;
+							if (!(vClient[i]->GetisLockOn()))
+							{
+								lookingdir = { (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second };
+								metaknightSkill->Setdirection({ (long)lookingdir.first, (long)lookingdir.second });
+							}
 							else
 							{
-								PAIR lookingdir = { (metaknightSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (metaknightSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+								lookingdir = { (metaknightSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x ), (metaknightSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+								
+								if (lookingdir.first == 0)
+									lookingdir.first = skilloffsetX;
+								if (lookingdir.second == 0)
+									lookingdir.second = skilloffsetX;
+
 								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
 								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
 
 								metaknightSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
 							}
+							metaknightSkill->Setangle(UpdateAngle(lookingdir));
 							metaknightSkill->Settime_1();
 							metaknightSkill->Settime_2();
 							metaknightSkill->Setisactivate(true);
 							metaknightSkill->SetID(s);
-							metaknightSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)metaknightSkill->Getsize() / OFFSETADJUST, (long)totalData.udata[i].lookingDir.second * (long)metaknightSkill->Getsize() / OFFSETADJUST });
+							metaknightSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)metaknightSkill->Getsize() / OFFSETADJUST / 2, (long)totalData.udata[i].lookingDir.second * (long)metaknightSkill->Getsize() / OFFSETADJUST / 2 });
 							metaknightSkill->Setposition({ totalData.udata[i].pos.x + metaknightSkill->Getoffset().x, totalData.udata[i].pos.y + metaknightSkill->Getoffset().y });
 							metaknightSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = metaknightSkill;
@@ -702,7 +713,7 @@ void GenerateSkill()
 							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 
 							MaberoaSkill* maberoaSkill = new MaberoaSkill(i, monsterIndex);
-							if (vClient[i]->GetisLockOn())
+							if (!(vClient[i]->GetisLockOn()))
 								maberoaSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
 							else
 							{
@@ -741,8 +752,12 @@ void GenerateSkill()
 							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 
 							KunaiSkill* kunaiSkill = new KunaiSkill(i, monsterIndex);
-							if (vClient[i]->GetisLockOn())
-								kunaiSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							PAIR lookingdir;
+							if (!(vClient[i]->GetisLockOn()))
+							{
+								lookingdir = { (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second };
+								kunaiSkill->Setdirection({ (long)lookingdir.first, (long)lookingdir.second });
+							}
 							else
 							{
 								PAIR lookingdir = { (kunaiSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (kunaiSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
@@ -751,6 +766,7 @@ void GenerateSkill()
 
 								kunaiSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
 							}
+							kunaiSkill->Setangle(UpdateAngle(lookingdir));
 							kunaiSkill->Settime_1();
 							kunaiSkill->Settime_2();
 							kunaiSkill->Setisactivate(true);
@@ -771,6 +787,7 @@ void GenerateSkill()
 							lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
 
 							magicarrowSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+							magicarrowSkill->Setangle(UpdateAngle(lookingdir));
 							
 							magicarrowSkill->Settime_1();
 							magicarrowSkill->Settime_2();
@@ -809,13 +826,15 @@ void GenerateSkill()
 							PAIR lookingdir = { (truckSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (truckSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
 							double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
 							lookingdir.first /= -temp / OFFSETADJUST; lookingdir.second /= -temp / OFFSETADJUST;
+
 							truckSkill->Setdirection({ (long)(lookingdir.first),(long)(lookingdir.second) });
+							truckSkill->Setangle(UpdateAngle(lookingdir));
+
 							truckSkill->Settime_1();
 							truckSkill->Settime_2();
 							truckSkill->Setisactivate(true);
 							truckSkill->SetID(s);
 							truckSkill->Setmasternum(i);
-							truckSkill->Setangle(UpdateAngle(lookingdir));
 							vSkill[s - SKILLINDEX] = truckSkill;
 						}
 						break;
@@ -1179,11 +1198,15 @@ void UpdateThread()
 
 float UpdateAngle(PAIR& lookingdir)
 {
-	double angleRadians = atan2(-lookingdir.second, lookingdir.first);
+	double angleRadians = atan2(lookingdir.second, lookingdir.first);
 
 	// 라디안 값을 도(degree)로 변환하려면
  	double angleDegrees = angleRadians * 180.0 / 3.14;
+
 	if (angleDegrees < 0)
-		angleDegrees = abs(angleDegrees) + 180;
+	{
+		angleDegrees = 180 + (180 - abs(angleDegrees));
+	}
+
 	return angleDegrees;
 }

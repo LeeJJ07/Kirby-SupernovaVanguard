@@ -542,10 +542,7 @@ unsigned __stdcall Send()
 			if (curScene == GAME)
 			{
 				POINT cursorPos;
-				GetCursorPos(&cursorPos); // 시스템 전체에서의 마우스 위치를 가져옴
-
-				// 필요하다면, 클라이언트 좌표로 변환
-				//ScreenToClient(hWnd, &cursorPos);
+				GetCursorPos(&cursorPos);
 
 				cursorX = cursorPos.x;
 				cursorY = cursorPos.y;

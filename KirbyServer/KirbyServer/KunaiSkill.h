@@ -15,7 +15,7 @@ public:
 	KunaiSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::KUNAISKILL, COLLIDERTYPE::RECTANGLE, 8, 2, 5, 8, 0.25, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::KUNAISKILL, COLLIDERTYPE::RECTANGLE, 0.8, 2, 10, 5, 0.25, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		imageaddress(nullptr)
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
@@ -49,11 +49,14 @@ bool SetKunaiSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].id = kunaiskill->GetID();
 	totalData.sdata[ID].skilltype = skill->Getskilltype();
 	totalData.sdata[ID].size = skill->Getsize();
+	totalData.sdata[ID].size2 = skill->Getsize2();
 	totalData.sdata[ID].position = skill->Getposition();
 	totalData.sdata[ID].colliderposition = kunaiskill->GetCollider()->GetPosition();
 	totalData.sdata[ID].collidersize = kunaicollider->GetWidth();
 	totalData.sdata[ID].collidersize2 = kunaicollider->GetHeight();
 	totalData.sdata[ID].collidertype = skill->Getcollidertype();
+	totalData.sdata[ID].targetnum = skill->Gettargetnum();
+	totalData.sdata[ID].angle = skill->Getangle();
 
 	return true;
 }

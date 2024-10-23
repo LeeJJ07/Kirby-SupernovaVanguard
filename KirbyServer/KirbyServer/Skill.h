@@ -39,7 +39,7 @@ private:
 public:
 	Skill() :masternum(0), targetnum(0), skilltype(KIRBYSKILL), collidertype(COLLIDERTYPE::CIRCLE),
 		speed(1), damage(1), size(0), size2(0), coolTime(5.0), offset({0,0}), position({0,0}), direction({1,0}) {}
-	Skill(int masternum, int targetnum, int skilltype, int collidertype, int speed, int damage, int size, int size2, float coolTime, POINT offset, POINT position, POINT direction)
+	Skill(int masternum, int targetnum, int skilltype, int collidertype, float speed, int damage, int size, int size2, float coolTime, POINT offset, POINT position, POINT direction)
 		:masternum(masternum), targetnum(targetnum), skilltype(skilltype), collidertype(collidertype),
 		speed(speed), damage(damage), size(size), size2(size2), coolTime(coolTime), offset(offset), position(position), direction(direction) {}
 	~Skill() {}

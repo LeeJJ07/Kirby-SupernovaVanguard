@@ -88,4 +88,4 @@ enum OBJECTINDEX
 #define TTRUCKSKILLDESTROY 6
 
 // >> Skill offset
-#define OFFSETADJUST 5
+#define OFFSETADJUST 50
