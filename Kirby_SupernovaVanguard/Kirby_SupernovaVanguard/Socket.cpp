@@ -75,20 +75,17 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 					LeaveCriticalSection(&cs);
 					return;
 				}
-				break;
+				break;;
 			}
 
-			Player* pData = dynamic_cast<Player*>(p[i]);
-			if (!pData)
+			if (!p[i])
 			{
-				pData = new Player();
-				CreateObject(pData, i + PLAYERINDEX);
+				p[i] = new Player();
+				CreateObject(p[i], i + PLAYERINDEX);
 			}
-			pData->ObjectUpdate(pD, i);
-			pData->GetCollider()->MovePosition(pData->GetPosition());
+			p[i]->ObjectUpdate(pD, i);
+			p[i]->GetCollider()->MovePosition(p[i]->GetPosition());
 
-			p[i] = pData;
-			
 			camera.PositionUpdate();
 		}
 		// <<
