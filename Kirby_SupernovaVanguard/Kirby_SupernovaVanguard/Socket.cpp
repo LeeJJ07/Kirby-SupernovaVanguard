@@ -42,7 +42,7 @@ int InitClient(HWND hWnd, SOCKET &s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
@@ -68,7 +68,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		// >> : playerdata
 		for (int i = 0; i < PLAYERNUM; i++)
 		{
-			if (pD.udata[i].dataType == 0)
+			if (pD.udata[i].dataType != 'p')
 			{
 				if (i == 0)
 				{
@@ -78,12 +78,11 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 				break;;
 			}
 
-			Player* pData = dynamic_cast<Player*>(p[i]);
 			if (!p[i])
 			{
-				pData = new Player();
-				CreateObject(pData, i + PLAYERINDEX);
-				pData->Setid(i + PLAYERINDEX);
+				p[i] = new Player();
+				CreateObject(p[i], i + PLAYERINDEX);
+				p[i]->Setid(i + PLAYERINDEX);
 			}
 			p[i]->ObjectUpdate(pD, i);
 			p[i]->GetCollider()->MovePosition(p[i]->GetPosition());
@@ -95,15 +94,18 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		// >> : monsterdata
 		for (int i = 0; i < MONSTERNUM; i++)
 		{
-			if (pD.mdata[i].dataType == 0)
+			if (pD.mdata[i].dataType != 'm')
 			{
 				objArr[i + MONSTERINDEX] = nullptr;
 				continue;
 			}
 
-			vMonster[i] = new Monster;
-			CreateObject((Monster*)vMonster[i], i + MONSTERINDEX);
-			vMonster[i]->Setid(i);
+			if (vMonster[i] == nullptr)
+			{
+				vMonster[i] = new Monster(pD.mdata[i].monsterType);
+				CreateObject((Monster*)vMonster[i], i + MONSTERINDEX);
+				vMonster[i]->Setid(i);
+			}
 
 			vMonster[i]->ObjectUpdate(pD, i);
 			vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());

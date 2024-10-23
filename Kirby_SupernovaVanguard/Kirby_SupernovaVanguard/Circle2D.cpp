@@ -2,10 +2,10 @@
 
 void Circle2D::DrawCollider(HDC& hdc, int& ID)
 {
-	int left = GetPosition().x - radius * 3;
-	int right = GetPosition().x + radius * 3;
-	int top = GetPosition().y - radius * 3;
-	int bottom = GetPosition().y + radius * 3;
+	int left = GetPosition().x - radius;
+	int right = GetPosition().x + radius;
+	int top = GetPosition().y - radius;
+	int bottom = GetPosition().y + radius;
 	Ellipse(hdc, left, top, right, bottom);
 
 	CString t;

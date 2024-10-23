@@ -335,7 +335,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -641,7 +641,7 @@ void GenerateSkill()
 							kirbySkill->Settime_2();
 							kirbySkill->Setisactivate(true);
 							kirbySkill->SetID(s);
-							kirbySkill->Setoffset({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
+							kirbySkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)kirbySkill->Getsize() / OFFSETADJUST / 2, (long)totalData.udata[i].lookingDir.second * (long)kirbySkill->Getsize() / OFFSETADJUST / 2 });
 							kirbySkill->Setposition({ totalData.udata[i].pos.x + kirbySkill->Getoffset().x, totalData.udata[i].pos.y + kirbySkill->Getoffset().y });
 							kirbySkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = kirbySkill;
@@ -666,7 +666,7 @@ void GenerateSkill()
 							dededeSkill->Settime_2();
 							dededeSkill->Setisactivate(true);
 							dededeSkill->SetID(s);
-							dededeSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * 10, (long)totalData.udata[i].lookingDir.second * 10 });
+							dededeSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)dededeSkill->Getsize() / OFFSETADJUST / 2, (long)totalData.udata[i].lookingDir.second * (long)dededeSkill->Getsize() / OFFSETADJUST / 2 });
 							dededeSkill->Setposition({ totalData.udata[i].pos.x + dededeSkill->Getoffset().x, totalData.udata[i].pos.y + dededeSkill->Getoffset().y });
 							dededeSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = dededeSkill;
