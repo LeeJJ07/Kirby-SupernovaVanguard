@@ -50,8 +50,6 @@ TOTALDATA uData;
 Object** objArr;
 static SOCKET cSocket;
 
-
-
 // >> : Thread
 DWORD dwThID1, dwThID2, dwThID3;
 HANDLE hThreads[3];
@@ -485,7 +483,7 @@ void DrawCamera(HDC hdc)
 			((Monster*)objArr[i])->Draw(hdc);
 			break;
 		case PMISSILE:
-			DrawSkill(hdc, (Skill*)objArr[i]);
+			((Skill*)objArr[i])->DrawSkill(hdc);
 			break;
 		case EMISSILE:
 			break;

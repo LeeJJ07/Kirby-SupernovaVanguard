@@ -90,7 +90,6 @@ void Monster::Draw(HDC& hdc)
 
     SelectObject(hMemDC, hOldBitmap);
     DeleteDC(hMemDC);
-
 }
 
 void Monster::ObjectUpdate(TOTALDATA& totalData, int i)

@@ -232,7 +232,7 @@ void DrawAnimation(HDC hdc)
     // 현재 프레임에 따라 비트맵의 시작 위치 계산
     int xStart = 0;
     for (int i = 0; i < curFrame; i++)
-        xStart += widths[i] + spacingX;
+        xStart += widths[i] + spacingX - 1;
     int yStart = 0;
 
     int diffX = xStart + widths[curFrame] / 2 - pos[curFrame].x;
@@ -661,8 +661,7 @@ BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             g_TextImgWidth = 0;
             for (int i = 0; i < length; i++)
                 g_TextImgWidth += widths[i] + spacingX;
-            g_TextImgWidth -= spacingX;
-            g_TextImgHeight = height;
+            g_TextImgHeight = height - 1;
 
             g_StartImgX = rectView.right / 2 - g_CharPos.x - g_TextImgWidth / 2;
             g_StartImgY = rectView.bottom / 2 - g_CharPos.y - height / 2;
