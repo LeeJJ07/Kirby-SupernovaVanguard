@@ -550,8 +550,8 @@ unsigned __stdcall Send()
 	{
 		if (timeSpan_send.count() >= 0.01 && cs.DebugInfo != NULL)
 		{
-			if (threadEnd_Send)
-				return 0;
+			/*if (threadEnd_Send)
+				return 0;*/
 			if (curScene == GAME)
 			{
 				POINT cursorPos;
@@ -591,8 +591,8 @@ unsigned __stdcall Read()
 	{
 		if (timeSpan_read.count() >= 0.005)
 		{
-			if (threadEnd_Read)
-				return 0;
+			/*if (threadEnd_Read)
+				return 0;*/
 			ReadMessage(cSocket, vClient, uData);
 
 			if (uData.publicdata.islevelUp && !isChoiceSkill)
@@ -650,8 +650,8 @@ unsigned __stdcall Paint(HWND pParam)
 		}
 		if (timeSpan_render.count() >= 0.0075 && cs.DebugInfo != NULL)
 		{
-			if (threadEnd_Paint)
-				return 0;
+			/*if (threadEnd_Paint)
+				return 0;*/
 			EnterCriticalSection(&cs);
 
 			HDC hdc = BeginPaint(pParam, &ps);

@@ -26,10 +26,10 @@
 #define SCREEN_SIZE_Y				1200
 
 #define PAIR std::pair<double,double>
-#define PLAYERNUM 4
-#define MONSTERNUM 100
-#define SKILLNUM 50
-#define MONSTERSKILLNUM 100
+#define PLAYERNUM			4
+#define MONSTERNUM			500
+#define SKILLNUM			100
+#define MONSTERSKILLNUM		100
 #define OBJECTNUM PLAYERNUM + MONSTERNUM + SKILLNUM + MONSTERSKILLNUM
 #define SKILLARR 6
 

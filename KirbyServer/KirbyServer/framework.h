@@ -38,8 +38,8 @@
 
 #define PAIR std::pair<double,double>
 #define PLAYERNUM					4
-#define MONSTERNUM					100
-#define SKILLNUM					50
+#define MONSTERNUM					500
+#define SKILLNUM					100
 #define MONSTERSKILLNUM				100
 
 #define RETARGETINGTIME				1

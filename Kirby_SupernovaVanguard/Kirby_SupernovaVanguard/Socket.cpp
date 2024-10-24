@@ -63,7 +63,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 	int bytesReceived = recv(s, (char*)&pD, sizeof(TOTALDATA), 0);
 
-	if (bytesReceived >= sizeof(TOTALDATA))
+	if (bytesReceived >= (int)sizeof(TOTALDATA))
 	{
 		readCount++;
 

@@ -491,8 +491,8 @@ unsigned __stdcall Update()
 	{
 		if (timeSpan_update.count() >= 0.02)
 		{
-			if (threadEnd_Update)
-				return 0;
+			/*if (threadEnd_Update)
+				return 0;*/
 			EnterCriticalSection(&criticalsection);
 
 			if (isAllPlayerChoice)
@@ -523,8 +523,8 @@ unsigned __stdcall Send()
 	{
 		if (timeSpan_send.count() >= 0.0001)
 		{
-			if (threadEnd_Send)
-				return 0;
+			/*if (threadEnd_Send)
+				return 0;*/
 			EnterCriticalSection(&criticalsection);
 
 			for (int i = 0; i < PLAYERNUM; i++)
@@ -1234,7 +1234,7 @@ void InitKFM(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 }
 void InitGaoGao(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
-	m = new GaoGao({ -100, -100}, GAOGAO, ATTACK, { -50, -50 },
+	m = new GaoGao(generatePos, GAOGAO, ATTACK, { generatePos.x +100, generatePos.y + 100 },
 		GAOGAO_BASE_DAMAGE, GAOGAO_BASE_HEALTH, GAOGAO_BASE_ATTACK_SPEED, TRUE);
 
 	monsterCount++;
