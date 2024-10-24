@@ -103,6 +103,9 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx);
 
 bool testLandMine = false;
+bool init_miniboss1 = false;
+bool init_miniboss2 = false;
+bool init_boss = false;
 
 WSADATA wsaData;
 SOCKET s, cs;
@@ -215,11 +218,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (isAllclientReady)
 			{
-				if (!testLandMine)
+				/*if (!testLandMine)
 				{
 					testLandMine = true;
 					GenerateLandMine(2000, 1000, 600);
+				}*/
+				if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
+				{
+					init_miniboss1 = true;
+
 				}
+				if (!init_miniboss2 && totalData.publicdata.currentTime > SECOND_BOSS_INIT_TIME)
+				{
+					init_miniboss2 = true;
+				}
+				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
+				{
+					init_boss = true;
+				}
+
 				for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
 				{
 					if (totalData.udata[pIdx].dataType == 0)
@@ -1027,6 +1044,26 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 	mData.pos = m->GetPosition();
 	mData.monsterType = mType;
 	mData.id = ID;                                                                                                                   
+}
+void InitKFM(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
+{
+	m = new KungFuMan(generatePos, KUNGFUMAN, CHASE, { 0, 0 },
+		LANDMINE_BASE_DAMAGE, LANDMINE_BASE_HEALTH, LANDMINE_BASE_SPEED, TRUE);
+
+	monsterCount++;
+
+	mData.dataType = MONSTERTYPE;
+	mData.pos = m->GetPosition();
+	mData.monsterType = KUNGFUMAN;
+	mData.id = ID;
+}
+void InitGaoGao(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
+{
+
+}
+void InitBoss()
+{
+
 }
 void InitLandMine(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {

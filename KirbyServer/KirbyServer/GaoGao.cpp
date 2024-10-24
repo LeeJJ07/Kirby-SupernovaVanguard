@@ -10,6 +10,8 @@ void GaoGao::StateUpdate()
 		break;
 	case DEATH:
 		break;
+	case STUN:
+		break;
 	}
 }
 

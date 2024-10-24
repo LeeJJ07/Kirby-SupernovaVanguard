@@ -41,8 +41,8 @@ static enum ObjectImage
 	kirby_Idle,		 kirby_Walk,		kirby_Attack,		 ddd_Idle,			ddd_Walk,			 ddd_Attack,
 	meta_Idle,		 meta_Walk,			meta_Attack,		 maboroa_Idle,		maboroa_Walk,		 maboroa_Attack,
 	runner_Walk,	 spear_Walk,		spear_Attack,		 wingbug_Walk,		fireman_Walk,		 fireman_Attack,
-	landmine_Idle,	 KFM_Attack,		gaogao_Attack,		 boss_eye,			boss_mode1,			 boss_mode2,
-	boss_Attack1,	 boss_Attack2,		boss_Attack3
+	landmine_Idle,	 KFM_Walk,			KFM_Attack,			 KFM_DETECT,		gaogao_Attack,		 gaogao_Stun,
+	boss_eye,		 boss_mode1,		boss_mode2,			 boss_Attack1,		boss_Attack2,		 boss_Attack3
 };
 enum OBJECTINDEX
 {

@@ -1,8 +1,8 @@
 #pragma once
 #include "Object.h"
 
-enum EMonsterType { RUNNER, SPEAR, WINGBUG, FIREMAN, LANDMINE, KUNGFUMAN, GAOGAO, NEBULA};
-enum EMonsterState { CHASE, ATTACK, DEATH };
+enum EMonsterType { RUNNER, SPEAR, WINGBUG, FIREMAN, LANDMINE, KUNGFUMAN, GAOGAO, BOSS};
+enum EMonsterState { CHASE, ATTACK, DEATH, IDLE, DETECT, STUN };
 
 class Monster;
 

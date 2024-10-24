@@ -10,6 +10,8 @@ void KungFuMan::StateUpdate()
 		break;
 	case DEATH:
 		break;
+	case DETECT:
+		break;
 	}
 }
 

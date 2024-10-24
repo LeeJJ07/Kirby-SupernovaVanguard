@@ -2,8 +2,8 @@
 #include "Object.h"
 #include "PlayerData.h"
 
-enum EMonsterType { RUNNER, SPEAR, WINGBUG,  FIREMAN, LANDMINE };
-enum EMonsterState { MONSTER_CHASE, MONSTER_ATTACK, MONSTER_DEATH };
+enum EMonsterType { RUNNER, SPEAR, WINGBUG,  FIREMAN, LANDMINE, KUNGFUMAN, GAOGAO, BOSS };
+enum EMonsterState { MONSTER_CHASE, MONSTER_ATTACK, MONSTER_DEATH, MONSTER_IDLE, MONSTER_DETECT, MONSTER_STUN };
 
 class Monster : public Object
 {

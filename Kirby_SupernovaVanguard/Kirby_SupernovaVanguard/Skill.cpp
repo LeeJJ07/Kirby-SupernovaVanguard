@@ -2,7 +2,6 @@
 
 void Skill::ObjectUpdate(TOTALDATA& totalData, int i)
 {
-	
 	switch (totalData.sdata[i].collidertype)
 	{
 	case CIRCLEFIGURE:
