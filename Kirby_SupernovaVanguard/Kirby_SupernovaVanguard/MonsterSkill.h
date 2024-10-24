@@ -35,6 +35,7 @@ public:
 			Rectangle2D* rectangle = new Rectangle2D(true, EMISSILE);
 			SetObject(rectangle);
 		}
+		break;
 		case FIREMANSKILL:
 		{
 			Circle2D* circle = new Circle2D(true, EMISSILE);
