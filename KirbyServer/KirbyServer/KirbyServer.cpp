@@ -233,7 +233,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					testLandMine = true;
 					GenerateLandMine(2000, 1000, 600);
 				}*/
-				/*if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
+				if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
 				{
 					init_miniboss1 = true;
 					for (int i = 0; i < PLAYERNUM; i++)
@@ -241,11 +241,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if (!totalData.udata[i].dataType) continue;
 						GenerateKungFuMan();
 					}
-				}*/
+				}
 				if (!init_miniboss2 && totalData.publicdata.currentTime > SECOND_BOSS_INIT_TIME)
 				{
 					init_miniboss2 = true;
-					for (int i = 0; i < vClient.size(); i++)
+					for (int i = 0; i < PLAYERNUM; i++)
 					{
 						if (!totalData.udata[i].dataType) continue;
 						GenerateGaoGao();
@@ -380,7 +380,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -1169,7 +1169,7 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 {
 	//EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
-	EMonsterType mType = (EMonsterType)FIREMAN;
+	EMonsterType mType = (EMonsterType)SPEAR;
 	POINT generatePos = SetRandomSpawnPos(playerIdx, mType);
 
 	if (!IsValidSpawnPos(playerIdx, generatePos))
