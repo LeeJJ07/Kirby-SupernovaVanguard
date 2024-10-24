@@ -233,7 +233,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					testLandMine = true;
 					GenerateLandMine(2000, 1000, 600);
 				}*/
-				if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
+				/*if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
 				{
 					init_miniboss1 = true;
 					for(int i = 0 ;i < PLAYERNUM;i++)
@@ -241,11 +241,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if (!vClient[i]) continue;
 						GenerateKungFuMan();
 					}
-				}
+				}*/
 				if (!init_miniboss2 && totalData.publicdata.currentTime > SECOND_BOSS_INIT_TIME)
 				{
 					init_miniboss2 = true;
-					for (int i = 0; i < PLAYERNUM; i++)
+					for (int i = 0; i < vClient.size(); i++)
 					{
 						if (!vClient[i]) continue;
 						GenerateGaoGao();
@@ -380,7 +380,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 

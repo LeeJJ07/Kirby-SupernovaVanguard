@@ -52,7 +52,7 @@ bool SetFiremanSkillInDatasheet(MonsterSkill*& monsterskill, int& ID)
 	totalData.msdata[ID].colliderType = monsterskill->Getcollidertype();
 	totalData.msdata[ID].targetnum = monsterskill->Gettargetnum();
 	totalData.msdata[ID].angle = monsterskill->Getangle();
-	totalData.msdata[ID].skillType = SKILLTYPE;
+	totalData.msdata[ID].dataType = SKILLTYPE;
 
 	return true;
 }

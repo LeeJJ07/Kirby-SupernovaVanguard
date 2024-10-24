@@ -54,7 +54,7 @@ bool SetMagicArrowSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].colliderType = skill->Getcollidertype();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 	totalData.sdata[ID].angle = skill->Getangle();
-	totalData.sdata[ID].skillType = SKILLTYPE;
+	totalData.sdata[ID].dataType = SKILLTYPE;
 
 	return true;
 }

@@ -48,7 +48,7 @@ struct SKILLDATA
 	int angle;
 	short	id;
 	short	targetnum;
-	char dataType;
+	char	dataType;
 	bool	isActivate;
 };
 
@@ -65,7 +65,7 @@ struct MONSTERSKILLDATA
 	int angle;
 	short	id;
 	short	targetnum;
-	char dataType;
+	char	dataType;
 	bool	isActivate;
 };
 
