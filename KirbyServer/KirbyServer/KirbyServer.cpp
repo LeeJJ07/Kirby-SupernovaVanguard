@@ -24,8 +24,8 @@ int curskillindex = SKILLINDEX;
 std::vector<Monster*> monsterArr(MONSTERNUM);
 
 // >> : multithread
-DWORD dwThID1, dwThID2;
-HANDLE hThreads[2];
+DWORD dwThID1, dwThID2, dwThID3;
+HANDLE hThreads[3];
 CRITICAL_SECTION criticalsection;
 unsigned long ulStackSize = 0;
 bool threadEnd_Update;
@@ -33,6 +33,7 @@ bool threadEnd_Send;
 
 unsigned __stdcall Update();
 unsigned __stdcall Send();
+unsigned __stdcall Read();
 void UpdateTimer();
 void UpdateThread();
 // <<
@@ -47,6 +48,12 @@ static std::chrono::duration<double> timeSpan_send;
 static std::chrono::high_resolution_clock::time_point t1_update;
 static std::chrono::high_resolution_clock::time_point t2_update;
 static std::chrono::duration<double> timeSpan_update;
+// <<
+
+// >> : Read
+static std::chrono::high_resolution_clock::time_point t1_read;
+static std::chrono::high_resolution_clock::time_point t2_read;
+static std::chrono::duration<double> timeSpan_read;
 // <<
 
 // >> : skill
@@ -289,13 +296,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
 		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
+		hThreads[2] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Read, NULL, 0, (unsigned*)&dwThID3);
 
 		t1_send = std::chrono::high_resolution_clock::now();
 
 		if (hThreads[1])
 			ResumeThread(hThreads[1]);
+		if (hThreads[2])
+			ResumeThread(hThreads[2]);
 
-		totalData.publicdata.maxExp = 10000;
+		totalData.publicdata.maxExp = 1000;
 		totalData.publicdata.exp = 0;
 
 		return InitServer(hWnd);
@@ -336,6 +346,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			CloseHandle(hThreads[0]);
 		if (hThreads[1])
 			CloseHandle(hThreads[1]);
+		if (hThreads[2])
+			CloseHandle(hThreads[2]);
 
 		threadEnd_Update = true;
 		threadEnd_Send = true;
@@ -380,7 +392,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -447,7 +459,7 @@ void ReadData()
 			}
 		}
 	}
-	if (socketList.size() == choiceClientNum)
+	if (socketList.size() == choiceClientNum && socketList.size() != 0)
 	{
 		isAllPlayerChoice = true;
 		totalData.publicdata.islevelUp = false;
@@ -456,7 +468,7 @@ void ReadData()
 		choiceClientNum = 0;
 	}
 
-	if (socketList.size() == readyclientnum)
+	if (socketList.size() == readyclientnum && socketList.size() != 0)
 	{
 		isAllclientReady = true;
 	}
@@ -521,10 +533,8 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		if (timeSpan_send.count() >= 0.0001)
+		if (timeSpan_send.count() >= 0.01)
 		{
-			/*if (threadEnd_Send)
-				return 0;*/
 			EnterCriticalSection(&criticalsection);
 
 			for (int i = 0; i < PLAYERNUM; i++)
@@ -536,6 +546,25 @@ unsigned __stdcall Send()
 
 			t1_send = std::chrono::high_resolution_clock::now();
 			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+
+			LeaveCriticalSection(&criticalsection);
+		}
+		Sleep(0);
+	}
+}
+
+unsigned __stdcall Read()
+{
+	while (TRUE)
+	{
+		if (timeSpan_read.count() >= 0.001)
+		{
+			EnterCriticalSection(&criticalsection);
+
+			ReadData();
+
+			t1_read = std::chrono::high_resolution_clock::now();
+			timeSpan_read = std::chrono::duration_cast<std::chrono::duration<double>>(t2_read - t1_read);
 
 			LeaveCriticalSection(&criticalsection);
 		}
@@ -1564,11 +1593,16 @@ void UpdateTimer()
 void UpdateThread()
 {
 	t2_update = std::chrono::high_resolution_clock::now();
+
 	timeSpan_update = std::chrono::duration_cast<std::chrono::duration<double>>(t2_update - t1_update);
 
 	t2_send = std::chrono::high_resolution_clock::now();
 
 	timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+
+	t2_read = std::chrono::high_resolution_clock::now();
+
+	timeSpan_read = std::chrono::duration_cast<std::chrono::duration<double>>(t2_read - t1_read);
 }
 
 float UpdateAngle(PAIR& lookingdir)

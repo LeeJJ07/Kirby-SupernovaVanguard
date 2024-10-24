@@ -509,7 +509,13 @@ void DrawEXP(HDC& hdc, int& cameraTop, int& cameraLeft)
 	brush = CreateSolidBrush(RGB(255, 0, 0));
 	HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
 
+	if (uData.publicdata.exp < 0)
+		return;
+
 	float expPer = ((float)uData.publicdata.exp / uData.publicdata.maxExp);
+
+	if (expPer >= 100.f)
+		expPer = 100.f;
 
 	RECT ExpBar;
 
@@ -548,7 +554,7 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		if (timeSpan_send.count() >= 0.01 && cs.DebugInfo != NULL)
+		if (timeSpan_send.count() >= 0.0025 && cs.DebugInfo != NULL)
 		{
 			/*if (threadEnd_Send)
 				return 0;*/
@@ -589,7 +595,7 @@ unsigned __stdcall Read()
 {
 	while (TRUE)
 	{
-		if (timeSpan_read.count() >= 0.005)
+		if (timeSpan_read.count() >= 0.01)
 		{
 			/*if (threadEnd_Read)
 				return 0;*/
