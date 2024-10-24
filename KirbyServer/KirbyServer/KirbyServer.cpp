@@ -91,9 +91,14 @@ void ReadData();
 void UpdateMonster();
 void SetMonsterData(MONSTERDATA& mData, Monster*& m);
 void GenerateMonster(int playerIdx);
+void GenerateKungFuMan();
+void GenerateGaoGao();
 void GenerateBoss();
 void GenerateLandMine(int cx, int cy, int r);
 void InitLandMine(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos);
+void InitKFM(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos);
+void InitGaoGao(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos);
+void InitBoss();
 void CloseClient(SOCKET socket);
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID);
 bool IsValidSpawnPos(int playerIdx, POINT pos);
@@ -226,11 +231,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
 				{
 					init_miniboss1 = true;
-
+					GenerateKungFuMan();
 				}
 				if (!init_miniboss2 && totalData.publicdata.currentTime > SECOND_BOSS_INIT_TIME)
 				{
 					init_miniboss2 = true;
+					GenerateGaoGao();
 				}
 				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
 				{
@@ -1048,7 +1054,7 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 void InitKFM(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
 	m = new KungFuMan(generatePos, KUNGFUMAN, CHASE, { 0, 0 },
-		LANDMINE_BASE_DAMAGE, LANDMINE_BASE_HEALTH, LANDMINE_BASE_SPEED, TRUE);
+		KUNGFUMAN_BASE_DAMAGE, KUNGFUMAN_BASE_HEALTH, KUNGFUMAN_BASE_SPEED, KUNGFUMAN_BASE_ATTACK_SPEED, TRUE);
 
 	monsterCount++;
 
@@ -1059,7 +1065,15 @@ void InitKFM(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 }
 void InitGaoGao(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
+	m = new GaoGao({ -100, -100}, GAOGAO, ATTACK, { -50, -50 },
+		GAOGAO_BASE_DAMAGE, GAOGAO_BASE_HEALTH, GAOGAO_BASE_ATTACK_SPEED, TRUE);
 
+	monsterCount++;
+
+	mData.dataType = MONSTERTYPE;
+	mData.pos = m->GetPosition();
+	mData.monsterType = GAOGAO;
+	mData.id = ID;
 }
 void InitBoss()
 {
@@ -1152,12 +1166,6 @@ void GenerateMonster(int playerIdx)
 		}
 	}
 }
-
-void GenerateBoss()
-{
-
-}
-
 void GenerateLandMine(int cx, int cy, int r)
 {
 	int mineCount = 160;
@@ -1175,8 +1183,8 @@ void GenerateLandMine(int cx, int cy, int r)
 
 	for (int i = 0; i < mineCount; i++)
 	{
-		POINT generatePos = { cx + cos(radian * i) * r, cy + sin(radian * i) * r};
-		
+		POINT generatePos = { cx + cos(radian * i) * r, cy + sin(radian * i) * r };
+
 		for (int i = MONSTERINDEX; i < SKILLINDEX; i++)
 		{
 			if (!OBJECTIDARR[i])
@@ -1187,6 +1195,49 @@ void GenerateLandMine(int cx, int cy, int r)
 			}
 		}
 	}
+}
+
+void GenerateKungFuMan()
+{
+	//for (int i = 0; i < PLAYERNUM; i++)
+	//{
+	//	if (totalData.udata[i].dataType == 0) continue;
+	//	totalData.udata[i].pos.x = cx - 100 + 200 * i;
+	//	totalData.udata[i].pos.y = cy + 250;
+
+	//	vClient[i]->SetPosition(totalData.udata[i].pos);
+	//}
+
+	POINT generatePos = { 500, 500 };
+
+	for (int i = MONSTERINDEX; i < SKILLINDEX; i++)
+	{
+		if (!OBJECTIDARR[i])
+		{
+			InitKFM(totalData.mdata[i - MONSTERINDEX], monsterArr[i - MONSTERINDEX], i, generatePos);
+			OBJECTIDARR[i] = true;
+			break;
+		}
+	}
+}
+void GenerateGaoGao()
+{
+	POINT generatePos = { 500, 500 };
+
+	for (int i = MONSTERINDEX; i < SKILLINDEX; i++)
+	{
+		if (!OBJECTIDARR[i])
+		{
+			InitGaoGao(totalData.mdata[i - MONSTERINDEX], monsterArr[i - MONSTERINDEX], i, generatePos);
+			OBJECTIDARR[i] = true;
+			break;
+		}
+	}
+}
+
+void GenerateBoss()
+{
+
 }
 
 void UpdateSkill()
@@ -1239,7 +1290,12 @@ void UpdateMonster()
 
 		std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(monsterArr[i]->Gett2_targeting() - monsterArr[i]->Gett1_targeting());
 
-		if(time_span.count() > RETARGETINGTIME)
+		if ((monsterArr[i]->GetMonsterType() == KUNGFUMAN || monsterArr[i]->GetMonsterType() == GAOGAO) &&  time_span.count() > 0.1)
+		{
+			SetTarget(totalData.mdata[i], totalData, i);
+			monsterArr[i]->Sett1_targeting();
+		}
+		else if(time_span.count() > RETARGETINGTIME)
 		{
 			SetTarget(totalData.mdata[i], totalData, i);
 			monsterArr[i]->Sett1_targeting();

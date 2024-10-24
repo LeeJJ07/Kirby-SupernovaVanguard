@@ -2,37 +2,76 @@
 
 void Monster::SetMonsterAni()
 {
-    Animation* tempAni[3] = { nullptr };
+    Animation* tempAni[6] = { nullptr };
     switch (monsterType)
     {
     case RUNNER:
         tempAni[0] = imageDatas[runner_Walk];
         tempAni[1] = nullptr;
         tempAni[2] = nullptr;
+        tempAni[3] = nullptr;
+        tempAni[4] = nullptr;
+        tempAni[5] = nullptr;
         break;
     case SPEAR:
         tempAni[0] = imageDatas[spear_Walk];
         tempAni[1] = imageDatas[spear_Attack];
         tempAni[2] = nullptr;
+        tempAni[3] = nullptr;
+        tempAni[4] = nullptr;
+        tempAni[5] = nullptr;
         break;
     case WINGBUG:
         tempAni[0] = imageDatas[wingbug_Walk];
         tempAni[1] = nullptr;
         tempAni[2] = nullptr;
+        tempAni[3] = nullptr;
+        tempAni[4] = nullptr;
+        tempAni[5] = nullptr;
         break;
     case FIREMAN:
         tempAni[0] = imageDatas[fireman_Walk];
         tempAni[1] = imageDatas[fireman_Attack];
         tempAni[2] = nullptr;
+        tempAni[3] = nullptr;
+        tempAni[4] = nullptr;
+        tempAni[5] = nullptr;
         break;
     case LANDMINE:
         tempAni[0] = imageDatas[landmine_Idle];
         tempAni[1] = nullptr;
         tempAni[2] = nullptr;
+        tempAni[3] = nullptr;
+        tempAni[4] = nullptr;
+        tempAni[5] = nullptr;
+        break;
+    case KUNGFUMAN:
+        tempAni[0] = imageDatas[KFM_Walk];
+        tempAni[1] = imageDatas[KFM_Attack];
+        tempAni[2] = nullptr;
+        tempAni[3] = nullptr;
+        tempAni[4] = imageDatas[KFM_Detect];
+        tempAni[5] = nullptr;
+        break;
+    case GAOGAO:
+        tempAni[0] = nullptr;
+        tempAni[1] = imageDatas[gaogao_Attack];
+        tempAni[2] = nullptr;
+        tempAni[3] = nullptr;
+        tempAni[4] = imageDatas[gaogao_Detect];
+        tempAni[5] = imageDatas[gaogao_Stun];
+        break;
+    case BOSS:
+        tempAni[0] = nullptr;
+        tempAni[1] = nullptr;
+        tempAni[2] = nullptr;
+        tempAni[3] = nullptr;
+        tempAni[4] = nullptr;
+        tempAni[5] = nullptr;
         break;
     }
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 6; i++)
     {
         if (tempAni[i] == nullptr) 
             continue;
@@ -47,6 +86,10 @@ void Monster::SetMonsterAni()
 
 void Monster::Draw(HDC& hdc)
 {
+    if (ani[curState] == nullptr)
+    {
+        return;
+    }
     HDC hMemDC = CreateCompatibleDC(hdc);
     HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, ani[curState]->GetBitmap());
 
