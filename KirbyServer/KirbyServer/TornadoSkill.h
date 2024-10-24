@@ -5,8 +5,6 @@
 class TornadoSkill : public Skill
 {
 private:
-	const char* imageaddress;
-
 	Collider2D* collider;
 
 	std::chrono::high_resolution_clock::time_point t1_activate;
@@ -15,8 +13,7 @@ public:
 	TornadoSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::TORNADOSKILL, COLLIDERTYPE::RECTANGLE, 0.2, 10, 30, 60, 6, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
-		imageaddress(nullptr)
+		: Skill(masternum, targetnum, SKILLTYPE::TORNADOSKILL, COLLIDERTYPE::RECTANGLE, 0.2, 10, 30, 60, 6, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
 		rectangle2D->SetPosition(this->Getposition());
@@ -24,7 +21,6 @@ public:
 	}
 	~TornadoSkill()
 	{
-		delete imageaddress;
 		delete collider;
 	}
 

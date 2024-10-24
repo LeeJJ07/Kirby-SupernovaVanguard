@@ -156,6 +156,15 @@
     <ClInclude Include="ReadData.h">
       <Filter>클래스\Data\ReadData</Filter>
     </ClInclude>
+    <ClInclude Include="MonsterSkill.h">
+      <Filter>클래스\Object\MonsterSkill</Filter>
+    </ClInclude>
+    <ClInclude Include="SpearSkill.h">
+      <Filter>클래스\Object\MonsterSkill</Filter>
+    </ClInclude>
+    <ClInclude Include="TotalMonsterSkill.h">
+      <Filter>클래스\Object\MonsterSkill</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="KirbyServer.ico">
@@ -213,6 +222,9 @@
     </Filter>
     <Filter Include="클래스\Data\SendData">
       <UniqueIdentifier>{95568765-a2f4-4e16-94fc-5a72f2348e52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="클래스\Object\MonsterSkill">
+      <UniqueIdentifier>{e990f63c-ca49-4e60-a894-51f7a5cfdaa1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

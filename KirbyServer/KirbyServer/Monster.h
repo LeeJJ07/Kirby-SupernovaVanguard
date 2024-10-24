@@ -1,5 +1,8 @@
 #pragma once
 #include "Object.h"
+#include "MonsterSkill.h"
+#include "SkillManager.h"
+#include "TotalData.h"
 
 enum EMonsterType { RUNNER, SPEAR, WINGBUG, FIREMAN, LANDMINE, KUNGFUMAN, GAOGAO, NEBULA};
 enum EMonsterState { CHASE, ATTACK, DEATH };
@@ -26,6 +29,8 @@ protected:
 
 	std::chrono::high_resolution_clock::time_point t1_targeting;
 	std::chrono::high_resolution_clock::time_point t2_targeting;
+
+	std::vector<SkillManager*> vSkillManager;
 public:
 	Monster() : monsterType(RUNNER), curState(CHASE), Object()
 	{
@@ -68,7 +73,11 @@ public:
 		this->isEnabled = isEnabled;
 	}
 
-	virtual ~Monster() {}
+	virtual ~Monster()
+	{
+		for (auto vsm : vSkillManager)
+			delete vsm;
+	}
 
 	EMonsterType	GetMonsterType() { return monsterType; }
 	void SetMosterType(EMonsterType monsterType) { this->monsterType = monsterType; }
@@ -83,6 +92,7 @@ public:
 	bool GetEnabled() { return isEnabled; }
 	std::chrono::high_resolution_clock::time_point Gett1_targeting() { return t1_targeting; }
 	std::chrono::high_resolution_clock::time_point Gett2_targeting() { return t2_targeting; }
+	std::vector<SkillManager*> GetSkillManager() { return vSkillManager; }
 
 	void SetTargetPos(POINT targetPos) { this->targetPos = targetPos; }
 	void SetDamage(int damage) { this->damage = damage; }
@@ -92,6 +102,7 @@ public:
 	void SetEnabled(bool isEnabled) { this->isEnabled = isEnabled; }
 	void Sett1_targeting() { t1_targeting = std::chrono::high_resolution_clock::now(); }
 	void Sett2_targeting() { t2_targeting = std::chrono::high_resolution_clock::now(); }
+	void	SetSkillManager(std::vector<SkillManager*> vSkillManager) { this->vSkillManager = vSkillManager; }
 
 	virtual void StateUpdate() = 0;
 	virtual void Update() = 0;

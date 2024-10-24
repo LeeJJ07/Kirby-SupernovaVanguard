@@ -41,6 +41,22 @@ struct SKILLDATA
 	bool isactivate;
 };
 
+struct MONSTERSKILLDATA
+{
+	POINT	position;
+	POINT	colliderPosition;
+	int skillType;
+	int size;
+	int size2;
+	int colliderType;
+	int	colliderSize;
+	int	colliderSize2;
+	int angle;
+	short	id;
+	short	targetnum;
+	bool	isActivate;
+};
+
 struct MONSTERDATA :public OBJECTDATA
 {
 	int targetnum;
@@ -62,6 +78,7 @@ struct TOTALDATA
 	PLAYERDATA		udata[PLAYERNUM];
 	MONSTERDATA		mdata[MONSTERNUM];
 	SKILLDATA		sdata[SKILLNUM];
+	MONSTERSKILLDATA		msdata[MONSTERSKILLNUM];
 };
 
 void SetObjectData(TOTALDATA*&, Object*);

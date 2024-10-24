@@ -7,6 +7,7 @@
 #include "TotalData.h"
 #include "ReadData.h"
 #include "TotalSkill.h"
+#include "TotalMonsterSkill.h"
 
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "winmm.lib")
@@ -50,12 +51,16 @@ static std::chrono::duration<double> timeSpan_update;
 
 // >> : skill
 vector<Skill*> vSkill(SKILLNUM);
+vector<MonsterSkill*> vMonsterSkill(MONSTERSKILLNUM);
 void GenerateSkill();
+void GenerateMonsterSkill();
 void UpdateSkill();
+void UpdateMonsterSkill();
 void UpdateUi();
 void SetBasisSkillData(int&);
 void SetSkillData(int&, int);
 void SetSkillToDatasheet();
+void SetMonsterSkillToDatasheet();
 float UpdateAngle(PAIR&);
 // <<
 
@@ -466,8 +471,11 @@ unsigned __stdcall Update()
 				UpdateMonster();
 				GenerateSkill();
 				UpdateSkill();
+				GenerateMonsterSkill();
+				UpdateMonsterSkill();
 				UpdateUi();
 				SetSkillToDatasheet();
+				SetMonsterSkillToDatasheet();
 			}
 
 			t1_update = std::chrono::high_resolution_clock::now();
@@ -864,7 +872,7 @@ void GenerateSkill()
 						}
 						break;
 						}
-						skillnum++;
+						//skillnum++;
 						temp[j]->Settime_1();
 
 						OBJECTIDARR[s] = true;
@@ -880,6 +888,72 @@ void GenerateSkill()
 			}
 		}
 	}
+}
+
+void GenerateMonsterSkill()
+{
+	for (int i = 0; i < MONSTERNUM; i++)
+	{
+		if (!OBJECTIDARR[i + MONSTERINDEX])
+		{
+			std::vector<SkillManager*> skillmanager = monsterArr[i]->GetSkillManager();
+			for (int j = 0; j < skillmanager.size(); j++)
+			{
+				skillmanager[j]->Settime_2();
+
+				double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(skillmanager[j]->Gettime_2() - skillmanager[j]->Gettime_1()).count();
+
+				if (skillcooltime > skillmanager[j]->Getcooltime())
+				{
+					int s;
+					bool isGenerateSkill = false;
+					for (s = MONSTERSKILLINDEX; s < FINALINDEX; s++)
+					{
+						if (!OBJECTIDARR[s])
+						{
+							switch (skillmanager[j]->Gettype())
+							{
+							case MONSTERSKILLTYPE::SPEARSKILL:
+							{
+								int playerIndex = FindClosePlayer(totalData.mdata[i].pos);
+
+								SpearSkill* spearSkill = new SpearSkill(i, playerIndex);
+
+								PAIR lookingdir = { (spearSkill->Getposition().x - totalData.udata[playerIndex].pos.x), (spearSkill->Getposition().y - totalData.udata[playerIndex].pos.y) };
+								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+
+								spearSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+
+								spearSkill->Settime_1();
+								spearSkill->Settime_2();
+								spearSkill->Setisactivate(true);
+								spearSkill->SetID(s);
+								spearSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)spearSkill->Getsize() / OFFSETADJUST / 2, (long)totalData.udata[i].lookingDir.second * (long)spearSkill->Getsize() / OFFSETADJUST / 2 });
+								spearSkill->Setposition({ totalData.udata[i].pos.x + spearSkill->Getoffset().x, totalData.udata[i].pos.y + spearSkill->Getoffset().y });
+								spearSkill->Setmasternum(i);
+								vMonsterSkill[s - MONSTERSKILLINDEX] = spearSkill;
+							}
+							break;
+							}
+							//skillnum++;
+							skillmanager[j]->Settime_1();
+
+							OBJECTIDARR[s] = true;
+							isGenerateSkill = true;
+
+							break;
+						}
+					}
+					if (s == FINALINDEX && !isGenerateSkill)
+					{
+						return;
+					}
+				}
+			}
+		}
+	}
+
 }
 
 void SetSkillToDatasheet()
@@ -926,6 +1000,26 @@ void SetSkillToDatasheet()
 	}
 }
 
+void SetMonsterSkillToDatasheet()
+{
+	int i = 0;
+	for (auto it = vMonsterSkill.begin(); it != vMonsterSkill.end(); ++it)
+	{
+		MonsterSkill* monsterSkill = *it;
+
+		if (monsterSkill == nullptr)
+			continue;
+
+		int ID = monsterSkill->GetID() - MONSTERSKILLINDEX;
+		switch (monsterSkill->Getskilltype())
+		{
+		case MONSTERSKILLTYPE::SPEARSKILL:
+			SetSpearSkillInDatasheet(monsterSkill, ID);
+			break;
+		}
+	}
+}
+
 int FindCloseMonster(POINT& myposition)
 {
 	int x = myposition.x;
@@ -948,6 +1042,30 @@ int FindCloseMonster(POINT& myposition)
 		}
 	}
 	return monsternum;
+}
+
+int FindClosePlayer(POINT& myposition)
+{
+	int x = myposition.x;
+	int y = myposition.y;
+
+	int playernum = -1;
+	int min = 99999999;
+
+	for (int i = 0; i < PLAYERNUM; i++)
+	{
+		if (totalData.udata[i].dataType != 'p')
+			continue;
+
+		int value = pow(x - totalData.udata[i].pos.x, 2) + pow(y - totalData.udata[i].pos.y, 2);
+
+		if (value < min)
+		{
+			min = value;
+			playernum = i;
+		}
+	}
+	return playernum;
 }
 
 POINT GetNormalizationRange(POINT& skill, POINT& monster)
@@ -999,6 +1117,8 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 	if (!IsValidSpawnPos(playerIdx, generatePos))
 		return;
 
+	MonsterSkill* monsterSkill = nullptr;
+
 	switch (mType)
 	{
 	case RUNNER:
@@ -1008,6 +1128,8 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 	case SPEAR:
 		m = new SpearMonster(generatePos, mType, CHASE, { 0, 0 },
 			SPEAR_BASE_DAMAGE, SPEAR_BASE_HEALTH, SPEAR_BASE_SPEED, SPEAR_BASE_RANGE, TRUE);
+
+		monsterSkill = new SpearSkill(ID, playerIdx);
 		break;
 	case WINGBUG:
 		m = new WingBugMonster(generatePos, mType, CHASE, { 0, 0 },
@@ -1020,6 +1142,12 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 			FIREMAN_BASE_DAMAGE, FIREMAN_BASE_HEALTH, FIREMAN_BASE_SPEED, TRUE);
 		break;
 	}
+
+	SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
+
+	std::vector<SkillManager*> sm = monsterArr[ID]->GetSkillManager();
+	sm.push_back(skillmanager);
+	monsterArr[ID]->SetSkillManager(sm);
 
 	monsterCount++;
 
@@ -1186,6 +1314,21 @@ void UpdateSkill()
 			break;
 		case SKILLTYPE::TRUCKSKILL:
 			UpdateTruckSkill(skill);
+			break;
+		}
+	}
+}
+
+void UpdateMonsterSkill()
+{
+	for (auto skill : vMonsterSkill)
+	{
+		if (skill == nullptr)
+			continue;
+		switch (skill->Getskilltype())
+		{
+		case MONSTERSKILLTYPE::SPEARSKILL:
+			UpdateSpearSkill(skill);
 			break;
 		}
 	}

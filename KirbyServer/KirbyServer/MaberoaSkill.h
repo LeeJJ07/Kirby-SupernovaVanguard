@@ -8,7 +8,6 @@ class MaberoaSkill : public Skill
 {
 private:
 	float biggersize;
-	const char* imageaddress;
 
 	Collider2D* collider;
 
@@ -19,7 +18,7 @@ public:
 		int masternum,
 		int targetnum)
 		: Skill(masternum, targetnum, SKILLTYPE::MABEROASKILL, COLLIDERTYPE::CIRCLE, 0.2, 5, 0, 0, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
-		imageaddress(nullptr), biggersize(1)
+		biggersize(1)
 	{
 		Circle2D* circle2D = new Circle2D(true, PMISSILE);
 		circle2D->SetPosition(this->Getposition());
@@ -27,7 +26,6 @@ public:
 	}
 	~MaberoaSkill()
 	{
-		delete imageaddress;
 		delete collider;
 	}
 

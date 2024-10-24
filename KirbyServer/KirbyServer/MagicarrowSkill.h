@@ -5,8 +5,7 @@
 class MagicArrowSkill : public Skill
 {
 private:
-	const char* imageaddress;
-
+	int pass;
 	Collider2D* collider;
 
 	std::chrono::high_resolution_clock::time_point t1_activate;
@@ -15,8 +14,7 @@ public:
 	MagicArrowSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::MAGICARROWSKILL, COLLIDERTYPE::RECTANGLE, 0.6, 5, 50, 15, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
-		imageaddress(nullptr)
+		: Skill(masternum, targetnum, SKILLTYPE::MAGICARROWSKILL, COLLIDERTYPE::RECTANGLE, 0.6, 5, 50, 15, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
 		rectangle2D->SetPosition(this->Getposition());
@@ -24,7 +22,6 @@ public:
 	}
 	~MagicArrowSkill()
 	{
-		delete imageaddress;
 		delete collider;
 	}
 
