@@ -236,9 +236,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
 				{
 					init_miniboss1 = true;
-					for(int i = 0 ;i < PLAYERNUM;i++)
+					for (int i = 0; i < PLAYERNUM; i++)
 					{
-						if (!vClient[i]) continue;
+						if (!totalData.udata[i].dataType) continue;
 						GenerateKungFuMan();
 					}
 				}
@@ -247,7 +247,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					init_miniboss2 = true;
 					for (int i = 0; i < PLAYERNUM; i++)
 					{
-						if (!vClient[i]) continue;
+						if (!totalData.udata[i].dataType) continue;
 						GenerateGaoGao();
 					}
 				}
@@ -924,12 +924,8 @@ void GenerateMonsterSkill()
 {
 	for (int i = 0; i < MONSTERNUM; i++)
 	{
-		if (monsterArr[i] != 0 && monsterArr[i]->GetMonsterState() == EMonsterState::ATTACK)
+		if (monsterArr[i] != 0 &&monsterArr[i]->GetMonsterState() == EMonsterState::ATTACK)
 		{
-			EMonsterType emonsterType = monsterArr[i]->GetMonsterType();
-			if (emonsterType != SPEAR && emonsterType != FIREMAN /* 추가*/)
-				continue;
-
 			std::vector<SkillManager*> skillmanager = monsterArr[i]->GetSkillManager();
 			for (int j = 0; j < skillmanager.size(); j++)
 			{
@@ -1173,15 +1169,13 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 {
 	//EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
-	EMonsterType mType = (EMonsterType)SPEAR;
+	EMonsterType mType = (EMonsterType)FIREMAN;
 	POINT generatePos = SetRandomSpawnPos(playerIdx, mType);
 
 	if (!IsValidSpawnPos(playerIdx, generatePos))
 		return;
 
 	MonsterSkill* monsterSkill = nullptr;
-
-	bool generateskill = false;
 
 	switch (mType)
 	{
@@ -1194,7 +1188,6 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 			SPEAR_BASE_DAMAGE, SPEAR_BASE_HEALTH, SPEAR_BASE_SPEED, SPEAR_BASE_RANGE, TRUE);
 
 		monsterSkill = new SpearSkill(ID, playerIdx);
-		generateskill = true;
 		break;
 	case WINGBUG:
 		m = new WingBugMonster(generatePos, mType, CHASE, { 0, 0 },
@@ -1207,20 +1200,16 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 			FIREMAN_BASE_DAMAGE, FIREMAN_BASE_HEALTH, FIREMAN_BASE_SPEED, TRUE);
 
 		monsterSkill = new FiremanSkill(ID, playerIdx);
-		generateskill = true;
 		break;
 	}
 
 	monsterArr[ID - MONSTERINDEX] = m;
 
-	if(generateskill)
-	{
-		SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
+	SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
 
-		std::vector<SkillManager*> sm = monsterArr[ID - MONSTERINDEX]->GetSkillManager();
-		sm.push_back(skillmanager);
-		monsterArr[ID - MONSTERINDEX]->SetSkillManager(sm);
-	}
+	std::vector<SkillManager*> sm = monsterArr[ID - MONSTERINDEX]->GetSkillManager();
+	sm.push_back(skillmanager);
+	monsterArr[ID - MONSTERINDEX]->SetSkillManager(sm);
 
 	monsterCount++;
 
