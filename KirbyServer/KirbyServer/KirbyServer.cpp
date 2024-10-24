@@ -96,8 +96,8 @@ void ReadData();
 void UpdateMonster();
 void SetMonsterData(MONSTERDATA& mData, Monster*& m);
 void GenerateMonster(int playerIdx);
-void GenerateKungFuMan();
-void GenerateGaoGao();
+void GenerateKungFuMan(int idx);
+void GenerateGaoGao(int idx);
 void GenerateBoss();
 void GenerateLandMine(int cx, int cy, int r);
 void InitLandMine(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos);
@@ -239,7 +239,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					for (int i = 0; i < PLAYERNUM; i++)
 					{
 						if (!totalData.udata[i].dataType) continue;
-						GenerateKungFuMan();
+						GenerateKungFuMan(i);
 					}
 				}
 				if (!init_miniboss2 && totalData.publicdata.currentTime > SECOND_BOSS_INIT_TIME)
@@ -248,7 +248,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					for (int i = 0; i < PLAYERNUM; i++)
 					{
 						if (!totalData.udata[i].dataType) continue;
-						GenerateGaoGao();
+						GenerateGaoGao(i);
 					}
 				}
 				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
@@ -380,7 +380,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -1168,8 +1168,7 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 {
-	//EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
-	EMonsterType mType = (EMonsterType)SPEAR;
+	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
 	POINT generatePos = SetRandomSpawnPos(playerIdx, mType);
 
 	if (!IsValidSpawnPos(playerIdx, generatePos))
@@ -1205,11 +1204,14 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 
 	monsterArr[ID - MONSTERINDEX] = m;
 
-	SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
+	if(monsterSkill!=nullptr)
+	{
+		SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
 
-	std::vector<SkillManager*> sm = monsterArr[ID - MONSTERINDEX]->GetSkillManager();
-	sm.push_back(skillmanager);
-	monsterArr[ID - MONSTERINDEX]->SetSkillManager(sm);
+		std::vector<SkillManager*> sm = monsterArr[ID - MONSTERINDEX]->GetSkillManager();
+		sm.push_back(skillmanager);
+		monsterArr[ID - MONSTERINDEX]->SetSkillManager(sm);
+	}
 
 	monsterCount++;
 
@@ -1364,7 +1366,7 @@ void GenerateLandMine(int cx, int cy, int r)
 	}
 }
 
-void GenerateKungFuMan()
+void GenerateKungFuMan(int idx)
 {
 	//for (int i = 0; i < PLAYERNUM; i++)
 	//{
@@ -1375,7 +1377,22 @@ void GenerateKungFuMan()
 	//	vClient[i]->SetPosition(totalData.udata[i].pos);
 	//}
 
-	POINT generatePos = { 500, 500 };
+	POINT generatePos;
+	switch (idx)
+	{
+	case UP:
+		generatePos = { 1000, -50 };
+		break;
+	case DOWN:
+		generatePos = { 1000, 2050 };
+		break;
+	case RIGHT:
+		generatePos = { 4050, 1000 };
+		break;
+	case LEFT:
+		generatePos = { -50, 1000 };
+		break;
+	}
 
 	for (int i = MONSTERINDEX; i < SKILLINDEX; i++)
 	{
@@ -1387,9 +1404,24 @@ void GenerateKungFuMan()
 		}
 	}
 }
-void GenerateGaoGao()
+void GenerateGaoGao(int idx)
 {
-	POINT generatePos = { 500, 500 };
+	POINT generatePos;
+	switch (idx)
+	{
+	case UP:
+		generatePos = { 1000, -50 };
+		break;
+	case DOWN:
+		generatePos = { 1000, 2050 };
+		break;
+	case RIGHT:
+		generatePos = { 4050, 1000 };
+		break;
+	case LEFT:
+		generatePos = { -50, 1000 };
+		break;
+	}
 
 	for (int i = MONSTERINDEX; i < SKILLINDEX; i++)
 	{
