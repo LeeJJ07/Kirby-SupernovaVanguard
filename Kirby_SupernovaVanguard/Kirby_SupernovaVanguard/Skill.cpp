@@ -94,9 +94,24 @@ void Skill::DrawSkill(HDC& hdc)
 	int centerX = GetPosition().x;
 	int centerY = GetPosition().y;
 
+	int WchangeValue;
+	int HchangeValue;
+
+	Circle2D* collider2D = dynamic_cast<Circle2D*>(this->GetCollider());
+	if (collider2D != 0)
+	{
+		WchangeValue = collider2D->GetRadius() * 2.f;
+		HchangeValue = collider2D->GetRadius() * 2.f;
+	}
+	else
+	{
+		Rectangle2D* collider2D = dynamic_cast<Rectangle2D*>(this->GetCollider());
+		WchangeValue = width * collider2D->GetWidth() / 100;
+		HchangeValue = height * collider2D->GetHeight() / 100;
+	}
+	
 	float radius = ((Circle2D*)(this->GetCollider()))->GetRadius();
-	int WchangeValue = width * radius / 150;
-	int HchangeValue = height * radius / 150;
+	
 
 	HDC hTempDC = CreateCompatibleDC(hdc);
 	HBITMAP hTempBitmap = CreateCompatibleBitmap(hdc, WchangeValue, HchangeValue);

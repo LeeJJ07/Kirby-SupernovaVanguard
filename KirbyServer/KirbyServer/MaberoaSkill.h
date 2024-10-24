@@ -2,7 +2,7 @@
 
 #include "Skill.h"
 
-#define KIRBYSKILLMAXXSIZE 15
+#define MABEOROASKILLMAXXSIZE 20
 
 class MaberoaSkill : public Skill
 {
@@ -69,7 +69,7 @@ void UpdateMaberoaSkill(Skill*& skill)
 {
 	maberoaskill = dynamic_cast<MaberoaSkill*>(skill);
 
-	if (maberoaskill->Getsize() < KIRBYSKILLMAXXSIZE)
+	if (maberoaskill->Getsize() < MABEOROASKILLMAXXSIZE)
 	{
 		maberoaskill->MaberoaSkillBigger();
 		int x = totalData.udata[maberoaskill->Getmasternum()].pos.x + maberoaskill->Getoffset().x;
