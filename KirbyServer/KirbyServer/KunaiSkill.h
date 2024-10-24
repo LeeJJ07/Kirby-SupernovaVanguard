@@ -13,7 +13,7 @@ public:
 	KunaiSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::KUNAISKILL, COLLIDERTYPE::RECTANGLE, 0.8, 2, 10, 5, 0.25, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
+		: Skill(masternum, targetnum, SKILLTYPE::KUNAISKILL, ECOLLIDERSHAPE::RECTANGLE, 0.8, 2, 10, 5, 0.25, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
 		rectangle2D->SetPosition(this->Getposition());

@@ -220,11 +220,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (isAllclientReady)
 			{
-				if (!testLandMine)
+				/*if (!testLandMine)
 				{
 					testLandMine = true;
 					GenerateLandMine(2000, 1000, 600);
-				}
+				}*/
 				for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
 				{
 					if (totalData.udata[pIdx].dataType == 0)
@@ -350,7 +350,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -872,7 +872,7 @@ void GenerateSkill()
 						}
 						break;
 						}
-						//skillnum++;
+
 						temp[j]->Settime_1();
 
 						OBJECTIDARR[s] = true;
@@ -894,7 +894,7 @@ void GenerateMonsterSkill()
 {
 	for (int i = 0; i < MONSTERNUM; i++)
 	{
-		if (!OBJECTIDARR[i + MONSTERINDEX])
+		if (monsterArr[i] != 0 &&monsterArr[i]->GetMonsterState() == EMonsterState::ATTACK)
 		{
 			std::vector<SkillManager*> skillmanager = monsterArr[i]->GetSkillManager();
 			for (int j = 0; j < skillmanager.size(); j++)
@@ -924,19 +924,43 @@ void GenerateMonsterSkill()
 								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
 
 								spearSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+								spearSkill->Setangle(UpdateAngle(lookingdir));
 
 								spearSkill->Settime_1();
 								spearSkill->Settime_2();
 								spearSkill->Setisactivate(true);
 								spearSkill->SetID(s);
-								spearSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)spearSkill->Getsize() / OFFSETADJUST / 2, (long)totalData.udata[i].lookingDir.second * (long)spearSkill->Getsize() / OFFSETADJUST / 2 });
-								spearSkill->Setposition({ totalData.udata[i].pos.x + spearSkill->Getoffset().x, totalData.udata[i].pos.y + spearSkill->Getoffset().y });
+								spearSkill->Setoffset({ (long)totalData.mdata[i].lookingDir.first * (long)spearSkill->Getsize() / OFFSETADJUST / 2, (long)totalData.mdata[i].lookingDir.second * (long)spearSkill->Getsize() / OFFSETADJUST / 2 });
+								spearSkill->Setposition({ totalData.mdata[i].pos.x + spearSkill->Getoffset().x, totalData.mdata[i].pos.y + spearSkill->Getoffset().y });
 								spearSkill->Setmasternum(i);
 								vMonsterSkill[s - MONSTERSKILLINDEX] = spearSkill;
 							}
 							break;
+							case MONSTERSKILLTYPE::FIREMANSKILL:
+							{
+								int playerIndex = FindClosePlayer(totalData.mdata[i].pos);
+
+								FiremanSkill* firemanSkill = new FiremanSkill(i, playerIndex);
+
+								PAIR lookingdir = { (firemanSkill->Getposition().x - totalData.udata[playerIndex].pos.x), (firemanSkill->Getposition().y - totalData.udata[playerIndex].pos.y) };
+								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+
+								firemanSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+								firemanSkill->Setangle(UpdateAngle(lookingdir));
+
+								firemanSkill->Settime_1();
+								firemanSkill->Settime_2();
+								firemanSkill->Setisactivate(true);
+								firemanSkill->SetID(s);
+								firemanSkill->Setoffset({ (long)totalData.mdata[i].lookingDir.first * (long)firemanSkill->Getsize() / OFFSETADJUST / 2, (long)totalData.mdata[i].lookingDir.second * (long)firemanSkill->Getsize() / OFFSETADJUST / 2 });
+								firemanSkill->Setposition({ totalData.mdata[i].pos.x + firemanSkill->Getoffset().x, totalData.mdata[i].pos.y + firemanSkill->Getoffset().y });
+								firemanSkill->Setmasternum(i);
+								vMonsterSkill[s - MONSTERSKILLINDEX] = firemanSkill;
 							}
-							//skillnum++;
+							break;
+							}
+
 							skillmanager[j]->Settime_1();
 
 							OBJECTIDARR[s] = true;
@@ -1015,6 +1039,9 @@ void SetMonsterSkillToDatasheet()
 		{
 		case MONSTERSKILLTYPE::SPEARSKILL:
 			SetSpearSkillInDatasheet(monsterSkill, ID);
+			break;
+		case MONSTERSKILLTYPE::FIREMANSKILL:
+			SetFiremanSkillInDatasheet(monsterSkill, ID);
 			break;
 		}
 	}
@@ -1111,7 +1138,8 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 {
-	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+	//EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+	EMonsterType mType = (EMonsterType)FIREMAN;
 	POINT generatePos = SetRandomSpawnPos(playerIdx, mType);
 
 	if (!IsValidSpawnPos(playerIdx, generatePos))
@@ -1140,14 +1168,18 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 	case FIREMAN:
 		m = new FireManMonster(generatePos, mType, CHASE, { 0, 0 },
 			FIREMAN_BASE_DAMAGE, FIREMAN_BASE_HEALTH, FIREMAN_BASE_SPEED, TRUE);
+
+		monsterSkill = new FiremanSkill(ID, playerIdx);
 		break;
 	}
 
+	monsterArr[ID - MONSTERINDEX] = m;
+
 	SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
 
-	std::vector<SkillManager*> sm = monsterArr[ID]->GetSkillManager();
+	std::vector<SkillManager*> sm = monsterArr[ID - MONSTERINDEX]->GetSkillManager();
 	sm.push_back(skillmanager);
-	monsterArr[ID]->SetSkillManager(sm);
+	monsterArr[ID - MONSTERINDEX]->SetSkillManager(sm);
 
 	monsterCount++;
 
@@ -1156,6 +1188,7 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 	mData.monsterType = mType;
 	mData.id = ID;                                                                                                                   
 }
+
 void InitLandMine(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
 	m = new LandMineMonster(generatePos, LANDMINE, CHASE, { 0, 0 },
@@ -1329,6 +1362,9 @@ void UpdateMonsterSkill()
 		{
 		case MONSTERSKILLTYPE::SPEARSKILL:
 			UpdateSpearSkill(skill);
+			break;
+		case MONSTERSKILLTYPE::FIREMANSKILL:
+			UpdateFiremanSkill(skill);
 			break;
 		}
 	}

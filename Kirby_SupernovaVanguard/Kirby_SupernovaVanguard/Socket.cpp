@@ -3,7 +3,8 @@
 #include "ActionData.h"
 #include "Multithread.h"
 #include "Camera.h"
-#include "AllSkill.h"
+#include "Skill.h"
+#include "MonsterSkill.h"
 
 short myID;
 int textreadCount;
@@ -42,7 +43,7 @@ int InitClient(HWND hWnd, SOCKET &s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
@@ -115,7 +116,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		// >> : skilldata
 		for (int i = 0; i < SKILLNUM; i++)
 		{
-			if (pD.sdata[i].isactivate == false || pD.sdata[i].skilltype > TRUCKSKILL)
+			if (pD.sdata[i].isActivate == false || pD.sdata[i].skillType > TRUCKSKILL)
 			{
 				objArr[i + SKILLINDEX] = nullptr;
 				vSkill[i] = nullptr;
@@ -124,13 +125,35 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 
 			if(vSkill[i] == nullptr)
 			{
-				vSkill[i] = new Skill((ESKILLTYPE)pD.sdata[i].skilltype);
+				vSkill[i] = new Skill((ESKILLTYPE)pD.sdata[i].skillType);
 				CreateObject((Skill*)vSkill[i], i + SKILLINDEX);
-				vSkill[i]->Setid(pD.sdata[i].targetnum);
+				vSkill[i]->Setid(pD.sdata[i].targetNum);
 			}
 
 			vSkill[i]->ObjectUpdate(pD, i);
 			vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());
+		}
+		// <<
+
+		// >> : monsterskilldata
+		for (int i = 0; i < MONSTERSKILLNUM; i++)
+		{
+			if (pD.msdata[i].isActivate == false || pD.msdata[i].skillType > TRUCKSKILL)
+			{
+				objArr[i + MONSTERSKILLINDEX] = nullptr;
+				vMonsterSkill[i] = nullptr;
+				continue;
+			}
+
+			if (vMonsterSkill[i] == nullptr)
+			{
+				vMonsterSkill[i] = new MonsterSkill((EMONSTERSKILLTYPE)pD.msdata[i].skillType);
+				CreateObject((MonsterSkill*)vMonsterSkill[i], i + MONSTERSKILLINDEX);
+				vMonsterSkill[i]->Setid(pD.msdata[i].targetNum);
+			}
+
+			vMonsterSkill[i]->ObjectUpdate(pD, i);
+			vMonsterSkill[i]->GetCollider()->MovePosition(vMonsterSkill[i]->GetPosition());
 		}
 		// <<
 

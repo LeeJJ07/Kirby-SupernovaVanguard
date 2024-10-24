@@ -4,7 +4,7 @@
 
 class Object;
 
-enum ColliderType
+enum ECOLLIDERTYPE
 {
 	TERRAIN = 0,
 	PLAYER = 1,
@@ -13,18 +13,23 @@ enum ColliderType
 	EMISSILE = 4,
 };
 
+enum ECOLLIDERSHAPE {
+	CIRCLE = 3,
+	RECTANGLE
+};
+
 class Collider2D
 {
 private:
 	POINT position;
 	POINT offset;
-	ColliderType type;
+	ECOLLIDERTYPE type;
 	bool isTrigger;
 
 public:
 	Collider2D() : position({ 0,0 }), offset({ 0,0 }), type(TERRAIN), isTrigger(false) {}
-	Collider2D(bool trigger, ColliderType _type) : position({ 0,0 }), offset({ 0,0 }), type(_type), isTrigger(trigger) {}
-	Collider2D(POINT c, POINT _offset = { 0,0 }, ColliderType t = TERRAIN, bool trigger = false) : position(c), offset(_offset), type(t), isTrigger(trigger) {}
+	Collider2D(bool trigger, ECOLLIDERTYPE _type) : position({ 0,0 }), offset({ 0,0 }), type(_type), isTrigger(trigger) {}
+	Collider2D(POINT c, POINT _offset = { 0,0 }, ECOLLIDERTYPE t = TERRAIN, bool trigger = false) : position(c), offset(_offset), type(t), isTrigger(trigger) {}
 	~Collider2D() {}
 
 	POINT	GetPosition()const { return position; }

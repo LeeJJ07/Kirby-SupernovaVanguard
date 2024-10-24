@@ -14,7 +14,7 @@ public:
 	SpearSkill(
 		int masternum,
 		int targetnum)
-		: MonsterSkill(masternum, targetnum, MONSTERSKILLTYPE::SPEARSKILL, COLLIDERTYPE::RECTANGLE, 0.2, 5, 20, 5, 3., { 0,0 }, { totalData.mdata[masternum].pos.x, totalData.mdata[masternum].pos.y }, { 5,0 })
+		: MonsterSkill(masternum, targetnum, MONSTERSKILLTYPE::SPEARSKILL, ECOLLIDERSHAPE::RECTANGLE, 0.2, 5, 20, 5, 3., { 0,0 }, { totalData.mdata[masternum].pos.x, totalData.mdata[masternum].pos.y }, { 5,0 })
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, EMISSILE);
 		rectangle2D->SetPosition(this->Getposition());
@@ -53,6 +53,7 @@ bool SetSpearSkillInDatasheet(MonsterSkill*& monsterskill, int& ID)
 	totalData.msdata[ID].position = monsterskill->Getposition();
 	totalData.msdata[ID].colliderType = monsterskill->Getcollidertype();
 	totalData.msdata[ID].targetnum = monsterskill->Gettargetnum();
+	totalData.msdata[ID].angle = monsterskill->Getangle();
 
 	return true;
 }

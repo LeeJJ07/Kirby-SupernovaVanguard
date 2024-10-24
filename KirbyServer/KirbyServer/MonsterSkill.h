@@ -4,11 +4,7 @@
 
 enum MONSTERSKILLTYPE {
 	SPEARSKILL = 1,
-};
-
-enum COLLIDERTYPE {
-	CIRCLE = 3,
-	RECTANGLE
+	FIREMANSKILL,
 };
 
 class MonsterSkill {
@@ -29,7 +25,7 @@ private:
 	POINT position;
 	POINT direction;
 public:
-	MonsterSkill() :masternum(0), targetnum(0), skilltype(SPEARSKILL), collidertype(COLLIDERTYPE::RECTANGLE),
+	MonsterSkill() :masternum(0), targetnum(0), skilltype(SPEARSKILL), collidertype(ECOLLIDERSHAPE::RECTANGLE),
 		speed(1), damage(1), size(0), size2(0), coolTime(5.0), offset({ 0,0 }), position({ 0,0 }), direction({ 1,0 }) {}
 	MonsterSkill(int masternum, int targetnum, int skilltype, int collidertype, float speed, int damage, int size, int size2, float coolTime, POINT offset, POINT position, POINT direction)
 		:masternum(masternum), targetnum(targetnum), skilltype(skilltype), collidertype(collidertype),

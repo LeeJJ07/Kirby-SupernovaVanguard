@@ -17,7 +17,7 @@ public:
 	MaberoaSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::MABEROASKILL, COLLIDERTYPE::CIRCLE, 0.2, 5, 0, 0, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::MABEROASKILL, ECOLLIDERSHAPE::CIRCLE, 0.2, 5, 0, 0, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		biggersize(1)
 	{
 		Circle2D* circle2D = new Circle2D(true, PMISSILE);

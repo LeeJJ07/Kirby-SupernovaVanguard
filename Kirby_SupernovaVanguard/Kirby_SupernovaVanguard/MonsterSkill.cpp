@@ -1,66 +1,34 @@
-#include "Skill.h"
+#include "MonsterSkill.h"
 
-void Skill::ObjectUpdate(TOTALDATA& totalData, int i)
+void MonsterSkill::ObjectUpdate(TOTALDATA& totalData, int i)
 {
-	switch (totalData.sdata[i].colliderType)
+	switch (totalData.msdata[i].colliderType)
 	{
 	case CIRCLEFIGURE:
 		Circle2D* skillcirclecollider;
 		skillcirclecollider = dynamic_cast<Circle2D*>(this->GetCollider());
-		skillcirclecollider->SetRadius(totalData.sdata[i].colliderSize);
+		skillcirclecollider->SetRadius(totalData.msdata[i].colliderSize);
 		break;
 	case RECTANGLEFIGURE:
 		Rectangle2D* skillrectanglecollider;
 		skillrectanglecollider = dynamic_cast<Rectangle2D*>(this->GetCollider());
-		skillrectanglecollider->SetWidth(totalData.sdata[i].colliderSize);
-		skillrectanglecollider->SetHeight(totalData.sdata[i].colliderSize2);
-		skillrectanglecollider->Setangle(totalData.sdata[i].angle);
+		skillrectanglecollider->SetWidth(totalData.msdata[i].colliderSize);
+		skillrectanglecollider->SetHeight(totalData.msdata[i].colliderSize2);
+		skillrectanglecollider->Setangle(totalData.msdata[i].angle);
 		break;
 	}
-	SetPosition(totalData.sdata[i].position);
-	GetCollider()->MovePosition(totalData.sdata[i].colliderPosition);
-	Setsize(totalData.sdata[i].size);
-	Setsize2(totalData.sdata[i].size2);
+	SetPosition(totalData.msdata[i].position);
+	GetCollider()->MovePosition(totalData.msdata[i].colliderPosition);
+	Setsize(totalData.msdata[i].size);
+	Setsize2(totalData.msdata[i].size2);
 }
 
-void Skill::SetSkillAni()
+void MonsterSkill::SetMonsterSkillAni()
 {
 	Animation* tempAni[2] = { nullptr };
-	switch (skillType)
+	switch (monsterSkillType)
 	{
-	case KIRBYSKILL:
-		tempAni[0] = imageDatas[kirbySkill_Attack];
-		tempAni[1] = nullptr;
-		break;
-	case DEDEDESKILL:
-		tempAni[0] = imageDatas[dededeSkill_Attack];
-		tempAni[1] = nullptr;
-		break;
-	case METAKNIGHTSKILL:
-		tempAni[0] = imageDatas[metaknightSkill_Attack];
-		tempAni[1] = nullptr;
-		break;
-	case MABEROASKILL:
-		tempAni[0] = imageDatas[maberoaSkill_Attack];
-		tempAni[1] = nullptr;
-		break;
-	case ELECTRICFIELDSKILL:
-		tempAni[0] = nullptr;
-		tempAni[1] = nullptr;
-		break;
-	case KUNAISKILL:
-		tempAni[0] = nullptr;
-		tempAni[1] = nullptr;
-		break;
-	case MAGICARROWSKILL:
-		tempAni[0] = nullptr;
-		tempAni[1] = nullptr;
-		break;
-	case TORNADOSKILL:
-		tempAni[0] = nullptr;
-		tempAni[1] = nullptr;
-		break;
-	case TRUCKSKILL:
+	case SPEARSKILL:
 		tempAni[0] = nullptr;
 		tempAni[1] = nullptr;
 		break;
@@ -75,19 +43,19 @@ void Skill::SetSkillAni()
 			tempAni[i]->GetLengths(), tempAni[i]->Height(), tempAni[i]->GetFilePath());
 		temp->Load();
 
-		ani.insert({ (ESKILLSTATE)i, temp });
+		monsterani.insert({ (EMONSTERSKILLSTATE)i, temp });
 	}
 }
 
-void Skill::DrawSkill(HDC& hdc)
+void MonsterSkill::DrawMonsterSkill(HDC& hdc)
 {
 	HDC hMemDC = CreateCompatibleDC(hdc);
-	HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, ani[eSkillState]->GetBitmap());
+	HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, monsterani[eMonsterSkillState]->GetBitmap());
 
-	ani[eSkillState]->IncreaseIdx();
-	int idx = ani[eSkillState]->GetIndex();
-	int width = ani[eSkillState]->GetCurWidth();
-	int height = ani[eSkillState]->GetHeight() - 1;
+	monsterani[eMonsterSkillState]->IncreaseIdx();
+	int idx = monsterani[eMonsterSkillState]->GetIndex();
+	int width = monsterani[eMonsterSkillState]->GetCurWidth();
+	int height = monsterani[eMonsterSkillState]->GetHeight() - 1;
 
 	// GetPosition()으로 얻은 좌표를 중심으로 계산
 	int centerX = GetPosition().x;
@@ -108,16 +76,16 @@ void Skill::DrawSkill(HDC& hdc)
 		WchangeValue = width * collider2D->GetWidth() / 100;
 		HchangeValue = height * collider2D->GetHeight() / 100;
 	}
-	
+
 	float radius = ((Circle2D*)(this->GetCollider()))->GetRadius();
-	
+
 
 	HDC hTempDC = CreateCompatibleDC(hdc);
 	HBITMAP hTempBitmap = CreateCompatibleBitmap(hdc, WchangeValue, HchangeValue);
 	HBITMAP hOldTempBitmap = (HBITMAP)SelectObject(hTempDC, hTempBitmap);
 
 	// 크기 변환
-	StretchBlt(hTempDC, 0, 0, WchangeValue, HchangeValue, hMemDC, ani[eSkillState]->GetPrevWidth(), 0, width, height, SRCCOPY);
+	StretchBlt(hTempDC, 0, 0, WchangeValue, HchangeValue, hMemDC, monsterani[eMonsterSkillState]->GetPrevWidth(), 0, width, height, SRCCOPY);
 
 	// 새로운 좌표: 중심을 기준으로 변환된 이미지의 좌상단 위치를 구함
 	int newLeft = centerX - WchangeValue / 2;
@@ -145,7 +113,7 @@ void Skill::DrawSkill(HDC& hdc)
 	TransparentBlt(
 		hdc, newLeft, newTop, WchangeValue, HchangeValue, // 수정된 좌표
 		hTempDC, 0, 0, WchangeValue, HchangeValue,
-		RGB(ani[eSkillState]->GetR(), ani[eSkillState]->GetG(), ani[eSkillState]->GetB())
+		RGB(monsterani[eMonsterSkillState]->GetR(), monsterani[eMonsterSkillState]->GetG(), monsterani[eMonsterSkillState]->GetB())
 	);
 
 	// 변환을 원래 상태로 복원

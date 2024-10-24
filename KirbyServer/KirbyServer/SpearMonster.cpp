@@ -19,7 +19,6 @@ void SpearMonster::StateUpdate()
 
 void SpearMonster::Update()
 {
-
 	StateUpdate();
 	if (curState == CHASE)
 	{

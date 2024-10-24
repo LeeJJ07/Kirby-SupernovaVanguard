@@ -72,6 +72,7 @@ enum OBJECTINDEX
 #define FIREMAN_BASE_DAMAGE			30
 #define FIREMAN_BASE_HEALTH			15
 #define FIREMAN_BASE_SPEED			2
+#define FIREMAN_BASE_RANGE			10
 
 #define LANDMINE_BASE_DAMAGE		30
 #define LANDMINE_BASE_HEALTH		150
@@ -90,6 +91,7 @@ enum OBJECTINDEX
 
 // >> MonsterSkill Destroy Time
 #define TSPEARSKILLDESTROY 5
+#define TFIREMANSKILLDESTROY 1
 
 // >> Skill offset
 #define OFFSETADJUST 50

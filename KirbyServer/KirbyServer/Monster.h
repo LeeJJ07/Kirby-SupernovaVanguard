@@ -2,7 +2,6 @@
 #include "Object.h"
 #include "MonsterSkill.h"
 #include "SkillManager.h"
-#include "TotalData.h"
 
 enum EMonsterType { RUNNER, SPEAR, WINGBUG, FIREMAN, LANDMINE, KUNGFUMAN, GAOGAO, NEBULA};
 enum EMonsterState { CHASE, ATTACK, DEATH };

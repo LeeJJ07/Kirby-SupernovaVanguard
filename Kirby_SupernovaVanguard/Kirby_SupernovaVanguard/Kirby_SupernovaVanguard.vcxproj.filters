@@ -46,6 +46,10 @@
     <ClCompile Include="Rectangle2D.cpp">
       <Filter>클래스파일\Colliders\Rectangle</Filter>
     </ClCompile>
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="MonsterSkill.cpp">
+      <Filter>클래스파일\Objects\Skill</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -137,6 +141,10 @@
     </ClInclude>
     <ClInclude Include="Exp.h">
       <Filter>클래스파일\UI\Exp</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="MonsterSkill.h">
+      <Filter>클래스파일\Objects\Skill</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

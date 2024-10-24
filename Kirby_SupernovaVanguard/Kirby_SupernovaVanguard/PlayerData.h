@@ -28,17 +28,17 @@ struct PLAYERDATA :public OBJECTDATA
 struct SKILLDATA
 {
 	POINT position;
-	POINT colliderposition;
-	int skilltype;
+	POINT colliderPosition;
+	int skillType;
 	int size;
 	int size2;
-	int collidertype;
-	int collidersize;
-	int collidersize2;
+	int colliderType;
+	int colliderSize;
+	int colliderSize2;
 	int	angle;
 	short id;
-	short targetnum;
-	bool isactivate;
+	short targetNum;
+	bool isActivate;
 };
 
 struct MONSTERSKILLDATA
@@ -53,7 +53,7 @@ struct MONSTERSKILLDATA
 	int	colliderSize2;
 	int angle;
 	short	id;
-	short	targetnum;
+	short	targetNum;
 	bool	isActivate;
 };
 

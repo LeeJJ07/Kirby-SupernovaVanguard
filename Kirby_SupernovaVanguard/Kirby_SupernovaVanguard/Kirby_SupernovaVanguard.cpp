@@ -46,6 +46,7 @@ unsigned __stdcall Read();
 std::vector<Object*> vClient(PLAYERNUM);
 std::vector<Object*> vMonster(MONSTERNUM);
 std::vector<Object*> vSkill(SKILLNUM);
+std::vector<Object*> vMonsterSkill(MONSTERSKILLNUM);
 TOTALDATA uData;
 Object** objArr;
 static SOCKET cSocket;
@@ -486,6 +487,7 @@ void DrawCamera(HDC hdc)
 			((Skill*)objArr[i])->DrawSkill(hdc);
 			break;
 		case EMISSILE:
+			//((Skill*)objArr[i])->DrawMonsterSkill(hdc);
 			break;
 		default:
 			continue;

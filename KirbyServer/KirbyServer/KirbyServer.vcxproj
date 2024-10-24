@@ -133,6 +133,7 @@
     <ClInclude Include="DededeSkill.h" />
     <ClInclude Include="EletricfieldSkill.h" />
     <ClInclude Include="FireManMonster.h" />
+    <ClInclude Include="FiremanSkill.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GaoGao.h" />
     <ClInclude Include="KirbyServer.h" />

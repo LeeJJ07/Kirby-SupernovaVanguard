@@ -3,8 +3,6 @@
 #include "Object.h"
 #include "PlayerData.h"
 
-static int skillID = 0;
-
 enum ESKILLTYPE {
 	KIRBYSKILL = 1,
 	DEDEDESKILL,
@@ -17,7 +15,7 @@ enum ESKILLTYPE {
 	TRUCKSKILL
 };
 
-enum ESkillState {
+enum ESKILLSTATE {
 	ATTACKSKILL,
 	DISAPPEAR
 };
@@ -27,16 +25,16 @@ private:
 	int size;
 	int size2;
 	float angle;
-	ESKILLTYPE skilltype;
-	ESkillState eskillstate;
+	ESKILLTYPE skillType;
+	ESKILLSTATE eSkillState;
 
-	std::map<ESkillState, Animation*> ani;
+	std::map<ESKILLSTATE, Animation*> ani;
 public:
-	Skill() :size(0), size2(0), angle(0), skilltype(KIRBYSKILL), eskillstate(ATTACKSKILL)
+	Skill() :size(0), size2(0), angle(0), skillType(KIRBYSKILL), eSkillState(ESKILLSTATE::ATTACKSKILL)
 	{}
-	Skill(ESKILLTYPE skilltype) :size(0), size2(0), angle(0), skilltype(skilltype), eskillstate(ATTACKSKILL)
+	Skill(ESKILLTYPE skillType) :size(0), size2(0), angle(0), skillType(skillType), eSkillState(ESKILLSTATE::ATTACKSKILL)
 	{
-		switch(skilltype)
+		switch(skillType)
 		{
 		case KIRBYSKILL:
 		{
@@ -105,7 +103,6 @@ public:
 	
 	int	Getangle() { return angle; }
 	int	Getsize() { return size; }
-	ESKILLTYPE	Getskilltype() { return skilltype; }
 
 	void	Setangle(int angle) { this->angle = angle; }
 	void	Setsize(int size) { this->size = size; }
