@@ -55,6 +55,7 @@ bool SetDededeSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].colliderSize = dededecollider->GetRadius();
 	totalData.sdata[ID].colliderType = skill->Getcollidertype();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
+	totalData.sdata[ID].skillType = SKILLTYPE;
 
 	return true;
 }

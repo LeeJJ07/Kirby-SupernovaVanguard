@@ -12,6 +12,7 @@ int textreadCount;
 enum DATATYPE {
 	PLAYERTYPE = 'p',
 	MONSTERTYPE = 'm',
+	SKILLTYPE = 's',
 	ITEMTYPE = 'i'
 };
 
@@ -69,7 +70,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		// >> : playerdata
 		for (int i = 0; i < PLAYERNUM; i++)
 		{
-			if (pD.udata[i].dataType != 'p')
+			if (pD.udata[i].dataType != PLAYERTYPE)
 			{
 				if (i == 0)
 				{
@@ -95,7 +96,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		// >> : monsterdata
 		for (int i = 0; i < MONSTERNUM; i++)
 		{
-			if (pD.mdata[i].dataType != 'm')
+			if (pD.mdata[i].dataType != MONSTERTYPE)
 			{
 				objArr[i + MONSTERINDEX] = nullptr;
 				continue;
@@ -116,7 +117,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		// >> : skilldata
 		for (int i = 0; i < SKILLNUM; i++)
 		{
-			if (pD.sdata[i].isActivate == false || pD.sdata[i].skillType > TRUCKSKILL)
+			if (pD.sdata[i].dataType != SKILLTYPE || !pD.msdata[i].isActivate)
 			{
 				objArr[i + SKILLINDEX] = nullptr;
 				vSkill[i] = nullptr;
@@ -138,7 +139,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		// >> : monsterskilldata
 		for (int i = 0; i < MONSTERSKILLNUM; i++)
 		{
-			if (pD.msdata[i].isActivate == false || pD.msdata[i].skillType > TRUCKSKILL)
+			if (pD.msdata[i].dataType != SKILLTYPE || !pD.msdata[i].isActivate)
 			{
 				objArr[i + MONSTERSKILLINDEX] = nullptr;
 				vMonsterSkill[i] = nullptr;

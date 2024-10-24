@@ -51,6 +51,7 @@ bool SetTornadoSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].colliderSize2	= tornadocollider->GetHeight();
 	totalData.sdata[ID].colliderType	= skill->Getcollidertype();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
+	totalData.sdata[ID].skillType = SKILLTYPE;
 
 	return true;
 }

@@ -14,6 +14,7 @@
 enum DATATYPE {
 	PLAYERTYPE = 'p',
 	MONSTERTYPE = 'm',
+	SKILLTYPE = 's',
 	ITEMTYPE = 'i'
 };
 
@@ -47,6 +48,7 @@ struct SKILLDATA
 	int angle;
 	short	id;
 	short	targetnum;
+	char dataType;
 	bool	isActivate;
 };
 
@@ -63,6 +65,7 @@ struct MONSTERSKILLDATA
 	int angle;
 	short	id;
 	short	targetnum;
+	char dataType;
 	bool	isActivate;
 };
 
