@@ -23,13 +23,20 @@ class Collider2D
 private:
 	POINT position;
 	POINT offset;
-	ECOLLIDERTYPE type;
+	ECOLLIDERTYPE	type;
+	ECOLLIDERSHAPE	shape;
 	bool isTrigger;
 
 public:
-	Collider2D() : position({ 0,0 }), offset({ 0,0 }), type(TERRAIN), isTrigger(false) {}
-	Collider2D(bool trigger, ECOLLIDERTYPE _type) : position({ 0,0 }), offset({ 0,0 }), type(_type), isTrigger(trigger) {}
-	Collider2D(POINT c, POINT _offset = { 0,0 }, ECOLLIDERTYPE t = TERRAIN, bool trigger = false) : position(c), offset(_offset), type(t), isTrigger(trigger) {}
+	Collider2D(ECOLLIDERSHAPE shape) : position({ 0,0 }), offset({ 0,0 }), type(TERRAIN), isTrigger(false),shape(shape) {}
+
+	Collider2D(bool trigger, ECOLLIDERTYPE _type, ECOLLIDERSHAPE shape)
+		: position({ 0,0 }), offset({ 0,0 }), type(_type), isTrigger(trigger), shape(shape)
+	{}
+
+	Collider2D(POINT c, ECOLLIDERSHAPE shape, POINT _offset = { 0,0 }, ECOLLIDERTYPE t = TERRAIN, bool trigger = false)
+		: position(c), offset(_offset), type(t), isTrigger(trigger), shape(shape)
+	{}
 	~Collider2D() {}
 
 	POINT	GetPosition()const { return position; }

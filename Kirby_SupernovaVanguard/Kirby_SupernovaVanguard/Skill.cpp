@@ -2,14 +2,14 @@
 
 void Skill::ObjectUpdate(TOTALDATA& totalData, int i)
 {
-	switch (totalData.sdata[i].colliderType)
+	switch (totalData.sdata[i].colliderShape)
 	{
-	case CIRCLEFIGURE:
+	case CIRCLE:
 		Circle2D* skillcirclecollider;
 		skillcirclecollider = dynamic_cast<Circle2D*>(this->GetCollider());
 		skillcirclecollider->SetRadius(totalData.sdata[i].colliderSize);
 		break;
-	case RECTANGLEFIGURE:
+	case RECTANGLE:
 		Rectangle2D* skillrectanglecollider;
 		skillrectanglecollider = dynamic_cast<Rectangle2D*>(this->GetCollider());
 		skillrectanglecollider->SetWidth(totalData.sdata[i].colliderSize);

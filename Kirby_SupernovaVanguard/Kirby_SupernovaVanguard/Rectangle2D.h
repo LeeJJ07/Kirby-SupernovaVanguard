@@ -9,8 +9,8 @@ private:
 	int width;
 	int height;
 public:
-	Rectangle2D(int width = 0, int height = 0) : Collider2D(), width(width), height(height) {}
-	Rectangle2D(bool isTrigger, ColliderType type) : Collider2D(isTrigger, type), width(BASESIZE), height(BASESIZE) {}
+	Rectangle2D(int width = 0, int height = 0) : Collider2D(RECTANGLE), width(width), height(height) {}
+	Rectangle2D(bool isTrigger, ColliderType type) : Collider2D(isTrigger, type, RECTANGLE), width(BASESIZE), height(BASESIZE) {}
 	~Rectangle2D() {};
 
 	int GetWidth() { return width; }

@@ -51,7 +51,7 @@ bool SetTruckSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].colliderPosition = truckskill->GetCollider()->GetPosition();
 	totalData.sdata[ID].colliderSize = tornadocollider->GetWidth();
 	totalData.sdata[ID].colliderSize2 = tornadocollider->GetHeight();
-	totalData.sdata[ID].colliderType = skill->Getcollidertype();
+	totalData.sdata[ID].colliderShape = skill->GetcolliderShape();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 	totalData.sdata[ID].angle = skill->Getangle();
 	totalData.sdata[ID].dataType = SKILLTYPE;

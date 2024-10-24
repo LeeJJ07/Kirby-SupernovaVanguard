@@ -473,7 +473,7 @@ void DrawCamera(HDC hdc)
 			|| objArr[i]->GetPosition().y > vClient[myID]->GetPosition().y + 650)
 			continue;
 
-		switch (objArr[i]->GetCollider()->GetType())
+		switch (objArr[i]->GetCollider()->GetColliderType())
 		{
 		case TERRAIN:
 			break;

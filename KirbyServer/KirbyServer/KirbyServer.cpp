@@ -305,7 +305,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (hThreads[2])
 			ResumeThread(hThreads[2]);
 
-		totalData.publicdata.maxExp = 1000;
+		totalData.publicdata.maxExp = 10000;
 		totalData.publicdata.exp = 0;
 
 		return InitServer(hWnd);
@@ -955,6 +955,10 @@ void GenerateMonsterSkill()
 	{
 		if (monsterArr[i] != 0 &&monsterArr[i]->GetMonsterState() == EMonsterState::ATTACK)
 		{
+			EMonsterType  type = monsterArr[i]->GetMonsterType();
+			if (type != SPEAR && type != FIREMAN)
+				continue;
+
 			std::vector<SkillManager*> skillmanager = monsterArr[i]->GetSkillManager();
 			for (int j = 0; j < skillmanager.size(); j++)
 			{
@@ -1231,9 +1235,7 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 		break;
 	}
 
-	monsterArr[ID - MONSTERINDEX] = m;
-
-	if(monsterSkill!=nullptr)
+	if (monsterSkill != nullptr)
 	{
 		SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
 

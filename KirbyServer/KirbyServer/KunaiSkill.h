@@ -50,7 +50,7 @@ bool SetKunaiSkillInDatasheet(Skill*& skill, int& ID)
 	totalData.sdata[ID].colliderPosition = kunaiskill->GetCollider()->GetPosition();
 	totalData.sdata[ID].colliderSize = kunaicollider->GetWidth();
 	totalData.sdata[ID].colliderSize2 = kunaicollider->GetHeight();
-	totalData.sdata[ID].colliderType = skill->Getcollidertype();
+	totalData.sdata[ID].colliderShape = skill->GetcolliderShape();
 	totalData.sdata[ID].targetnum = skill->Gettargetnum();
 	totalData.sdata[ID].angle = skill->Getangle();
 	totalData.sdata[ID].dataType = SKILLTYPE;

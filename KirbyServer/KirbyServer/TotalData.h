@@ -42,6 +42,7 @@ struct SKILLDATA
 	int skillType;
 	int size;
 	int size2;
+	int colliderShape;
 	int colliderType;
 	int	colliderSize;
 	int	colliderSize2;
@@ -59,6 +60,7 @@ struct MONSTERSKILLDATA
 	int skillType;
 	int size;
 	int size2;
+	int colliderShape;
 	int colliderType;
 	int	colliderSize;
 	int	colliderSize2;
