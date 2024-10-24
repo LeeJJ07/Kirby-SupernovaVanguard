@@ -146,7 +146,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 				continue;
 			}
 
-			if (vMonsterSkill[i] == nullptr)
+			if (vMonsterSkill[i] == nullptr || vMonsterSkill[i]->GetCollider()->GetColliderShape() != pD.msdata[i].colliderShape)
 			{
 				vMonsterSkill[i] = new MonsterSkill((EMONSTERSKILLTYPE)pD.msdata[i].skillType);
 				CreateObject((MonsterSkill*)vMonsterSkill[i], i + MONSTERSKILLINDEX);
