@@ -236,12 +236,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
 				{
 					init_miniboss1 = true;
-					GenerateKungFuMan();
+					for(int i = 0 ;i < PLAYERNUM;i++)
+					{
+						if (!vClient[i]) continue;
+						GenerateKungFuMan();
+					}
 				}
 				if (!init_miniboss2 && totalData.publicdata.currentTime > SECOND_BOSS_INIT_TIME)
 				{
 					init_miniboss2 = true;
-					GenerateGaoGao();
+					for (int i = 0; i < PLAYERNUM; i++)
+					{
+						if (!vClient[i]) continue;
+						GenerateGaoGao();
+					}
 				}
 				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
 				{
@@ -372,7 +380,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
