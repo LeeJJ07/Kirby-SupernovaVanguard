@@ -117,7 +117,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 		// >> : skilldata
 		for (int i = 0; i < SKILLNUM; i++)
 		{
-			if (pD.sdata[i].dataType != SKILLTYPE || !pD.msdata[i].isActivate)
+			if (pD.sdata[i].dataType != SKILLTYPE || !pD.sdata[i].isActivate)
 			{
 				objArr[i + SKILLINDEX] = nullptr;
 				vSkill[i] = nullptr;
@@ -169,7 +169,6 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			CountReadNum();
 		}
 	}
-
 	LeaveCriticalSection(&cs);
 }
 
