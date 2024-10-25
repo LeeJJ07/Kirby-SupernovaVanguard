@@ -43,7 +43,7 @@ public:
 		}
 		break;
 		}
-		//SetMonsterSkillAni();
+		SetMonsterSkillAni();
 	}
 	~MonsterSkill()
 	{

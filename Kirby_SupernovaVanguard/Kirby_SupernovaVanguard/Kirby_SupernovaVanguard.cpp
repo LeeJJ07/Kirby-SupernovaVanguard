@@ -5,6 +5,7 @@
 #include "StartScene.h"
 #include "SelectScene.h"
 #include "AllSkill.h"
+#include "MonsterSkill.h"
 #include "Camera.h"
 #include "Socket.h"
 #include "Map.h"
@@ -487,7 +488,7 @@ void DrawCamera(HDC hdc)
 			((Skill*)objArr[i])->DrawSkill(hdc);
 			break;
 		case EMISSILE:
-			//((Skill*)objArr[i])->DrawMonsterSkill(hdc);
+			((MonsterSkill*)objArr[i])->DrawMonsterSkill(hdc);
 			break;
 		default:
 			continue;
@@ -597,8 +598,8 @@ unsigned __stdcall Read()
 	{
 		if (timeSpan_read.count() >= 0.01)
 		{
-			/*if (threadEnd_Read)
-				return 0;*/
+			EnterCriticalSection(&cs);
+
 			ReadMessage(cSocket, vClient, uData);
 
 			if (uData.publicdata.islevelUp && !isChoiceSkill)
@@ -639,6 +640,8 @@ unsigned __stdcall Read()
 				isChoiceSkill = false;
 			}
 			t1_read = std::chrono::high_resolution_clock::now();
+
+			LeaveCriticalSection(&cs);
 		}
 		Sleep(0);
 	}

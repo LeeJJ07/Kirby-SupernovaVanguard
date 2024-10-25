@@ -29,7 +29,11 @@ void MonsterSkill::SetMonsterSkillAni()
 	switch (monsterSkillType)
 	{
 	case SPEARSKILL:
-		tempAni[0] = nullptr;
+		tempAni[0] = imageDatas[spearSkill_Attack];
+		tempAni[1] = imageDatas[spearSkill_Attack];
+		break;
+	case FIREMANSKILL:
+		tempAni[0] = imageDatas[fireman_Attack];
 		tempAni[1] = nullptr;
 		break;
 	}
@@ -73,12 +77,9 @@ void MonsterSkill::DrawMonsterSkill(HDC& hdc)
 	else
 	{
 		Rectangle2D* collider2D = dynamic_cast<Rectangle2D*>(this->GetCollider());
-		WchangeValue = width * collider2D->GetWidth() / 100;
-		HchangeValue = height * collider2D->GetHeight() / 100;
+		WchangeValue = collider2D->GetWidth();
+		HchangeValue = collider2D->GetHeight();
 	}
-
-	float radius = ((Circle2D*)(this->GetCollider()))->GetRadius();
-
 
 	HDC hTempDC = CreateCompatibleDC(hdc);
 	HBITMAP hTempBitmap = CreateCompatibleBitmap(hdc, WchangeValue, HchangeValue);

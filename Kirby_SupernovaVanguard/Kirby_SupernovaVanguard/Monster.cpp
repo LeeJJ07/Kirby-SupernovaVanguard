@@ -31,7 +31,7 @@ void Monster::SetMonsterAni()
         break;
     case FIREMAN:
         tempAni[0] = imageDatas[fireman_Walk];
-        tempAni[1] = imageDatas[fireman_Attack];
+        tempAni[1] = nullptr;
         tempAni[2] = nullptr;
         tempAni[3] = nullptr;
         tempAni[4] = nullptr;

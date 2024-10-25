@@ -39,13 +39,13 @@ static enum ECharacterState { IDLE, WALK, ATTACK };
 //ObjectImage enum 데이터와 txt 파일의 데이터 순서가 일치해야함.
 static enum ObjectImage
 {
-	kirby_Idle,		 kirby_Walk,		kirby_Attack,		 ddd_Idle,					ddd_Walk,			 ddd_Attack,
-	meta_Idle,		 meta_Walk,			meta_Attack,		 maboroa_Idle,				maboroa_Walk,		 maboroa_Attack,
-	runner_Walk,	 spear_Walk,		spear_Attack,		 wingbug_Walk,				fireman_Walk,		 fireman_Attack,
-	landmine_Idle,	 KFM_Walk,			KFM_Attack,			 KFM_Detect,				gaogao_Attack,		 gaogao_Detect,
-	gaogao_Stun,	 boss_eye,			boss_mode1,			 boss_mode2,				boss_Attack1,		 boss_Attack2,		 
-	boss_Attack3,	 kirbySkill_Attack, dededeSkill_Attack,  metaknightSkill_Attack,	maberoaSkill_Attack
-
+	kirby_Idle,			kirby_Walk,				kirby_Attack,			ddd_Idle,				ddd_Walk,				ddd_Attack,
+	meta_Idle,			meta_Walk,				meta_Attack,			maboroa_Idle,			maboroa_Walk,			maboroa_Attack,
+	runner_Walk,		spear_Walk,				spear_Attack,			wingbug_Walk,			fireman_Walk,			fireman_Attack,
+	landmine_Idle,		KFM_Walk,				KFM_Attack,				KFM_Detect,				gaogao_Attack,			gaogao_Detect,
+	gaogao_Stun,		boss_eye,				boss_mode1,				boss_mode2,				boss_Attack1,			boss_Attack2,		 
+	boss_Attack3,		kirbySkill_Attack,		dededeSkill_Attack,		metaknightSkill_Attack,	maberoaSkill_Attack,	electricfieldSkill_Attack,
+	kunaiSkill_Attack,	magicarrowSkill_Attack, tornadoSkill_Attack,	truckSkill_Attack,		spearSkill_Attack
 };
 
 enum OBJECTINDEX

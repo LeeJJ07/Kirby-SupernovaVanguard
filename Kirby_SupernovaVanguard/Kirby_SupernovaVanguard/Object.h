@@ -26,7 +26,7 @@ public:
 	~Object() { delete collider; }
 
 	PAIR			GetLookingDir()	{ return lookingDirection; }
-	POINT			GetPosition()	{ return position; }
+ 	POINT			GetPosition()	{ return position; }
 	short			Getid()	{ return id; }
 	bool			GetIsInGame()	{ return isInGame; }
 	Collider2D*		GetCollider()	{ return collider; }

@@ -240,7 +240,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					testLandMine = true;
 					GenerateLandMine(2000, 1000, 600);
 				}*/
-				if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
+				/*if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
 				{
 					init_miniboss1 = true;
 					for (int i = 0; i < PLAYERNUM; i++)
@@ -257,7 +257,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if (!totalData.udata[i].dataType) continue;
 						GenerateGaoGao(i);
 					}
-				}
+				}*/
 				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
 				{
 					init_boss = true;
@@ -305,7 +305,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (hThreads[2])
 			ResumeThread(hThreads[2]);
 
-		totalData.publicdata.maxExp = 10000;
+		totalData.publicdata.maxExp = 100;
 		totalData.publicdata.exp = 0;
 
 		return InitServer(hWnd);
@@ -845,8 +845,7 @@ void GenerateSkill()
 									lookingdir.second = skilloffsetX;
 
 								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
-								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
-								lookingdir.first = -lookingdir.first; lookingdir.second = -lookingdir.second;
+								lookingdir.first /= -temp / OFFSETADJUST; lookingdir.second /= -temp / OFFSETADJUST;
 
 								kunaiSkill->Setdirection({ (long)lookingdir.first,(long)lookingdir.second });
 							}
@@ -876,9 +875,9 @@ void GenerateSkill()
 
 							double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
 							
-							lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+							lookingdir.first /= -temp / OFFSETADJUST; lookingdir.second /= -temp / OFFSETADJUST;
 
-							magicarrowSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+							magicarrowSkill->Setdirection({ (long)(lookingdir.first),(long)(lookingdir.second) });
 							magicarrowSkill->Setangle(UpdateAngle(lookingdir));
 							
 							magicarrowSkill->Settime_1();
@@ -917,9 +916,9 @@ void GenerateSkill()
 
 							PAIR lookingdir = { (truckSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (truckSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
 							double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
-							lookingdir.first /= -temp / OFFSETADJUST; lookingdir.second /= -temp / OFFSETADJUST;
+							lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
 
-							truckSkill->Setdirection({ (long)(lookingdir.first),(long)(lookingdir.second) });
+							truckSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
 							truckSkill->Setangle(UpdateAngle(lookingdir));
 
 							truckSkill->Settime_1();
@@ -984,9 +983,9 @@ void GenerateMonsterSkill()
 
 								PAIR lookingdir = { (spearSkill->Getposition().x - totalData.udata[playerIndex].pos.x), (spearSkill->Getposition().y - totalData.udata[playerIndex].pos.y) };
 								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
-								lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+								lookingdir.first /= -temp / OFFSETADJUST; lookingdir.second /= -temp / OFFSETADJUST;
 
-								spearSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+								spearSkill->Setdirection({ (long)(lookingdir.first),(long)(lookingdir.second) });
 								spearSkill->Setangle(UpdateAngle(lookingdir));
 
 								spearSkill->Settime_1();
@@ -1201,7 +1200,8 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 {
-	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+	//EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+	EMonsterType mType = EMonsterType::SPEAR;
 	POINT generatePos = SetRandomSpawnPos(playerIdx, mType);
 
 	if (!IsValidSpawnPos(playerIdx, generatePos))

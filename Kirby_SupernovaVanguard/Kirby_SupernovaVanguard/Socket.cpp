@@ -59,8 +59,6 @@ int InitClient(HWND hWnd, SOCKET &s)
 
 void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 {
-	EnterCriticalSection(&cs);
-
 	int bytesReceived = recv(s, (char*)&pD, sizeof(TOTALDATA), 0);
 
 	if (bytesReceived >= (int)sizeof(TOTALDATA))
@@ -169,7 +167,6 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			CountReadNum();
 		}
 	}
-	LeaveCriticalSection(&cs);
 }
 
 bool ReadInitMessage(SOCKET& s, TOTALDATA& uD)

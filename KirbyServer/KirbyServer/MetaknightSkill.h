@@ -62,11 +62,6 @@ void UpdateMetaknightSkill(Skill*& skill)
 {
 	metaknightskill = dynamic_cast<MetaknightSkill*>(skill);
 
-	/*POINT newpos;
-	newpos.x = metaknightskill->Getposition().x + metaknightskill->Getdirection().x;
-	newpos.y = metaknightskill->Getposition().y + metaknightskill->Getdirection().y;
-	metaknightskill->Setposition(newpos);*/
-
 	POINT newpos;
 	newpos.x = totalData.udata[metaknightskill->Getmasternum()].pos.x + metaknightskill->Getoffset().x;
 	newpos.y = totalData.udata[metaknightskill->Getmasternum()].pos.y + metaknightskill->Getoffset().y;
