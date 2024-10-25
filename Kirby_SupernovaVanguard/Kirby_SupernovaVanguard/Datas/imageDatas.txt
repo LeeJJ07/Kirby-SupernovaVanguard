@@ -29,7 +29,7 @@ Images/bmp/boss_mode2.bmp  4 5 168 184 144 31 36 101 37 170 34 235 39 65 65 65 6
 Images/bmp/boss_Attack1.bmp  3 12 168 184 144 31 75 98 75 175 74 60 60 60 140
 Images/bmp/boss_Attack2.bmp  4 3 168 184 144 20 21 69 24 123 23 177 22 45 45 55 55 45
 Images/bmp/boss_Attack3.bmp  3 0 168 184 144 14 16 36 16 58 15 25 25 25 25
-Images/bmp/kirbySkill_Attack.bmp  3 0 255 255 255 17 17 51 17 84 17 34 34 34 34
+Images/bmp/kirbySkill_Attack.bmp  5 0 255 255 255 17 47 59 40 120 33 190 35 252 33 35 53 69 69 69 63
 Images/bmp/dededeSkill_Attack.bmp  1 0 116 154 212 150 150 300 300
 Images/bmp/metaknightSkill_Attack.bmp  7 0 224 224 224 47 40 107 40 153 40 217 40 319 40 422 40 481 40 50 60 48 110 95 65 60 85
 Images/bmp/maboroaSkill_Attack.bmp  4 2 72 104 112 37 36 91 36 148 36 202 36 55 55 55 55 55

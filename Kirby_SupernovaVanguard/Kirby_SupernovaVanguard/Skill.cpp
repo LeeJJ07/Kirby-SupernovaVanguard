@@ -105,8 +105,8 @@ void Skill::DrawSkill(HDC& hdc)
 		HchangeValue = WchangeValue;
 
 		// 새로운 좌표: 중심을 기준으로 변환된 이미지의 좌상단 위치를 구함
-		newLeft = centerX - WchangeValue / 2;
-		newTop = centerY - HchangeValue / 2;
+		newLeft = centerX - WchangeValue / 2.0f;
+		newTop = centerY - HchangeValue / 2.0f;
 	}
 	else
 	{
@@ -127,10 +127,10 @@ void Skill::DrawSkill(HDC& hdc)
 	StretchBlt(hTempDC, 0, 0, WchangeValue, HchangeValue, hMemDC, ani[eSkillState]->GetPrevWidth(), 0, width, height, SRCCOPY);
 
 	// 디바이스 컨텍스트에서 고급 그래픽 모드 설정
-	SetGraphicsMode(hdc, GM_ADVANCED);
 
 	if (collider2D == 0)
 	{
+		SetGraphicsMode(hdc, GM_ADVANCED);
 		float radian = this->GetCollider()->Getangle() * 3.14f / 180;
 
 		// 회전 변환 매트릭스 설정
@@ -155,11 +155,12 @@ void Skill::DrawSkill(HDC& hdc)
 	);
 
 	// 변환을 원래 상태로 복원
-	ModifyWorldTransform(hdc, NULL, MWT_IDENTITY);
+	if (collider2D == 0)
+		ModifyWorldTransform(hdc, NULL, MWT_IDENTITY);
 
 	SelectObject(hTempDC, hOldTempBitmap);
-	DeleteDC(hTempDC);
 	DeleteObject(hTempBitmap);
+	DeleteDC(hTempDC);
 
 	SelectObject(hMemDC, hOldBitmap);
 	DeleteDC(hMemDC);
