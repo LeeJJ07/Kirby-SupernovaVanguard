@@ -456,22 +456,32 @@ void DoubleBuffering(HDC hdc)
 	}
 	// <<
 
-	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, bufferdc, cLeft, cTop, SRCCOPY);
-
 	if (!uData.publicdata.isAllPlayerChoice)
 	{
-		// 반투명 브러시 색상 (회색, 약간 투명하게 표현)
-		HBRUSH hBrush = CreateSolidBrush(RGB(50, 50, 50)); // 회색 톤의 브러시 생성
-		HBRUSH oldBrush = (HBRUSH)SelectObject(bufferdc, hBrush);
-
 		// 반투명 효과를 위해 카메라 뷰의 전체 크기를 덮음
-		RECT rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
-		FillRect(bufferdc, &rect, hBrush);
+		BLENDFUNCTION blend = { AC_SRC_OVER, 0, 128, 0 }; // 128은 투명도 (0-255 범위)
+		HDC hScreenDC = GetDC(NULL);
+		HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
+		HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, CAMERA_WIDTH, CAMERA_HEIGHT);
+		SelectObject(hMemoryDC, hBitmap);
 
-		// 기존 브러시로 복원 및 반투명 브러시 삭제
-		SelectObject(bufferdc, oldBrush);
+		// 전체를 회색으로 채우기
+		RECT rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
+		HBRUSH hBrush = CreateSolidBrush(RGB(50, 50, 50));
+		FillRect(hMemoryDC, &rect, hBrush);
 		DeleteObject(hBrush);
+
+		// AlphaBlend로 그리기
+		AlphaBlend(bufferdc, cLeft, cTop, CAMERA_WIDTH, CAMERA_HEIGHT, hMemoryDC, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, blend);
+
+		// 메모리 DC 및 비트맵 정리
+		DeleteObject(hBitmap);
+		DeleteDC(hMemoryDC);
+		ReleaseDC(NULL, hScreenDC);
 	}
+
+	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, bufferdc, cLeft, cTop, SRCCOPY);
+
 }
 
 void DrawCamera(HDC hdc)
