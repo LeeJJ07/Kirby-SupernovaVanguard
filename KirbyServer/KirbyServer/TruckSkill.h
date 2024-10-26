@@ -79,7 +79,8 @@ void UpdateTruckSkill(Skill*& skill)
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(truckskill->Gettime_2() - truckskill->Gettime_1()).count();
 	if (skilldestroytime > TTRUCKSKILLDESTROY)
 	{
-		truckskill->Setisactivate(false);
 		OBJECTIDARR[truckskill->GetID()] = false;
+		delete skill;
+		skill = nullptr;
 	}
 }

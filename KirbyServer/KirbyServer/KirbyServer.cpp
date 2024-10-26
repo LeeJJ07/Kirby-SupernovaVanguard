@@ -38,6 +38,10 @@ void UpdateTimer();
 void UpdateThread();
 // <<
 
+// >> : collision
+void CollisionUpdate();
+// <<
+
 // >> : send
 static std::chrono::high_resolution_clock::time_point t1_send;
 static std::chrono::high_resolution_clock::time_point t2_send;
@@ -65,6 +69,7 @@ void UpdateSkill();
 void UpdateMonsterSkill();
 void UpdateUi();
 void SetBasisSkillData(int&);
+void SetEmptySkillData(int&);
 void SetSkillData(int&, int);
 void SetSkillToDatasheet();
 void SetMonsterSkillToDatasheet();
@@ -392,7 +397,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -510,6 +515,7 @@ unsigned __stdcall Update()
 			if (isAllPlayerChoice)
 			{
 				UpdateTimer();
+				CollisionUpdate();
 				UpdateMonster();
 				GenerateSkill();
 				UpdateSkill();
@@ -692,7 +698,7 @@ void GenerateSkill()
 			{
 				int s;
 				bool isGenerateSkill = false;
-				for (s = SKILLINDEX; s < FINALINDEX; s++)
+				for (s = SKILLINDEX; s < MONSTERSKILLINDEX; s++)
 				{
 					if (!OBJECTIDARR[s])
 					{
@@ -1050,7 +1056,11 @@ void SetSkillToDatasheet()
 		Skill* skill = *it;
 
 		if (skill == nullptr)
+		{
+			SetEmptySkillData(i);
+			i++;
 			continue;
+		}
 
 		int ID = skill->GetID() - SKILLINDEX;
 		switch (skill->Getskilltype())
@@ -1083,7 +1093,25 @@ void SetSkillToDatasheet()
 			SetTruckSkillInDatasheet(skill, ID);
 			break;
 		}
+		i++;
 	}
+}
+
+void SetEmptySkillData(int& i)
+{
+	totalData.sdata[i].isActivate = false;
+	totalData.sdata[i].id = 0;
+	totalData.sdata[i].skillType = 0;
+	totalData.sdata[i].size = 0;
+	totalData.sdata[i].size2 = 0;
+	totalData.sdata[i].position = { 0,0 };
+	totalData.sdata[i].colliderPosition = { 0,0 };
+	totalData.sdata[i].colliderSize = 0;
+	totalData.sdata[i].colliderSize2 = 0;
+	totalData.sdata[i].colliderShape = 0;
+	totalData.sdata[i].targetnum = 0;
+	totalData.sdata[i].angle = 0;
+	totalData.sdata[i].dataType = NULL;
 }
 
 void SetMonsterSkillToDatasheet()
@@ -1472,7 +1500,7 @@ void GenerateBoss()
 
 void UpdateSkill()
 {
-	for (auto skill : vSkill)
+	for (auto& skill : vSkill)
 	{
 		if (skill == nullptr)
 			continue;
@@ -1553,6 +1581,7 @@ void UpdateMonster()
 		{
 			totalData.mdata[i].dataType = 0;
 			delete monsterArr[i];
+			monsterArr[i] = nullptr;
 			continue;
 		}
 
@@ -1620,4 +1649,64 @@ float UpdateAngle(PAIR& lookingdir)
 	}
 
 	return angleDegrees;
+}
+
+void CollisionUpdate()
+{
+	for (int i = 0; i < monsterArr.size(); i++)
+	{
+		if (monsterArr[i] == nullptr)
+			continue;
+
+		for (int j = 0; j < vSkill.size(); j++)
+		{
+			if (vSkill[j] == nullptr)
+				continue;
+
+			if (vSkill[j]->GetcolliderShape() == CIRCLE)
+			{
+				int distanceMToS = sqrt(pow(monsterArr[i]->GetPosition().x - vSkill[j]->Getposition().x, 2)
+					+ pow(monsterArr[i]->GetPosition().y - vSkill[j]->Getposition().y, 2));
+
+				int radiusSum = 20 + vSkill[j]->Getsize();
+
+				if (radiusSum > distanceMToS)
+				{
+					OBJECTIDARR[vSkill[j]->GetID()] = false;
+					vSkill[j] = nullptr;
+				}
+			}
+			else
+			{
+				int angle = vSkill[j]->Getangle();
+				int value1 = abs(vSkill[j]->Getsize() * cos(angle * 3.14 * 180));
+				int value2 = abs(vSkill[j]->Getsize2() * cos((180 - angle) * 3.14 * 180));
+				POINT vectorDistance = { monsterArr[i]->GetPosition().x - vSkill[j]->Getposition().x,monsterArr[i]->GetPosition().y - vSkill[j]->Getposition().y };
+				if (vectorDistance.x == 0)
+					vectorDistance.x = 1;
+				if (vectorDistance.y == 0)
+					vectorDistance.y = 1;
+				int d = round(sqrt((float)pow(vectorDistance.x, 2) + pow(vectorDistance.y, 2)));
+				int angle2 = atan(vectorDistance.y / vectorDistance.x);
+				int angle3 = atan(vectorDistance.x / vectorDistance.y);
+				int distance = abs(d * cos(angle2 * 3.14 * 180));
+				int distance2 = abs(d * cos(angle3 * 3.14 * 180));
+				int distanceMToS = 20 + value1 + value2;
+
+				if (distanceMToS > distance && distanceMToS > distance2)
+				{
+					monsterArr[i]->SetCurHealth(monsterArr[i]->GetCurHealth() - vSkill[j]->Getdamage());
+					OBJECTIDARR[vSkill[j]->GetID()] = false;
+					vSkill[j] = nullptr;
+				}
+				if (monsterArr[i]->GetCurHealth() <= 0)
+				{
+					totalData.mdata[i].dataType = 0;
+					delete monsterArr[i];
+					monsterArr[i] = nullptr;
+					break;
+				}
+			}
+		}
+	}
 }

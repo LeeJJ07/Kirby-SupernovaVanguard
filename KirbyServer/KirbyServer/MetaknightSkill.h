@@ -78,7 +78,8 @@ void UpdateMetaknightSkill(Skill*& skill)
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(metaknightskill->Gettime_2() - metaknightskill->Gettime_1()).count();
 	if (skilldestroytime > 0.5)
 	{
-		metaknightskill->Setisactivate(false);
 		OBJECTIDARR[metaknightskill->GetID()] = false;
+		delete skill;
+		skill = nullptr;
 	}
 }

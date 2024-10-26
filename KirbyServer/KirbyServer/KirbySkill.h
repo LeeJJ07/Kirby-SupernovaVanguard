@@ -96,8 +96,9 @@ void UpdateKirbySkill(Skill* &skill)
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(kirbyskill->Gettime_2() - kirbyskill->Gettime_1()).count();
 	if (skilldestroytime > TKIRBYSKILLDESTROY)
 	{
-		kirbyskill->Setisactivate(false);
 		OBJECTIDARR[kirbyskill->GetID()] = false;
+		delete skill;
+		skill = nullptr;
 	}
 }
 

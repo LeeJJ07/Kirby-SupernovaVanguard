@@ -96,7 +96,8 @@ void UpdateTornadoSkill(Skill*& skill)
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(tornadoskill->Gettime_2() - tornadoskill->Gettime_1()).count();
 	if (skilldestroytime > TTORNADOSKILLDESTROY)
 	{
-		tornadoskill->Setisactivate(false);
 		OBJECTIDARR[tornadoskill->GetID()] = false;
+		delete skill;
+		skill = nullptr;
 	}
 }

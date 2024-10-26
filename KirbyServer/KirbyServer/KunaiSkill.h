@@ -78,7 +78,8 @@ void UpdateKunaiSkill(Skill*& skill)
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(kunaiskill->Gettime_2() - kunaiskill->Gettime_1()).count();
 	if (skilldestroytime > TKUNAISKILLDESTROY)
 	{
-		kunaiskill->Setisactivate(false);
 		OBJECTIDARR[kunaiskill->GetID()] = false;
+		delete skill;
+		skill = nullptr;
 	}
 }

@@ -75,7 +75,8 @@ void UpdateElectricfieldSkill(Skill*& skill)
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(electricfieldskill->Gettime_2() - electricfieldskill->Gettime_1()).count();
 	if (skilldestroytime > 0.1)
 	{
-		electricfieldskill->Setisactivate(false);
 		OBJECTIDARR[electricfieldskill->GetID()] = false;
+		delete skill;
+		skill = nullptr;
 	}
 }

@@ -83,24 +83,24 @@ public:
 	EMonsterState GetMonsterState() { return curState; }
 	void SetMonsterState(EMonsterState nextState) { this->curState = nextState; }
 
-	POINT GetTargetPos() { return targetPos; }
-	int GetDamage() { return damage; }
-	int GetMaxHealth() { return maxHealth; }
-	int GetCurHealth() { return curHealth; }
-	float GetSpeed() { return speed; }
-	bool GetEnabled() { return isEnabled; }
+	POINT	GetTargetPos() { return targetPos; }
+	int		GetDamage() { return damage; }
+	int		GetMaxHealth() { return maxHealth; }
+	int		GetCurHealth() { return curHealth; }
+	float	GetSpeed() { return speed; }
+	bool	GetEnabled() { return isEnabled; }
 	std::chrono::high_resolution_clock::time_point Gett1_targeting() { return t1_targeting; }
 	std::chrono::high_resolution_clock::time_point Gett2_targeting() { return t2_targeting; }
 	std::vector<SkillManager*> GetSkillManager() { return vSkillManager; }
 
-	void SetTargetPos(POINT targetPos) { this->targetPos = targetPos; }
-	void SetDamage(int damage) { this->damage = damage; }
-	void SetMaxHealth(int maxHealth) { this->maxHealth = maxHealth; }
-	void SetCurHealth(int curHealth) { this->curHealth = curHealth; }
-	void SetSpeed(float speed) { this->speed = speed; }
-	void SetEnabled(bool isEnabled) { this->isEnabled = isEnabled; }
-	void Sett1_targeting() { t1_targeting = std::chrono::high_resolution_clock::now(); }
-	void Sett2_targeting() { t2_targeting = std::chrono::high_resolution_clock::now(); }
+	void	SetTargetPos(POINT targetPos) { this->targetPos = targetPos; }
+	void	SetDamage(int damage) { this->damage = damage; }
+	void	SetMaxHealth(int maxHealth) { this->maxHealth = maxHealth; }
+	void	SetCurHealth(int curHealth) { this->curHealth = curHealth; }
+	void	SetSpeed(float speed) { this->speed = speed; }
+	void	SetEnabled(bool isEnabled) { this->isEnabled = isEnabled; }
+	void	Sett1_targeting() { t1_targeting = std::chrono::high_resolution_clock::now(); }
+	void	Sett2_targeting() { t2_targeting = std::chrono::high_resolution_clock::now(); }
 	void	SetSkillManager(std::vector<SkillManager*> vSkillManager) { this->vSkillManager = vSkillManager; }
 
 	virtual void StateUpdate() = 0;

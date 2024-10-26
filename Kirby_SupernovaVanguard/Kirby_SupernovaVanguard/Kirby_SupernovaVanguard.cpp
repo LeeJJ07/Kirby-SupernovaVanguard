@@ -614,6 +614,7 @@ unsigned __stdcall Read()
 					aD.newskill = 6;
 					isChoiceSkill = true;
 				}
+
 				if (GetAsyncKeyState('7') & 0x8000)
 				{
 					aD.newskill = 7;

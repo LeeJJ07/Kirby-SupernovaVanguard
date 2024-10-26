@@ -93,8 +93,9 @@ void UpdateMaberoaSkill(Skill*& skill)
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(maberoaskill->Gettime_2() - maberoaskill->Gettime_1()).count();
 	if (skilldestroytime > TKIRBYSKILLDESTROY)
 	{
-		maberoaskill->Setisactivate(false);
 		OBJECTIDARR[maberoaskill->GetID()] = false;
+		delete skill;
+		skill = nullptr;
 	}
 }
 

@@ -83,8 +83,8 @@ void UpdateDededeSkill(Skill*& skill)
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(dededeskill->Gettime_2() - dededeskill->Gettime_1()).count();
 	if (skilldestroytime > TDEDEDESKILLDESTROY)
 	{
-		dededeskill->Setisactivate(false);
 		OBJECTIDARR[dededeskill->GetID()] = false;
+		skill = nullptr;
 	}
 }
 
