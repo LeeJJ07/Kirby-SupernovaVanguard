@@ -81,6 +81,9 @@ bool isLockOn = true;
 static std::chrono::high_resolution_clock::time_point t1_UI;
 static std::chrono::high_resolution_clock::time_point t2_UI;
 static std::chrono::duration<double> timeSpan_UI;
+
+int levelExp[51];
+
 // <<
 
 #define MAX_LOADSTRING 100
@@ -105,12 +108,14 @@ void SetMonsterData(MONSTERDATA& mData, Monster*& m);
 void GenerateMonster(int playerIdx);
 void GenerateKungFuMan(int idx);
 void GenerateGaoGao(int idx);
-void GenerateBoss();
+
+void ReplacePlayer(int cx, int cy);
+void GenerateBoss(int cx, int cy);
 void GenerateLandMine(int cx, int cy, int r);
 void InitLandMine(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos);
 void InitKFM(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos);
 void InitGaoGao(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos);
-void InitBoss();
+void InitBoss(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos);
 void CloseClient(SOCKET socket);
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID);
 bool IsValidSpawnPos(int playerIdx, POINT pos);
@@ -119,10 +124,11 @@ void InitUserData(PLAYERDATA& userData, int id);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx);
 
-bool testLandMine = false;
 bool init_miniboss1 = false;
 bool init_miniboss2 = false;
 bool init_boss = false;
+
+void InitLevel();
 
 WSADATA wsaData;
 SOCKET s, cs;
@@ -235,12 +241,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			if (isAllclientReady)
 			{
-				/*if (!testLandMine)
+				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
 				{
-					testLandMine = true;
+					// AllMonsterDie;
+					init_boss = true;
+					GenerateBoss(2000, 1000);
 					GenerateLandMine(2000, 1000, 600);
-				}*/
-				/*if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
+					ReplacePlayer(2000, 1000);
+				}
+				if (!init_miniboss1 && totalData.publicdata.currentTime > FIRST_BOSS_INIT_TIME)
 				{
 					init_miniboss1 = true;
 					for (int i = 0; i < PLAYERNUM; i++)
@@ -257,7 +266,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						if (!totalData.udata[i].dataType) continue;
 						GenerateGaoGao(i);
 					}
-				}*/
+				}
 				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
 				{
 					init_boss = true;
@@ -305,8 +314,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (hThreads[2])
 			ResumeThread(hThreads[2]);
 
-		totalData.publicdata.maxExp = 100;
-		totalData.publicdata.exp = 0;
+		InitLevel();
 
 		return InitServer(hWnd);
 	}
@@ -1275,9 +1283,16 @@ void InitGaoGao(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 	mData.monsterType = GAOGAO;
 	mData.id = ID;
 }
-void InitBoss()
+void InitBoss(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
+	m = new Boss(generatePos, BOSS, CHASE, {totalData.udata[0].pos}, BOSS_BASE_DAMAGE, BOSS_BASE_HEALTH, BOSS_BASE_SPEED, TRUE);
 
+	monsterCount++;
+
+	mData.dataType = MONSTERTYPE;
+	mData.pos = m->GetPosition();
+	mData.monsterType = BOSS;
+	mData.id = ID;
 }
 void InitLandMine(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
@@ -1366,20 +1381,25 @@ void GenerateMonster(int playerIdx)
 		}
 	}
 }
+void ReplacePlayer(int cx, int cy)
+{
+	int playerCount = 0;
+	while (totalData.udata[playerCount++].dataType);
+
+	for (int i = 0; i < playerCount; i++)
+	{
+		if (totalData.udata[i].dataType == 0) continue;
+		totalData.udata[i].pos.x = cx - 100 * (playerCount - 1) + 200 * i;
+		totalData.udata[i].pos.y = cy + 250;
+
+		vClient[i]->SetPosition(totalData.udata[i].pos);
+	}
+}
 void GenerateLandMine(int cx, int cy, int r)
 {
 	int mineCount = 160;
 	double pi = 3.141592;
 	double radian = 360 / mineCount * 180 / pi;
-
-	for (int i = 0; i < PLAYERNUM; i++)
-	{
-		if (totalData.udata[i].dataType == 0) continue;
-		totalData.udata[i].pos.x = cx - 100 + 200 * i;
-		totalData.udata[i].pos.y = cy + 250;
-
-		vClient[i]->SetPosition(totalData.udata[i].pos);
-	}
 
 	for (int i = 0; i < mineCount; i++)
 	{
@@ -1399,16 +1419,7 @@ void GenerateLandMine(int cx, int cy, int r)
 
 void GenerateKungFuMan(int idx)
 {
-	//for (int i = 0; i < PLAYERNUM; i++)
-	//{
-	//	if (totalData.udata[i].dataType == 0) continue;
-	//	totalData.udata[i].pos.x = cx - 100 + 200 * i;
-	//	totalData.udata[i].pos.y = cy + 250;
-
-	//	vClient[i]->SetPosition(totalData.udata[i].pos);
-	//}
-
-	POINT generatePos;
+	POINT generatePos = { 0, 0 };
 	switch (idx)
 	{
 	case UP:
@@ -1437,7 +1448,7 @@ void GenerateKungFuMan(int idx)
 }
 void GenerateGaoGao(int idx)
 {
-	POINT generatePos;
+	POINT generatePos = { 0, 0 };
 	switch (idx)
 	{
 	case UP:
@@ -1465,9 +1476,17 @@ void GenerateGaoGao(int idx)
 	}
 }
 
-void GenerateBoss()
+void GenerateBoss(int cx, int cy)
 {
-
+	for (int i = MONSTERINDEX; i < SKILLINDEX; i++)
+	{
+		if (!OBJECTIDARR[i])
+		{
+			InitBoss(totalData.mdata[i - MONSTERINDEX], monsterArr[i - MONSTERINDEX], i, { cx, cy - 300 });
+			OBJECTIDARR[i] = true;
+			break;
+		}
+	}
 }
 
 void UpdateSkill()
@@ -1562,17 +1581,19 @@ void UpdateMonster()
 
 void UpdateUi()
 {
-	totalData.publicdata.exp++;
+	
 	if (totalData.publicdata.exp >= totalData.publicdata.maxExp)
 	{
-		totalData.publicdata.maxExp *= 100;
+		totalData.publicdata.level++;
+		totalData.publicdata.maxExp = levelExp[((totalData.publicdata.level > 50) ? 50 : totalData.publicdata.level)];
 		totalData.publicdata.exp = 0;
 		totalData.publicdata.islevelUp = true;
 		isAllPlayerChoice = false;
 	}
 	if (timeSpan_UI.count() >= 1)
 	{
-		totalData.publicdata.currentTime += 1;
+		totalData.publicdata.currentTime++;
+		totalData.publicdata.exp++;
 		t1_UI = std::chrono::high_resolution_clock::now();
 		timeSpan_UI = std::chrono::duration_cast<std::chrono::duration<double>>(t2_UI - t1_UI);
 	}
@@ -1620,4 +1641,17 @@ float UpdateAngle(PAIR& lookingdir)
 	}
 
 	return angleDegrees;
+}
+
+void InitLevel()
+{
+	levelExp[0] = 0;
+	for (int i = 1; i <= 50; i++)
+	{
+		levelExp[i] = levelExp[i-1] + ((i - 1) / 10 + 1) * 10;
+	}
+
+	totalData.publicdata.level = 1;
+	totalData.publicdata.maxExp = levelExp[totalData.publicdata.level];
+	totalData.publicdata.exp = 0;
 }

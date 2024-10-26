@@ -99,6 +99,7 @@ public:
 		return curHealth <= 0;
 	}
 
+	void BossDraw(HDC&);
 	void Draw(HDC&);
 	void ObjectUpdate(TOTALDATA&, int i);
 };

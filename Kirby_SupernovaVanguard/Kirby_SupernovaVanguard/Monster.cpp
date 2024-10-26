@@ -62,12 +62,12 @@ void Monster::SetMonsterAni()
         tempAni[5] = imageDatas[gaogao_Stun];
         break;
     case BOSS:
-        tempAni[0] = nullptr;
-        tempAni[1] = nullptr;
+        tempAni[0] = imageDatas[boss_mode1];
+        tempAni[1] = imageDatas[boss_mode2];
         tempAni[2] = nullptr;
         tempAni[3] = nullptr;
         tempAni[4] = nullptr;
-        tempAni[5] = nullptr;
+        tempAni[5] = imageDatas[boss_eye];
         break;
     }
 
@@ -86,10 +86,14 @@ void Monster::SetMonsterAni()
 
 void Monster::Draw(HDC& hdc)
 {
-    if (ani[curState] == nullptr)
+    if (monsterType == BOSS)
     {
+        BossDraw(hdc);
         return;
     }
+    if (ani[curState] == nullptr)
+        return;
+
     HDC hMemDC = CreateCompatibleDC(hdc);
     HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, ani[curState]->GetBitmap());
 
@@ -132,6 +136,48 @@ void Monster::Draw(HDC& hdc)
     DeleteObject(hTempBitmap);
 
     SelectObject(hMemDC, hOldBitmap);
+    DeleteDC(hMemDC);
+}
+void Monster::BossDraw(HDC& hdc)
+{
+    HDC hMemDC = CreateCompatibleDC(hdc);
+
+    // 현재 상태에 따른 보스 애니메이션 비트맵 선택 및 그리기
+    HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, ani[curState]->GetBitmap());
+    ani[curState]->IncreaseIdx();
+
+    // 보스 애니메이션 크기를 2배로 설정
+    int width = ani[curState]->GetCurWidth() * 2;
+    int height = ani[curState]->GetHeight() * 2;
+    int left = GetPosition().x - ani[curState]->GetCurCog().x * 2 + ani[curState]->GetPrevWidth() * 2;
+    int top = GetPosition().y - ani[curState]->GetCurCog().y * 2;
+
+    TransparentBlt(
+        hdc, left, top, width, height,
+        hMemDC, ani[curState]->GetPrevWidth(), 0, ani[curState]->GetCurWidth(), ani[curState]->GetHeight(),
+        RGB(ani[curState]->GetR(), ani[curState]->GetG(), ani[curState]->GetB())
+    );
+
+    // 보스 애니메이션 그린 후, hMemDC에서 비트맵 선택 해제
+    SelectObject(hMemDC, hOldBitmap);
+
+    // 눈 애니메이션을 그리기 위해 hMemDC에 눈 비트맵 선택
+    HBITMAP hEyeBitmap = (HBITMAP)SelectObject(hMemDC, ani[(EMonsterState)5]->GetBitmap());
+
+    // 눈 애니메이션 크기를 2배로 설정
+    int eyeWidth = (ani[(EMonsterState)5]->GetCurWidth() - 1) * 1.5f;
+    int eyeHeight = ani[(EMonsterState)5]->GetHeight() * 1.5f;
+    int eyeLeft = GetPosition().x - ani[(EMonsterState)5]->GetCurCog().x * 1.5f + lookingDirection.first * 5;
+    int eyeTop = GetPosition().y - ani[(EMonsterState)5]->GetCurCog().y * 1.5f + lookingDirection.second * 5;
+
+    TransparentBlt(
+        hdc, eyeLeft, eyeTop, eyeWidth, eyeHeight,
+        hMemDC, 0, 0, ani[(EMonsterState)5]->GetCurWidth() - 1, ani[(EMonsterState)5]->GetHeight(),
+        RGB(ani[(EMonsterState)5]->GetR(), ani[(EMonsterState)5]->GetG(), ani[(EMonsterState)5]->GetB())
+    );
+
+    // 리소스 해제
+    SelectObject(hMemDC, hEyeBitmap);
     DeleteDC(hMemDC);
 }
 

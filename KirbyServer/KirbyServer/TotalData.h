@@ -81,6 +81,7 @@ struct MONSTERDATA :public OBJECTDATA
 struct PUBLICDATA
 {
 	float	currentTime;
+	int		level;
 	int		exp;
 	int		maxExp;
 	bool	islevelUp;

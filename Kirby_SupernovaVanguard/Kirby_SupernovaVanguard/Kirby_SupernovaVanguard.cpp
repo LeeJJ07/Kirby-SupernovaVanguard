@@ -510,18 +510,18 @@ void DrawEXP(HDC& hdc, int& cameraTop, int& cameraLeft)
 	brush = CreateSolidBrush(RGB(255, 0, 0));
 	HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
 
-	if (uData.publicdata.exp < 0)
+	if (uData.publicdata.exp < 0 || uData.publicdata.exp > uData.publicdata.maxExp)
 		return;
 
-	float expPer = ((float)uData.publicdata.exp / uData.publicdata.maxExp);
-
-	if (expPer >= 100.f)
-		expPer = 100.f;
+	// 경험치 비율을 0에서 1 사이로 제한
+	double expPer = (double)uData.publicdata.exp / uData.publicdata.maxExp;
+	if (expPer >= 1.0f)
+		expPer = 0.0f;
 
 	RECT ExpBar;
 
 	ExpBar.left = cameraLeft + EXP_OFFSET_LEFT;
-	ExpBar.right = ExpBar.left + (CAMERA_WIDTH - EXP_OFFSET_RIGHT) * expPer;
+	ExpBar.right = ExpBar.left + (int)((CAMERA_WIDTH - EXP_OFFSET_RIGHT) * expPer);
 	ExpBar.top = cameraTop + CAMERA_HEIGHT - EXP_OFFSET_TOP;
 	ExpBar.bottom = cameraTop + CAMERA_HEIGHT - EXP_OFFSET_BOTTOM;
 	Rectangle(hdc, ExpBar.left, ExpBar.top, ExpBar.right, ExpBar.bottom);

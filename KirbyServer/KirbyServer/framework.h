@@ -32,9 +32,9 @@
 #define DEFAULT_SPAWN_SIZE_X		50
 #define DEFAULT_SPAWN_SIZE_Y		50
 
-#define FIRST_BOSS_INIT_TIME		20 //300
-#define SECOND_BOSS_INIT_TIME		40 //600
-#define THIRD_BOSS_INIT_TIME		90 //900
+#define FIRST_BOSS_INIT_TIME		1000 //300
+#define SECOND_BOSS_INIT_TIME		1000 //600
+#define THIRD_BOSS_INIT_TIME		5 //900
 
 #define PAIR std::pair<double,double>
 #define PLAYERNUM					4
@@ -98,7 +98,7 @@ enum OBJECTINDEX
 
 #define BOSS_BASE_DAMAGE				30
 #define BOSS_BASE_HEALTH				150
-#define BOSS_BASE_SPEED					0
+#define BOSS_BASE_SPEED					1
 
 // >> Skill Destroy Time
 #define TKIRBYSKILLDESTROY 2
