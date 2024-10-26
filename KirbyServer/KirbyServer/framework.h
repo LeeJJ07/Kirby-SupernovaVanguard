@@ -22,6 +22,7 @@
 #include <iostream>
 #include <cmath>
 #include <time.h>
+#include <map>
 
 #define MAX_MAP_SIZE_X				4000
 #define MAX_MAP_SIZE_Y				2000

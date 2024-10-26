@@ -30,12 +30,24 @@ protected:
 	std::chrono::high_resolution_clock::time_point t2_targeting;
 
 	std::vector<SkillManager*> vSkillManager;
+	std::map<std::string, int> check;
+
+	
 public:
 	Monster() : monsterType(RUNNER), curState(CHASE), Object()
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
-
+		string str = "ab";
+		if (check[str] == 1) {
+			return;
+		}
+		else {
+			check[str] = 1;
+			//시간 돌리기
+		}
+		// 만약에 시간이 쿨타임이 찼다.
+		// check[str] = 0;
 		this->targetPos = { 0, 0 };
 		this->damage = BASE_DAMAGE;
 		this->maxHealth = BASE_HEALTH;

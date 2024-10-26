@@ -122,7 +122,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 				continue;
 			}
 
-			if(vSkill[i] == nullptr)
+			if(vSkill[i] == nullptr || vSkill[i]->GetCollider()->GetColliderShape() != pD.sdata[i].colliderShape)
 			{
 				vSkill[i] = new Skill((ESKILLTYPE)pD.sdata[i].skillType);
 				CreateObject((Skill*)vSkill[i], i + SKILLINDEX);
