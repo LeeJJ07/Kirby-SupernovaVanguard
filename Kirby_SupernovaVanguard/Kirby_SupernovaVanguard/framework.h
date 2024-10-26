@@ -19,7 +19,8 @@
 #include <map>
 #include <fstream>
 #include <sstream>
-
+#include <gdiplus.h>
+#pragma comment (lib,"Gdiplus.lib")
 #pragma comment(lib, "msimg32.lib")
 
 #define SCREEN_SIZE_X				1920

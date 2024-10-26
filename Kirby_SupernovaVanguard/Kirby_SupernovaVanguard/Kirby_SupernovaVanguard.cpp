@@ -465,7 +465,7 @@ void DoubleBuffering(HDC hdc)
 		HBRUSH oldBrush = (HBRUSH)SelectObject(bufferdc, hBrush);
 
 		// 반투명 효과를 위해 카메라 뷰의 전체 크기를 덮음
-		RECT rect = { cLeft, cTop, cLeft + CAMERA_WIDTH, cTop + CAMERA_HEIGHT };
+		RECT rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
 		FillRect(bufferdc, &rect, hBrush);
 
 		// 기존 브러시로 복원 및 반투명 브러시 삭제
@@ -483,10 +483,10 @@ void DrawCamera(HDC hdc)
 
 		//#######################################################
 		//이부분 수정 필요 -> 카메라의 중심을 기준으로 그리기
-		if (objArr[i]->GetPosition().x < vClient[myID]->GetPosition().x - 1000
-			|| objArr[i]->GetPosition().x > vClient[myID]->GetPosition().x + 1000
-			|| objArr[i]->GetPosition().y < vClient[myID]->GetPosition().y - 650
-			|| objArr[i]->GetPosition().y > vClient[myID]->GetPosition().y + 650)
+		if (objArr[i]->GetPosition().x < vClient[myID]->GetPosition().x - CAMERA_WIDTH / 2
+			|| objArr[i]->GetPosition().x > vClient[myID]->GetPosition().x + CAMERA_WIDTH / 2
+			|| objArr[i]->GetPosition().y < vClient[myID]->GetPosition().y - CAMERA_HEIGHT / 2
+			|| objArr[i]->GetPosition().y > vClient[myID]->GetPosition().y + CAMERA_HEIGHT / 2)
 			continue;
 
 		switch (objArr[i]->GetCollider()->GetColliderType())
