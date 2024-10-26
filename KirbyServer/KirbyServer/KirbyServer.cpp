@@ -73,7 +73,6 @@ float UpdateAngle(PAIR&);
 
 // >> : player
 std::vector<Player*> vClient;
-bool isAllPlayerChoice = true;
 bool isLockOn = true;
 // <<
 
@@ -316,6 +315,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		InitLevel();
 
+		totalData.publicdata.isAllPlayerChoice = true;
+
 		return InitServer(hWnd);
 	}
 		break;
@@ -449,7 +450,7 @@ void ReadData()
 		int dataLen = recv(socketList[i], (char*)&temp, sizeof(ReceiveData), 0);
 		if(dataLen > 0)
 		{
-			if (isAllPlayerChoice)
+			if (totalData.publicdata.isAllPlayerChoice)
 			{
 				SetUserData(totalData.udata[temp.id], temp);
 				vClient[temp.id]->SetisLockOn(temp.isLockOn);
@@ -469,7 +470,7 @@ void ReadData()
 	}
 	if (socketList.size() == choiceClientNum && socketList.size() != 0)
 	{
-		isAllPlayerChoice = true;
+		totalData.publicdata.isAllPlayerChoice = true;
 		totalData.publicdata.islevelUp = false;
 		for (int i = 0; i < 4; i++)
 			a[i] = 0;
@@ -515,7 +516,7 @@ unsigned __stdcall Update()
 				return 0;*/
 			EnterCriticalSection(&criticalsection);
 
-			if (isAllPlayerChoice)
+			if (totalData.publicdata.isAllPlayerChoice)
 			{
 				UpdateTimer();
 				UpdateMonster();
@@ -1588,7 +1589,7 @@ void UpdateUi()
 		totalData.publicdata.maxExp = levelExp[((totalData.publicdata.level > 50) ? 50 : totalData.publicdata.level)];
 		totalData.publicdata.exp = 0;
 		totalData.publicdata.islevelUp = true;
-		isAllPlayerChoice = false;
+		totalData.publicdata.isAllPlayerChoice = false;
 	}
 	if (timeSpan_UI.count() >= 1)
 	{

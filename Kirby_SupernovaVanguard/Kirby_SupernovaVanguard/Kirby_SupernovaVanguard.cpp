@@ -457,6 +457,21 @@ void DoubleBuffering(HDC hdc)
 	// <<
 
 	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, bufferdc, cLeft, cTop, SRCCOPY);
+
+	if (!uData.publicdata.isAllPlayerChoice)
+	{
+		// 반투명 브러시 색상 (회색, 약간 투명하게 표현)
+		HBRUSH hBrush = CreateSolidBrush(RGB(50, 50, 50)); // 회색 톤의 브러시 생성
+		HBRUSH oldBrush = (HBRUSH)SelectObject(bufferdc, hBrush);
+
+		// 반투명 효과를 위해 카메라 뷰의 전체 크기를 덮음
+		RECT rect = { cLeft, cTop, cLeft + CAMERA_WIDTH, cTop + CAMERA_HEIGHT };
+		FillRect(bufferdc, &rect, hBrush);
+
+		// 기존 브러시로 복원 및 반투명 브러시 삭제
+		SelectObject(bufferdc, oldBrush);
+		DeleteObject(hBrush);
+	}
 }
 
 void DrawCamera(HDC hdc)

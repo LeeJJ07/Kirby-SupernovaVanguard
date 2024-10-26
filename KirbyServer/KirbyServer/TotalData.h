@@ -80,6 +80,7 @@ struct MONSTERDATA :public OBJECTDATA
 
 struct PUBLICDATA
 {
+	bool	isAllPlayerChoice;
 	float	currentTime;
 	int		level;
 	int		exp;
