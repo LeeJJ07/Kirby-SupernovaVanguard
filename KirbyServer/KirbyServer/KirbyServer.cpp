@@ -128,6 +128,7 @@ bool init_miniboss2 = false;
 bool init_boss = false;
 
 void InitLevel();
+void SetRandomChoiceSkill();
 
 WSADATA wsaData;
 SOCKET s, cs;
@@ -266,10 +267,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						GenerateGaoGao(i);
 					}
 				}
-				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
-				{
-					init_boss = true;
-				}
 				for (int pIdx = 0; pIdx < PLAYERNUM; pIdx++)
 				{
 					if (totalData.udata[pIdx].dataType == 0)
@@ -300,6 +297,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 	{
 		srand(NULL);
+
 		InitializeCriticalSection(&criticalsection);
 
 		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
@@ -462,9 +460,14 @@ void ReadData()
 			}
 			else if (temp.isChoice && a[i] == 0)
 			{
+
+				//여기서 고른 스킬 세팅 및 스킬 레벨업
 				choiceClientNum++;
 				a[i] = temp.newskill;
+				//여기서 해당 스킬이 있는건지 없는건지 판별해야하네
+				//없으면 SetSkillData
 				SetSkillData(i, a[i]);
+				//있으면 UpgradeSkillData
 			}
 		}
 	}
@@ -656,8 +659,13 @@ void SetBasisSkillData(int& playerIndex)
 	std::vector<SkillManager*> sm = vClient[playerIndex]->GetSkillManager();
 	sm.push_back(skillmanager);
 	vClient[playerIndex]->SetSkillManager(sm);
-}
 
+	vClient[playerIndex]->SetSkillLevel(vClient[playerIndex]->GetCharacterType(), 1);
+	for (int i = 1; i <= 4; i++) {
+		if (vClient[playerIndex]->GetSkillLevel(i)) continue;
+		vClient[playerIndex]->SetSkillLevel(i, -1);
+	}
+}
 void SetSkillData(int& playerIndex, int skillnum)
 {
 	Skill* basisSkill = nullptr;
@@ -684,6 +692,8 @@ void SetSkillData(int& playerIndex, int skillnum)
 	std::vector<SkillManager*> sm = vClient[playerIndex]->GetSkillManager();
 	sm.push_back(skillmanager);
 	vClient[playerIndex]->SetSkillManager(sm);
+
+	vClient[playerIndex]->SetSkillLevel(skillnum, 1);
 }
 
 void GenerateSkill()
@@ -1400,7 +1410,7 @@ void GenerateLandMine(int cx, int cy, int r)
 {
 	int mineCount = 160;
 	double pi = 3.141592;
-	double radian = 360 / mineCount * 180 / pi;
+	double radian = 360 / (double)mineCount * 180 / pi;
 
 	for (int i = 0; i < mineCount; i++)
 	{
@@ -1582,7 +1592,6 @@ void UpdateMonster()
 
 void UpdateUi()
 {
-	
 	if (totalData.publicdata.exp >= totalData.publicdata.maxExp)
 	{
 		totalData.publicdata.level++;
@@ -1590,6 +1599,8 @@ void UpdateUi()
 		totalData.publicdata.exp = 0;
 		totalData.publicdata.islevelUp = true;
 		totalData.publicdata.isAllPlayerChoice = false;
+
+		SetRandomChoiceSkill();
 	}
 	if (timeSpan_UI.count() >= 1)
 	{
@@ -1656,3 +1667,37 @@ void InitLevel()
 	totalData.publicdata.maxExp = levelExp[totalData.publicdata.level];
 	totalData.publicdata.exp = 0;
 }
+
+// >> : 초이스 스킬 랜덤 생성
+// 5 6 7 8 9 중에서 생성, 패시브 더 추가되면 ALL_SKILL_LAST_INDEX 값 다시 세팅
+void SetRandomChoiceSkill() {
+	for (int i = 0; i < PLAYERNUM; i++) {
+		if (totalData.udata[i].dataType == 0)
+			break;
+		std::vector<int> randIdx;
+		for (int j = 1; j <= ALL_SKILL_LAST_INDEX; j++) {
+			if (vClient[i]->GetSkillLevel(j) >= 5 || vClient[i]->GetSkillLevel(j) == -1)
+				continue;
+			randIdx.push_back(j);
+		}
+		if (randIdx.size() < 3) {
+			int j;
+			for (j = 0; j < randIdx.size(); j++) {
+				totalData.udata[i].levelUpSkillIndex[j] = { randIdx[j], vClient[i]->GetSkillLevel(randIdx[j]) };
+			}
+			for (; j < 3; j++) {
+				//먹을거로 채움.
+				// 타입이 -1 인거는 체력 포션
+				totalData.udata[i].levelUpSkillIndex[j] = { -1, -1 };
+			}
+		}
+		else {
+			std::random_shuffle(randIdx.begin(), randIdx.end());
+			for (int j = 0; j < 3; j++) {
+				totalData.udata[i].levelUpSkillIndex[j] = { randIdx[j], vClient[i]->GetSkillLevel(randIdx[j]) };
+			}
+		}
+	}
+}
+
+// <<

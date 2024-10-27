@@ -19,11 +19,14 @@ private:
 	bool	isLockOn;
 
 	std::vector<SkillManager*> vSkillManager;
+	int allSkillLevel[10];
 public:
 	Player(int ID) : characterType(KIRBY), Object(), ID(ID), isLockOn(true)
 	{
 		Circle2D* c = new Circle2D(true, PLAYER);
 		SetObject(c);
+		for (int i = 0; i < 10; i++)
+			allSkillLevel[i] = 0;
 	}
 	~Player()
 	{
@@ -35,6 +38,8 @@ public:
 	int	GetID()	{ return ID; }
 	bool	GetisLockOn()	{ return isLockOn; }
 	std::vector<SkillManager*> GetSkillManager() { return vSkillManager; }
+	int GetSkillLevel(int idx) { return allSkillLevel[idx]; }
+	void	SetSkillLevel(int idx, int level) { allSkillLevel[idx] = level; }
 
 	void	SetisLockOn(bool isLockOn) { this->isLockOn = isLockOn; }
 	void	SetSkillManager(std::vector<SkillManager*> vSkillManager) { this->vSkillManager = vSkillManager; }

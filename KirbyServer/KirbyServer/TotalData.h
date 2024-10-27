@@ -33,6 +33,8 @@ struct PLAYERDATA :public OBJECTDATA
 	POINT mousePos;
 	bool inGameStart;
 	int charactertype;
+
+	std::pair<short, int> levelUpSkillIndex[3]; //스킬 타입, 현재 레벨 담아서 전송
 };
 
 struct SKILLDATA

@@ -38,6 +38,8 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 void DoubleBuffering(HDC, std::vector<Object*>);
 void DrawCamera(HDC hdc, int cLeft, int cTop);
 void DrawEXP(HDC&,int&,int&);
+void DrawTime(HDC& hdc, int& cameraLeft, int& cameraTop);
+void DrawLevelUp(HDC& hdc, int& cameraLeft, int& cameraTop);
 void DrawCollider(HDC&);
 void InitObjArr();
 unsigned __stdcall Paint(HWND);
@@ -305,10 +307,40 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			aD.isLockOn = isLockOn;
 			break;
 		}
+		break;
 	case WM_LBUTTONDOWN:
 	{
-		cursorX = LOWORD(lParam);
-		cursorY = HIWORD(lParam);
+		// 이부분 세 개가 스킬 선택 부분이네
+		if (uData.publicdata.islevelUp && !isChoiceSkill)
+		{
+			aD.newskill = 5;
+			isChoiceSkill = true;
+			/*if (GetAsyncKeyState('5') & 0x8000)
+			{
+				aD.newskill = 5;
+				isChoiceSkill = true;
+			}
+			if (GetAsyncKeyState('6') & 0x8000)
+			{
+				aD.newskill = 6;
+				isChoiceSkill = true;
+			}
+			if (GetAsyncKeyState('7') & 0x8000)
+			{
+				aD.newskill = 7;
+				isChoiceSkill = true;
+			}
+			if (GetAsyncKeyState('8') & 0x8000)
+			{
+				aD.newskill = 8;
+				isChoiceSkill = true;
+			}
+			if (GetAsyncKeyState('9') & 0x8000)
+			{
+				aD.newskill = 9;
+				isChoiceSkill = true;
+			}*/
+		}
 	}
 	break;
 	case WM_PAINT:
@@ -414,8 +446,6 @@ void DoubleBuffering(HDC hdc)
 
 	BitBlt(bufferdc, cLeft, cTop, CAMERA_WIDTH, CAMERA_HEIGHT, memdc, cLeft, cTop, SRCCOPY);
 
-	CString t;
-
 	DrawCamera(bufferdc, cLeft, cTop);
 
 	DrawEXP(bufferdc, cTop, cLeft);
@@ -423,62 +453,10 @@ void DoubleBuffering(HDC hdc)
 	if (isDrawCollider)
 		DrawCollider(bufferdc);
 
-	// >> : 시간
-	{
-		int minutes = static_cast<int>(uData.publicdata.currentTime) / 60;
-		int seconds = static_cast<int>(uData.publicdata.currentTime) % 60;
-
-		t.Format(_T("%02d : %02d"), minutes, seconds);  // 두 자리의 분과 초로 출력
-
-		// 글꼴 생성 (예: Arial, 크기 50으로 설정)
-		HFONT hFont = CreateFont(50, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-			OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-			DEFAULT_PITCH | FF_SWISS, _T("Arial"));
-
-		// 기존 글꼴 저장
-		HFONT oldFont = (HFONT)SelectObject(bufferdc, hFont);
-
-		// 텍스트 색상을 흰색으로 설정
-		SetTextColor(bufferdc, RGB(255, 255, 255));
-
-		// 텍스트 배경색을 투명으로 설정
-		SetBkMode(bufferdc, TRANSPARENT);
-
-		// 시간의 텍스트 크기를 얻어 화면 상단 중앙에 배치
-		SIZE textSize;
-		GetTextExtentPoint32(bufferdc, t, t.GetLength(), &textSize);
-		int centerX = cLeft + (CAMERA_WIDTH - textSize.cx) / 2;  // 카메라 좌표 기준 중앙 X
-		TextOut(bufferdc, centerX, cTop + 60, t, t.GetLength());  // Y 좌표는 상단에 10픽셀 여백
-
-		// 기존 글꼴 및 색상 복원
-		SelectObject(bufferdc, oldFont);
-		DeleteObject(hFont);  // 새로 만든 글꼴 삭제
-	}
+	DrawTime(bufferdc, cLeft, cTop);
 	// <<
 
-	if (!uData.publicdata.isAllPlayerChoice)
-	{
-		// 반투명 효과를 위해 카메라 뷰의 전체 크기를 덮음
-		BLENDFUNCTION blend = { AC_SRC_OVER, 0, 128, 0 }; // 128은 투명도 (0-255 범위)
-		HDC hScreenDC = GetDC(NULL);
-		HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
-		HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, CAMERA_WIDTH, CAMERA_HEIGHT);
-		SelectObject(hMemoryDC, hBitmap);
-
-		// 전체를 회색으로 채우기
-		RECT rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
-		HBRUSH hBrush = CreateSolidBrush(RGB(50, 50, 50));
-		FillRect(hMemoryDC, &rect, hBrush);
-		DeleteObject(hBrush);
-
-		// AlphaBlend로 그리기
-		AlphaBlend(bufferdc, cLeft, cTop, CAMERA_WIDTH, CAMERA_HEIGHT, hMemoryDC, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, blend);
-
-		// 메모리 DC 및 비트맵 정리
-		DeleteObject(hBitmap);
-		DeleteDC(hMemoryDC);
-		ReleaseDC(NULL, hScreenDC);
-	}
+	DrawLevelUp(bufferdc, cLeft, cTop);
 
 	BitBlt(hdc, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, bufferdc, cLeft, cTop, SRCCOPY);
 
@@ -493,7 +471,7 @@ void DrawCamera(HDC hdc, int cLeft, int cTop)
 
 		if (objArr[i]->GetPosition().x < cLeft
 			|| objArr[i]->GetPosition().x > cLeft + CAMERA_WIDTH
-			|| objArr[i]->GetPosition().y <cTop
+			|| objArr[i]->GetPosition().y < cTop
 			|| objArr[i]->GetPosition().y > cTop + CAMERA_HEIGHT)
 			continue;
 
@@ -551,6 +529,67 @@ void DrawEXP(HDC& hdc, int& cameraTop, int& cameraLeft)
 
 	SelectObject(hdc, oldBrush);
 	DeleteObject(brush);
+}
+
+void DrawTime(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
+	int minutes = static_cast<int>(uData.publicdata.currentTime) / 60;
+	int seconds = static_cast<int>(uData.publicdata.currentTime) % 60;
+
+	CString t;
+
+	t.Format(_T("%02d : %02d"), minutes, seconds);  // 두 자리의 분과 초로 출력
+
+	// 글꼴 생성 (예: Arial, 크기 50으로 설정)
+	HFONT hFont = CreateFont(50, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+		OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_SWISS, _T("Arial"));
+
+	// 기존 글꼴 저장
+	HFONT oldFont = (HFONT)SelectObject(bufferdc, hFont);
+
+	// 텍스트 색상을 흰색으로 설정
+	SetTextColor(bufferdc, RGB(255, 255, 255));
+
+	// 텍스트 배경색을 투명으로 설정
+	SetBkMode(bufferdc, TRANSPARENT);
+
+	// 시간의 텍스트 크기를 얻어 화면 상단 중앙에 배치
+	SIZE textSize;
+	GetTextExtentPoint32(bufferdc, t, t.GetLength(), &textSize);
+	int centerX = cameraLeft + (CAMERA_WIDTH - textSize.cx) / 2;  // 카메라 좌표 기준 중앙 X
+	TextOut(bufferdc, centerX, cameraTop + 60, t, t.GetLength());  // Y 좌표는 상단에 10픽셀 여백
+
+	// 기존 글꼴 및 색상 복원
+	SelectObject(bufferdc, oldFont);
+	DeleteObject(hFont);  // 새로 만든 글꼴 삭제
+}
+
+void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
+	if (uData.publicdata.isAllPlayerChoice)
+		return;
+	// 반투명 효과를 위해 카메라 뷰의 전체 크기를 덮음
+	BLENDFUNCTION blend = { AC_SRC_OVER, 0, 128, 0 }; // 128은 투명도 (0-255 범위)
+	HDC hScreenDC = GetDC(NULL);
+	HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
+	HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, CAMERA_WIDTH, CAMERA_HEIGHT);
+	SelectObject(hMemoryDC, hBitmap);
+
+	// 전체를 회색으로 채우기
+	RECT rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
+	HBRUSH hBrush = CreateSolidBrush(RGB(50, 50, 50));
+	FillRect(hMemoryDC, &rect, hBrush);
+	DeleteObject(hBrush);
+
+	// AlphaBlend로 그리기
+	AlphaBlend(bufferdc, cameraLeft, cameraTop, CAMERA_WIDTH, CAMERA_HEIGHT, hMemoryDC, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, blend);
+
+	// 메모리 DC 및 비트맵 정리
+	DeleteObject(hBitmap);
+	DeleteDC(hMemoryDC);
+	ReleaseDC(NULL, hScreenDC);
+
+	// 여기에서 해당 레벨업 했을 때의 렌더링 부분 ( 고려사항 -> 스킬 타입과 레벨에 따라 다른 출력 )
+	//########################################
 }
 
 void DrawCollider(HDC& hdc)
@@ -625,34 +664,6 @@ unsigned __stdcall Read()
 
 			ReadMessage(cSocket, vClient, uData);
 
-			if (uData.publicdata.islevelUp && !isChoiceSkill)
-			{
-				if (GetAsyncKeyState('5') & 0x8000)
-				{
-					aD.newskill = 5;
-					isChoiceSkill = true;
-				}
-				if (GetAsyncKeyState('6') & 0x8000)
-				{
-					aD.newskill = 6;
-					isChoiceSkill = true;
-				}
-				if (GetAsyncKeyState('7') & 0x8000)
-				{
-					aD.newskill = 7;
-					isChoiceSkill = true;
-				}
-				if (GetAsyncKeyState('8') & 0x8000)
-				{
-					aD.newskill = 8;
-					isChoiceSkill = true;
-				}
-				if (GetAsyncKeyState('9') & 0x8000)
-				{
-					aD.newskill = 9;
-					isChoiceSkill = true;
-				}
-			}
 			if (uData.publicdata.islevelUp && isChoiceSkill)
 			{
 				aD.isChoice = true;
