@@ -36,7 +36,7 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void DoubleBuffering(HDC, std::vector<Object*>);
-void DrawCamera(HDC);
+void DrawCamera(HDC hdc, int cLeft, int cTop);
 void DrawEXP(HDC&,int&,int&);
 void DrawCollider(HDC&);
 void InitObjArr();
@@ -416,7 +416,7 @@ void DoubleBuffering(HDC hdc)
 
 	CString t;
 
-	DrawCamera(bufferdc);
+	DrawCamera(bufferdc, cLeft, cTop);
 
 	DrawEXP(bufferdc, cTop, cLeft);
 
@@ -484,19 +484,17 @@ void DoubleBuffering(HDC hdc)
 
 }
 
-void DrawCamera(HDC hdc)
+void DrawCamera(HDC hdc, int cLeft, int cTop)
 {
 	for (int i = 0; i < FINALINDEX; i++)
 	{
 		if (objArr[i] == nullptr)
 			continue;
 
-		//#######################################################
-		//이부분 수정 필요 -> 카메라의 중심을 기준으로 그리기
-		if (objArr[i]->GetPosition().x < vClient[myID]->GetPosition().x - CAMERA_WIDTH / 2
-			|| objArr[i]->GetPosition().x > vClient[myID]->GetPosition().x + CAMERA_WIDTH / 2
-			|| objArr[i]->GetPosition().y < vClient[myID]->GetPosition().y - CAMERA_HEIGHT / 2
-			|| objArr[i]->GetPosition().y > vClient[myID]->GetPosition().y + CAMERA_HEIGHT / 2)
+		if (objArr[i]->GetPosition().x < cLeft
+			|| objArr[i]->GetPosition().x > cLeft + CAMERA_WIDTH
+			|| objArr[i]->GetPosition().y <cTop
+			|| objArr[i]->GetPosition().y > cTop + CAMERA_HEIGHT)
 			continue;
 
 		switch (objArr[i]->GetCollider()->GetColliderType())
