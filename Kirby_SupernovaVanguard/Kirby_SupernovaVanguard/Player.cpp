@@ -8,6 +8,8 @@ void Player::ObjectUpdate(TOTALDATA& pData, int i)
 	SetLookingDir(pData.udata[i].lookingDir);
 	SetIsInGame(pData.udata[i].inGameStart);
 	SetMousePosition(pData.udata[i].mousePos);
+    SetmaxHealth(pData.udata[i].maxHealth);
+    SetcurHealth(pData.udata[i].curHealth);
 }
 
 void Player::SetPlayerAni()

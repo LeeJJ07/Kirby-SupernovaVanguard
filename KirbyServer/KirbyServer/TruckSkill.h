@@ -14,14 +14,14 @@ public:
 	TruckSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::TRUCKSKILL, ECOLLIDERSHAPE::RECTANGLE, 0.2, 50, 150, 100, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
+		: Skill(masternum, targetnum, SKILLTYPE::TRUCKSKILL, ECOLLIDERSHAPE::RECTANGLE, 0.2, 50, 1000, 150, 100, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
 		rectangle2D->SetPosition(this->Getposition());
 		SetCollider(rectangle2D);
 	}
 	~TruckSkill()
-	{
+	{   
 		delete collider;
 	}
 

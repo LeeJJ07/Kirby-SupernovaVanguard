@@ -22,6 +22,7 @@ protected:
 	int damage;
 	int maxHealth;
 	int curHealth;
+	int expValue = 10;
 	float speed;
 
 	bool isEnabled;
@@ -38,16 +39,16 @@ public:
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
-		string str = "ab";
-		if (check[str] == 1) {
-			return;
-		}
-		else {
-			check[str] = 1;
-			//시간 돌리기
-		}
-		// 만약에 시간이 쿨타임이 찼다.
-		// check[str] = 0;
+		//string str = "ab";
+		//if (check[str] == 1) {
+		//	return;
+		//}
+		//else {
+		//	check[str] = 1;
+		//	//시간 돌리기
+		//}
+		//// 만약에 시간이 쿨타임이 찼다.
+		//// check[str] = 0;
 		this->targetPos = { 0, 0 };
 		this->damage = BASE_DAMAGE;
 		this->maxHealth = BASE_HEALTH;
@@ -97,8 +98,9 @@ public:
 
 	POINT	GetTargetPos() { return targetPos; }
 	int		GetDamage() { return damage; }
-	int		GetMaxHealth() { return maxHealth; }
-	int		GetCurHealth() { return curHealth; }
+	int		GetmaxHealth() { return maxHealth; }
+	int		GetcurHealth() { return curHealth; }
+	int		GetexpValue() { return expValue; }
 	float	GetSpeed() { return speed; }
 	bool	GetEnabled() { return isEnabled; }
 	std::chrono::high_resolution_clock::time_point Gett1_targeting() { return t1_targeting; }
@@ -107,8 +109,9 @@ public:
 
 	void	SetTargetPos(POINT targetPos) { this->targetPos = targetPos; }
 	void	SetDamage(int damage) { this->damage = damage; }
-	void	SetMaxHealth(int maxHealth) { this->maxHealth = maxHealth; }
-	void	SetCurHealth(int curHealth) { this->curHealth = curHealth; }
+	void	SetmaxHealth(int maxHealth) { this->maxHealth = maxHealth; }
+	void	SetcurHealth(int curHealth) { this->curHealth = curHealth; }
+	void	SetexpValue(int expValue) { this->expValue = expValue; }
 	void	SetSpeed(float speed) { this->speed = speed; }
 	void	SetEnabled(bool isEnabled) { this->isEnabled = isEnabled; }
 	void	Sett1_targeting() { t1_targeting = std::chrono::high_resolution_clock::now(); }

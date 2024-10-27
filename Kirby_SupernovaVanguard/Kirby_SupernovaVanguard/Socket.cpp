@@ -44,7 +44,7 @@ int InitClient(HWND hWnd, SOCKET &s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("211.235.59.106");
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
@@ -97,6 +97,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			if (pD.mdata[i].dataType != MONSTERTYPE)
 			{
 				objArr[i + MONSTERINDEX] = nullptr;
+				vMonster[i] = nullptr;
 				continue;
 			}
 

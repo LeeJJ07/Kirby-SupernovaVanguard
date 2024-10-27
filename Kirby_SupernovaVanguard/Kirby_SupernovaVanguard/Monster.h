@@ -79,12 +79,12 @@ public:
 	void SetMonsterState(EMonsterState nextState) { this->curState = nextState; }
 
 	int GetDamage() { return damage; }
-	int GetMaxHealth() { return maxHealth; }
-	int GetCurHealth() { return curHealth; }
+	int GetmaxHealth() { return maxHealth; }
+	int GetcurHealth() { return curHealth; }
 	float GetSpeed() { return speed; }
 	void SetDamage(int damage) { this->damage = damage;}
-	void SetMaxHealth(int maxHealth) { this->maxHealth = maxHealth;}
-	void SetCurHealth(int curHealth) { this->curHealth = curHealth; }
+	void SetmaxHealth(int maxHealth) { this->maxHealth = maxHealth;}
+	void SetcurHealth(int curHealth) { this->curHealth = curHealth; }
 	void SetSpeed(float speed) { this->speed = speed; }
 	void SetLookingDir(PAIR lookingDir) { this->lookingDirection = lookingDir; }
 	void SetMonsterAni();

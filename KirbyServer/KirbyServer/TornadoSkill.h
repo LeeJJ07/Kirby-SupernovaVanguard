@@ -13,7 +13,7 @@ public:
 	TornadoSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::TORNADOSKILL, ECOLLIDERSHAPE::RECTANGLE, 0.2, 10, 50, 50, 6, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
+		: Skill(masternum, targetnum, SKILLTYPE::TORNADOSKILL, ECOLLIDERSHAPE::RECTANGLE, 0.2, 10, 10, 50, 50, 6, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
 		rectangle2D->SetPosition(this->Getposition());

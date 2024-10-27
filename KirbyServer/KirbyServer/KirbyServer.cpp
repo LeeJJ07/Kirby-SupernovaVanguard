@@ -39,7 +39,8 @@ void UpdateThread();
 // <<
 
 // >> : collision
-void CollisionUpdate();
+void MonsterCollisionUpdate();
+void PlayerCollisionUpdate();
 // <<
 
 // >> : send
@@ -80,6 +81,18 @@ float UpdateAngle(PAIR&);
 std::vector<Player*> vClient;
 bool isAllPlayerChoice = true;
 bool isLockOn = true;
+
+void InitUserData(PLAYERDATA& userData, int id);
+void UpdateUser();
+void SetUserToData(Player*&, short&);
+void SetUserData(PLAYERDATA& uData, ReceiveData rData);
+void PlayerHit(Player*& , MonsterSkill*& );
+void PlayerDie();
+// <<
+
+// >> : monster
+void MonsterHit(Monster*& , Skill*& );
+void MonsterDie(Monster*& , int& );
 // <<
 
 // >> : UI
@@ -120,8 +133,6 @@ void CloseClient(SOCKET socket);
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID);
 bool IsValidSpawnPos(int playerIdx, POINT pos);
 POINT SetRandomSpawnPos(int playerIdx, EMonsterType mType);
-void InitUserData(PLAYERDATA& userData, int id);
-void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx);
 
 bool testLandMine = false;
@@ -263,6 +274,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						GenerateGaoGao(i);
 					}
 				}*/
+				static bool isGenerate = false;
 				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
 				{
 					init_boss = true;
@@ -271,7 +283,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					if (totalData.udata[pIdx].dataType == 0)
 						break;
-					GenerateMonster(pIdx);
+					if(!isGenerate)
+					{
+						GenerateMonster(pIdx);
+						isGenerate = true;
+					}
 				}
 				if(!isGameStart)
 				{
@@ -397,7 +413,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("211.235.59.106");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -431,6 +447,8 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 	Player* player = new Player(userID);
 	vClient.push_back(player);
 
+	SetUserToData(player, userID);
+
 	SendToAll(); // { cs , userData }
 
 	return cs;
@@ -449,6 +467,7 @@ void ReadData()
 			if (isAllPlayerChoice)
 			{
 				SetUserData(totalData.udata[temp.id], temp);
+				vClient[temp.id]->SetPosition(totalData.udata[temp.id].pos);
 				vClient[temp.id]->SetisLockOn(temp.isLockOn);
 
 				if (totalData.udata[temp.id].inGameStart)
@@ -515,7 +534,8 @@ unsigned __stdcall Update()
 			if (isAllPlayerChoice)
 			{
 				UpdateTimer();
-				CollisionUpdate();
+				MonsterCollisionUpdate();
+				PlayerCollisionUpdate();
 				UpdateMonster();
 				GenerateSkill();
 				UpdateSkill();
@@ -588,6 +608,17 @@ void InitUserData(PLAYERDATA& userData, int id)
 	userData.offset = { 0, 0 };
 	userData.radius = 10;
 	userData.inGameStart = false;
+}
+
+void UpdateUser()
+{
+
+}
+
+void SetUserToData(Player*& player, short& ID)
+{
+	totalData.udata[ID].curHealth = player->GetcurHealth();
+	totalData.udata[ID].maxHealth = player->GetmaxHealth();
 }
 
 void SetUserData(PLAYERDATA& uData, ReceiveData rData)
@@ -1591,11 +1622,10 @@ void UpdateMonster()
 
 void UpdateUi()
 {
-	totalData.publicdata.exp++;
 	if (totalData.publicdata.exp >= totalData.publicdata.maxExp)
 	{
-		totalData.publicdata.maxExp *= 100;
-		totalData.publicdata.exp = 0;
+		totalData.publicdata.exp -= totalData.publicdata.maxExp;
+		totalData.publicdata.maxExp += 100;
 		totalData.publicdata.islevelUp = true;
 		isAllPlayerChoice = false;
 	}
@@ -1612,6 +1642,8 @@ void SetMonsterData(MONSTERDATA& mData, Monster*& m)
 	mData.pos = m->GetPosition();
 	mData.lookingDir = m->GetLookingDir();
 	mData.curState = m->GetMonsterState();
+	mData.curHealth = m->GetcurHealth();
+	mData.maxHealth = m->GetmaxHealth();
 }
 
 
@@ -1651,7 +1683,7 @@ float UpdateAngle(PAIR& lookingdir)
 	return angleDegrees;
 }
 
-void CollisionUpdate()
+void MonsterCollisionUpdate()
 {
 	for (int i = 0; i < monsterArr.size(); i++)
 	{
@@ -1670,10 +1702,16 @@ void CollisionUpdate()
 
 				int radiusSum = 20 + vSkill[j]->Getsize();
 
-				if (radiusSum > distanceMToS)
+				if (distanceMToS < radiusSum)
 				{
-					OBJECTIDARR[vSkill[j]->GetID()] = false;
-					vSkill[j] = nullptr;
+					MonsterHit(monsterArr[i], vSkill[j]);
+				}
+				if (monsterArr[i]->GetcurHealth() <= 0)
+				{
+					totalData.mdata[i].dataType = 0;
+					delete monsterArr[i];
+					monsterArr[i] = nullptr;
+					break;
 				}
 			}
 			else
@@ -1682,10 +1720,12 @@ void CollisionUpdate()
 				int value1 = abs(vSkill[j]->Getsize() * cos(angle * 3.14 * 180));
 				int value2 = abs(vSkill[j]->Getsize2() * cos((180 - angle) * 3.14 * 180));
 				POINT vectorDistance = { monsterArr[i]->GetPosition().x - vSkill[j]->Getposition().x,monsterArr[i]->GetPosition().y - vSkill[j]->Getposition().y };
+
 				if (vectorDistance.x == 0)
 					vectorDistance.x = 1;
 				if (vectorDistance.y == 0)
 					vectorDistance.y = 1;
+
 				int d = round(sqrt((float)pow(vectorDistance.x, 2) + pow(vectorDistance.y, 2)));
 				int angle2 = atan(vectorDistance.y / vectorDistance.x);
 				int angle3 = atan(vectorDistance.x / vectorDistance.y);
@@ -1695,18 +1735,115 @@ void CollisionUpdate()
 
 				if (distanceMToS > distance && distanceMToS > distance2)
 				{
-					monsterArr[i]->SetCurHealth(monsterArr[i]->GetCurHealth() - vSkill[j]->Getdamage());
-					OBJECTIDARR[vSkill[j]->GetID()] = false;
-					vSkill[j] = nullptr;
+					MonsterHit(monsterArr[i], vSkill[j]);
 				}
-				if (monsterArr[i]->GetCurHealth() <= 0)
+				if (monsterArr[i]->GetcurHealth() <= 0)
 				{
-					totalData.mdata[i].dataType = 0;
-					delete monsterArr[i];
-					monsterArr[i] = nullptr;
+					MonsterDie(monsterArr[i], j);
 					break;
 				}
 			}
 		}
 	}
+}
+
+void PlayerCollisionUpdate()
+{
+	for (int i = 0; i < vClient.size(); i++)
+	{
+		if (vClient[i] == nullptr)
+			continue;
+
+		for (int j = 0; j < vMonsterSkill.size(); j++)
+		{
+			if (vMonsterSkill[j] == nullptr)
+				continue;
+
+			if (vMonsterSkill[j]->GetcolliderShape() == CIRCLE)
+			{
+				int distancePToMS = sqrt(pow(vClient[i]->GetPosition().x - vMonsterSkill[j]->Getposition().x, 2)
+					+ pow(vClient[i]->GetPosition().y - vMonsterSkill[j]->Getposition().y, 2));
+
+				int radiusSum = 20 + vMonsterSkill[j]->Getsize();
+
+				if (distancePToMS < radiusSum)
+				{
+					vClient[i]->SetcurHealth(vClient[i]->GetcurHealth() - vMonsterSkill[j]->Getdamage());
+					OBJECTIDARR[vMonsterSkill[j]->GetID()] = false;
+					vMonsterSkill[j] = nullptr;
+				}
+				if (vClient[i]->GetcurHealth() <= 0)
+				{
+					vClient[i]->SetcurHealth(0);
+					break;
+				}
+			}
+			else
+			{
+				int angle = vMonsterSkill[j]->Getangle();
+				int value1 = abs(vMonsterSkill[j]->Getsize() * cos(angle * 3.14 * 180));
+				int value2 = abs(vMonsterSkill[j]->Getsize2() * cos((180 - angle) * 3.14 * 180));
+				POINT vectorDistance = { vClient[i]->GetPosition().x - vMonsterSkill[j]->Getposition().x,vClient[i]->GetPosition().y - vMonsterSkill[j]->Getposition().y };
+
+				if (vectorDistance.x == 0)
+					vectorDistance.x = 1;
+				if (vectorDistance.y == 0)
+					vectorDistance.y = 1;
+
+				int d = round(sqrt((float)pow(vectorDistance.x, 2) + pow(vectorDistance.y, 2)));
+				int angle2 =	atan(vectorDistance.y / vectorDistance.x);
+				int angle3 =	atan(vectorDistance.x / vectorDistance.y);
+				int distance =	abs(d * cos(angle2 * 3.14 * 180));
+				int distance2 =	abs(d * cos(angle3 * 3.14 * 180));
+				int distancePToMS = 20 + value1 + value2;
+
+				if (distancePToMS > distance && distancePToMS > distance2)
+				{
+					PlayerHit(vClient[i], vMonsterSkill[j]);
+					totalData.msdata[j].dataType = NULL;
+				}
+				if (vClient[i]->GetcurHealth() <= 0)
+				{
+					vClient[i]->SetcurHealth(0);
+					break;
+				}
+			}
+		}
+
+		short ID = i;
+		SetUserToData(vClient[i], ID);
+	}
+}
+
+void PlayerHit(Player*& player, MonsterSkill*& monsterskill)
+{
+	player->SetcurHealth(player->GetcurHealth() - monsterskill->Getdamage());
+	OBJECTIDARR[monsterskill->GetID()] = false;
+	delete monsterskill;
+	monsterskill = nullptr;
+}
+
+void PlayerDie()
+{
+
+}
+
+void MonsterHit(Monster*& monster,Skill*& skill)
+{
+	monster->SetcurHealth(monster->GetcurHealth() - skill->Getdamage());
+	int pierceCount = skill->GetpierceCount() - 1;
+	skill->SetpierceCount(pierceCount);
+	if (skill->GetpierceCount() == 0)
+	{
+		OBJECTIDARR[skill->GetID()] = false;
+		skill = nullptr;
+	}
+}
+
+void MonsterDie(Monster*& monster, int& id)
+{
+	totalData.publicdata.exp = monster->GetexpValue();
+	totalData.mdata[id].dataType = 0;
+	delete monster;
+	monster = nullptr;
 }
