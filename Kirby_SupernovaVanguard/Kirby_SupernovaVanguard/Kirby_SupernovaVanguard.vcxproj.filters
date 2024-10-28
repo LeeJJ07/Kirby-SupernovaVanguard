@@ -143,12 +143,15 @@
     <ClInclude Include="MonsterSkill.h">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="Hp.h">
       <Filter>클래스파일\UI</Filter>
     </ClInclude>
     <ClInclude Include="Exp.h">
       <Filter>클래스파일\UI</Filter>
     </ClInclude>
+=======
+>>>>>>> parent of c10b91f (feat: 레벨업 유아이 구현중)
   </ItemGroup>
   <ItemGroup>
     <Image Include="Kirby_SupernovaVanguard.ico">
