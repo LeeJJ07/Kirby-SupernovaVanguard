@@ -1473,7 +1473,7 @@ void ReplacePlayer(int cx, int cy)
 }
 void GenerateLandMine(int cx, int cy, int r)
 {
-	int mineCount = 160;
+	int mineCount = 80;
 	double pi = 3.141592;
 	double radian = 360 / (double)mineCount * 180 / pi;
 
