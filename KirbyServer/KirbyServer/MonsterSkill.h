@@ -5,6 +5,7 @@
 enum MONSTERSKILLTYPE {
 	SPEARSKILL = 1,
 	FIREMANSKILL,
+	LASERSKILL,
 };
 
 class MonsterSkill {

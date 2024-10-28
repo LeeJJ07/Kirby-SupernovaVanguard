@@ -141,6 +141,7 @@
     <ClInclude Include="KunaiSkill.h" />
     <ClInclude Include="KungFuMan.h" />
     <ClInclude Include="LandMineMonster.h" />
+    <ClInclude Include="LaserSkill.h" />
     <ClInclude Include="MaberoaSkill.h" />
     <ClInclude Include="MagicarrowSkill.h" />
     <ClInclude Include="MetaknightSkill.h" />
