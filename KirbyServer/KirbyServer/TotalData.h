@@ -32,6 +32,7 @@ struct PLAYERDATA :public OBJECTDATA
 {
 	POINT	mousePos;
 	bool	inGameStart;
+	bool	isAlive;
 	char	charactertype;
 	int	maxHealth;
 	int	curHealth;
