@@ -186,6 +186,8 @@ void Monster::ObjectUpdate(TOTALDATA& totalData, int i)
 	SetPosition(totalData.mdata[i].pos);
     SetLookingDir(totalData.mdata[i].lookingDir);
 	GetCollider()->SetOffset(totalData.mdata[i].offset);
+    SetmaxHealth(totalData.mdata[i].maxHealth);
+    SetcurHealth(totalData.mdata[i].curHealth);
     
     SetMonsterType(totalData.mdata[i].monsterType);
     

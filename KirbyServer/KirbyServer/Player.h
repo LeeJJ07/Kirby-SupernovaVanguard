@@ -16,17 +16,20 @@ class Player : public Object
 private:
 	ECharacterType characterType;
 	int	ID;
+	int maxHealth =	100;
+	int curHealth =	maxHealth;
+	float	damage = 1.f;
+	float	speed =	1.f;
 	bool	isLockOn;
 
 	std::vector<SkillManager*> vSkillManager;
-	int allSkillLevel[10];
 public:
-	Player(int ID) : characterType(KIRBY), Object(), ID(ID), isLockOn(true)
+	Player(int ID)
+		: characterType(KIRBY), Object(), ID(ID), isLockOn(true),
+		damage()
 	{
 		Circle2D* c = new Circle2D(true, PLAYER);
 		SetObject(c);
-		for (int i = 0; i < 10; i++)
-			allSkillLevel[i] = 0;
 	}
 	~Player()
 	{
@@ -36,11 +39,17 @@ public:
 
 	ECharacterType	GetCharacterType() { return characterType; }
 	int	GetID()	{ return ID; }
+	int GetmaxHealth()	{ return maxHealth; }
+	int GetcurHealth()	{ return curHealth; }
+	int Getdamage()	{ return damage; }
+	int Getspeed()	{ return speed; }
 	bool	GetisLockOn()	{ return isLockOn; }
 	std::vector<SkillManager*> GetSkillManager() { return vSkillManager; }
-	int GetSkillLevel(int idx) { return allSkillLevel[idx]; }
-	void	SetSkillLevel(int idx, int level) { allSkillLevel[idx] = level; }
 
+	void	SetmaxHealth(int maxHealth)	{ this->maxHealth = maxHealth; }
+	void	SetcurHealth(int curHealth)	{ this->curHealth = curHealth; }
+	void	Setdamage(float damage)	{ this->damage = damage; }
+	void	Setspeed(float speed)	{ this->speed = speed; }
 	void	SetisLockOn(bool isLockOn) { this->isLockOn = isLockOn; }
 	void	SetSkillManager(std::vector<SkillManager*> vSkillManager) { this->vSkillManager = vSkillManager; }
 	void	SetCharacterType(int characterType)

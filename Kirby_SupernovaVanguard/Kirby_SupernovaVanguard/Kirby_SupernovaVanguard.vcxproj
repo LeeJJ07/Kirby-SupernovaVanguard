@@ -138,6 +138,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Collider2D.h" />
     <ClInclude Include="GameScene.h" />
+    <ClInclude Include="Hp.h" />
     <ClInclude Include="KirbySkill.h" />
     <ClInclude Include="Kirby_SupernovaVanguard.h" />
     <ClInclude Include="KunaiSkill.h" />
@@ -153,7 +154,6 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SelectScene.h" />
     <ClInclude Include="Skill.h" />
-    <ClInclude Include="SkillSelector.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="StartScene.h" />
     <ClInclude Include="targetver.h" />
@@ -176,7 +176,6 @@
     <ClCompile Include="Rectangle2D.cpp" />
     <ClCompile Include="SelectScene.cpp" />
     <ClCompile Include="Skill.cpp" />
-    <ClCompile Include="SkillSelector.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="StartScene.cpp" />
     <ClCompile Include="PlayerData.cpp" />

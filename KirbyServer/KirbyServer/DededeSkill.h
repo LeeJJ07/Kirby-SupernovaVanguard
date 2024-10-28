@@ -15,7 +15,7 @@ public:
 	DededeSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::DEDEDESKILL, ECOLLIDERSHAPE::CIRCLE, 0, 20, 40, 0, 5., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::DEDEDESKILL, ECOLLIDERSHAPE::CIRCLE, 0, 20, 1000, 40, 0, 5., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		biggersize(2)
 	{
 		Circle2D* circle2D = new Circle2D(true, PMISSILE);
@@ -81,10 +81,24 @@ void UpdateDededeSkill(Skill*& skill)
 
 	dededeskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(dededeskill->Gettime_2() - dededeskill->Gettime_1()).count();
+
+	dededeskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(dededeskill->Gett2_attacktick() - dededeskill->Gett1_attacktick()).count();
+
+	if (hittime > DEDEDETICK)
+	{
+		dededeskill->Setcanhit(true);
+		dededeskill->Sett1_attacktick();
+	}
+	else
+	{
+		dededeskill->Setcanhit(false);
+	}
+
 	if (skilldestroytime > TDEDEDESKILLDESTROY)
 	{
-		dededeskill->Setisactivate(false);
 		OBJECTIDARR[dededeskill->GetID()] = false;
+		skill = nullptr;
 	}
 }
 

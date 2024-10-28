@@ -13,7 +13,7 @@ public:
 	TornadoSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::TORNADOSKILL, ECOLLIDERSHAPE::RECTANGLE, 0.2, 10, 50, 50, 6, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
+		: Skill(masternum, targetnum, SKILLTYPE::TORNADOSKILL, ECOLLIDERSHAPE::RECTANGLE, 0.2, 10, 10, 50, 50, 6, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
 		rectangle2D->SetPosition(this->Getposition());
@@ -94,9 +94,24 @@ void UpdateTornadoSkill(Skill*& skill)
 
 	tornadoskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(tornadoskill->Gettime_2() - tornadoskill->Gettime_1()).count();
+
+	tornadoskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(tornadoskill->Gett2_attacktick() - tornadoskill->Gett1_attacktick()).count();
+
+	if (hittime > TORNADOTICK)
+	{
+		tornadoskill->Setcanhit(true);
+		tornadoskill->Sett1_attacktick();
+	}
+	else
+	{
+		tornadoskill->Setcanhit(false);
+	}
+
 	if (skilldestroytime > TTORNADOSKILLDESTROY)
 	{
-		tornadoskill->Setisactivate(false);
 		OBJECTIDARR[tornadoskill->GetID()] = false;
+		delete skill;
+		skill = nullptr;
 	}
 }

@@ -22,8 +22,7 @@
 #include <iostream>
 #include <cmath>
 #include <time.h>
-#include <random>
-#include <algorithm>
+#include <map>
 
 #define MAX_MAP_SIZE_X				4000
 #define MAX_MAP_SIZE_Y				2000
@@ -45,8 +44,6 @@
 #define MONSTERSKILLNUM				100
 
 #define RETARGETINGTIME				1
-
-#define ALL_SKILL_LAST_INDEX		9
 
 enum OBJECTINDEX
 {
@@ -116,7 +113,7 @@ enum OBJECTINDEX
 #define TTRUCKSKILLDESTROY 6
 
 // >> MonsterSkill Destroy Time
-#define TSPEARSKILLDESTROY 5
+#define TSPEARSKILLDESTROY 3
 #define TFIREMANSKILLDESTROY 1
 
 // >> Skill offset

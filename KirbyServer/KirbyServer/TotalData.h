@@ -30,11 +30,20 @@ struct OBJECTDATA
 
 struct PLAYERDATA :public OBJECTDATA
 {
-	POINT mousePos;
-	bool inGameStart;
-	int charactertype;
+	POINT	mousePos;
+	bool	inGameStart;
+	char	charactertype;
+	int	maxHealth;
+	int	curHealth;
+};
 
-	std::pair<short, int> levelUpSkillIndex[3]; //스킬 타입, 현재 레벨 담아서 전송
+struct MONSTERDATA :public OBJECTDATA
+{
+	int	targetnum;
+	EMonsterType	monsterType;
+	EMonsterState	curState;
+	int	maxHealth;
+	int	curHealth;
 };
 
 struct SKILLDATA
@@ -73,13 +82,6 @@ struct MONSTERSKILLDATA
 	bool	isActivate;
 };
 
-struct MONSTERDATA :public OBJECTDATA
-{
-	int	targetnum;
-	EMonsterType	monsterType;
-	EMonsterState	curState;
-};
-
 struct PUBLICDATA
 {
 	bool	isAllPlayerChoice;
@@ -100,6 +102,3 @@ struct TOTALDATA
 };
 
 static TOTALDATA totalData;
-
-void SetUserData(PLAYERDATA&, Object*);
-void SetObject(Object*& p, PLAYERDATA& ud);
