@@ -1106,6 +1106,8 @@ void CleanUpImageDatas()
 		delete pair.second;  // 각 Animation 객체를 delete
 		pair.second = nullptr;  // 안전하게 포인터를 nullptr로 설정
 	}
+
+	imDatas.clear();
 	imageDatas.clear();  // map을 비움
 }
 

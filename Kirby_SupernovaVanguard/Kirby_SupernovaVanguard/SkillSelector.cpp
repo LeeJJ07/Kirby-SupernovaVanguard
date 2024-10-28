@@ -2,8 +2,9 @@
 #include "Skill.h"
 
 SkillSelector::SkillSelector(POINT pos)
-	:m_hBit(0)
-	, m_bitInfo{}
+	:m_hBit(0), m_bitInfo{}
+	,m_hBit_blank(0), m_bitInfo_blank{}
+	,m_hBit_full(0), m_bitInfo_full{}
 {
 	this->pos = pos;
 	this->width = SKILL_SELECTOR_WIDTH;
@@ -18,6 +19,8 @@ SkillSelector::SkillSelector(POINT pos)
 SkillSelector::~SkillSelector()
 {
 	DeleteObject(m_hBit);
+	DeleteObject(m_hBit_blank);
+	DeleteObject(m_hBit_full);
 }
 
 void SkillSelector::Load()
@@ -29,6 +32,22 @@ void SkillSelector::Load()
 		MessageBox(NULL, _T("이미지 로드 에러"), _T("에러"), MB_OK);
 	}
 	else GetObject(m_hBit, sizeof(BITMAP), &m_bitInfo);
+
+	m_hBit_blank = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/starBlank.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	if (m_hBit_blank == NULL)
+	{
+		DWORD dwError = GetLastError();
+		MessageBox(NULL, _T("이미지 로드 에러"), _T("에러"), MB_OK);
+	}
+	else GetObject(m_hBit_blank, sizeof(BITMAP), &m_bitInfo_blank);
+
+	m_hBit_full = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/starFull.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	if (m_hBit_full == NULL)
+	{
+		DWORD dwError = GetLastError();
+		MessageBox(NULL, _T("이미지 로드 에러"), _T("에러"), MB_OK);
+	}
+	else GetObject(m_hBit_full, sizeof(BITMAP), &m_bitInfo_full);
 }
 
 void SkillSelector::Draw(HDC& hdc, int& cameraLeft, int& cameraTop, HFONT& hLargeFont, HFONT& hSmallFont, std::map<ESKILLTYPE, std::pair< HBITMAP, BITMAP>>& imDatas)
@@ -44,6 +63,32 @@ void SkillSelector::Draw(HDC& hdc, int& cameraLeft, int& cameraTop, HFONT& hLarg
 
     SelectObject(hMemDC, hOldBitmap);
     DeleteDC(hMemDC);
+
+	int starCount = 5; // 별 개수
+	int startX = pos.x + cameraLeft - (starCount * 20) / 2; // 별 시작 x 좌표 중앙 정렬
+	int startY = pos.y + cameraTop + height / 2 - 150; // 기본 위치에서 아래로 약간 내려 배치
+
+	for (int i = 0; i < starCount; i++)
+	{
+		HDC hStarDC = CreateCompatibleDC(hdc);
+		HBITMAP hStarOldBitmap;
+
+		// m_hBit_blank 이미지 그리기
+		hStarOldBitmap = (HBITMAP)SelectObject(hStarDC, m_hBit_blank);
+		TransparentBlt(hdc, startX + i * 20, startY, 20, 20,
+			hStarDC, 0, 0, m_bitInfo_blank.bmWidth, m_bitInfo_blank.bmHeight, RGB(255, 0, 255));
+
+		// 스킬 레벨에 따라 m_hBit_full 이미지 덮어쓰기
+		if (i < curSkillLevel)
+		{ 
+			SelectObject(hStarDC, m_hBit_full);
+			TransparentBlt(hdc, startX + i * 20, startY, 20, 20,
+				hStarDC, 0, 0, m_bitInfo_full.bmWidth, m_bitInfo_full.bmHeight, RGB(255, 0, 255));
+		}
+
+		SelectObject(hStarDC, hStarOldBitmap);
+		DeleteDC(hStarDC);
+	}
 
 	HDC hSkillDC = CreateCompatibleDC(hdc);
 	HBITMAP hOldSkillBitmap = (HBITMAP)SelectObject(hSkillDC, imDatas[(ESKILLTYPE)skillIdx].first);

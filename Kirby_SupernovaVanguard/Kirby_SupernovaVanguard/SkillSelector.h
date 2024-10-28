@@ -9,6 +9,10 @@ class SkillSelector
 private:
 	HBITMAP m_hBit;
 	BITMAP m_bitInfo;
+	HBITMAP m_hBit_blank;
+	BITMAP m_bitInfo_blank;
+	HBITMAP m_hBit_full;
+	BITMAP m_bitInfo_full;
 
 	POINT pos;
 	int width, height;
