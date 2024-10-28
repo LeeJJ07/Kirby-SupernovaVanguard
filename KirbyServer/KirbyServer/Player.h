@@ -11,6 +11,14 @@ enum ECharacterType
 	MABOROA
 };
 
+enum ECharacterSize
+{
+	KIRBYSIZE = 10,
+	DEDEDESIZE = 15,
+	METAKNIGHTSIZE = 10,
+	MABOROASIZE = 12,
+};
+
 class Player : public Object
 {
 private:
@@ -18,6 +26,7 @@ private:
 	int	ID;
 	int maxHealth =	100;
 	int curHealth =	maxHealth;
+	int playerSize;
 	float	damage = 1.f;
 	float	speed =	1.f;
 	bool	isLockOn;
@@ -25,8 +34,8 @@ private:
 	std::vector<SkillManager*> vSkillManager;
 	int allSkillLevel[10];
 public:
-	Player(int ID)
-		: characterType(KIRBY), Object(), ID(ID), isLockOn(true),
+	Player(int ID, int playerSize)
+		: characterType(KIRBY), Object(), ID(ID), playerSize(playerSize),isLockOn(true),
 		damage()
 	{
 		Circle2D* c = new Circle2D(true, PLAYER);
@@ -46,17 +55,19 @@ public:
 	int GetcurHealth()	{ return curHealth; }
 	int Getdamage()	{ return damage; }
 	int Getspeed()	{ return speed; }
+	int GetSkillLevel(int idx) { return allSkillLevel[idx]; }
+	int GetplayerSize() { return playerSize; }
 	bool	GetisLockOn()	{ return isLockOn; }
 	std::vector<SkillManager*> GetSkillManager() { return vSkillManager; }
-	int GetSkillLevel(int idx) { return allSkillLevel[idx]; }
-	void	SetSkillLevel(int idx, int level) { allSkillLevel[idx] = level; }
 
 	void	SetmaxHealth(int maxHealth)	{ this->maxHealth = maxHealth; }
 	void	SetcurHealth(int curHealth)	{ this->curHealth = curHealth; }
+	void	SetplayerSize(int playerSize) { this->playerSize = playerSize; }
 	void	Setdamage(float damage)	{ this->damage = damage; }
 	void	Setspeed(float speed)	{ this->speed = speed; }
 	void	SetisLockOn(bool isLockOn) { this->isLockOn = isLockOn; }
 	void	SetSkillManager(std::vector<SkillManager*> vSkillManager) { this->vSkillManager = vSkillManager; }
+	void	SetSkillLevel(int idx, int level) { allSkillLevel[idx] = level; }
 	void	SetCharacterType(int characterType)
 	{
 		switch (characterType)

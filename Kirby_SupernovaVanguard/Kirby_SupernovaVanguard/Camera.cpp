@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Camera.h"
 #include "Player.h"
-#include "Map.h"
 
 Camera camera;
 

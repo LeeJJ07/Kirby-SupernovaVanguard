@@ -28,6 +28,7 @@ CRITICAL_SECTION criticalsection;
 unsigned long ulStackSize = 0;
 bool threadEnd_Update;
 bool threadEnd_Send;
+bool threadEnd_Read;
 
 unsigned __stdcall Update();
 unsigned __stdcall Send();
@@ -81,8 +82,8 @@ float UpdateAngle(PAIR&);
 std::vector<Player*> vClient;
 bool isLockOn = true;
 
+void SetPlayerSize(int&);
 void InitUserData(PLAYERDATA& userData, int id);
-void UpdateUser();
 void SetUserToData(Player*&, short&);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 void PlayerHit(Player*& , MonsterSkill*& );
@@ -234,7 +235,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
+   hInst = hInstance;
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
 	  CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
@@ -298,8 +299,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 					//GenerateMonster(pIdx);
 				}
-				if(!isGameStart)
+				if (!isGameStart)
 				{
+					for (int i = 0; i < socketList.size(); i++)
+					{
+						SetPlayerSize(i);
+					}
 					for (int i = 0; i < socketList.size(); i++)
 					{
 						SetBasisSkillData(i);
@@ -367,7 +372,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			wchar_t buffer[50];
 			swprintf(buffer, 50, L"%f", totalData.publicdata.currentTime);
 
-			// 화면에 float 값 출력
 			TextOut(hdc, 500, 500, buffer, wcslen(buffer));
 
 			EndPaint(hWnd, &ps);
@@ -383,10 +387,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		threadEnd_Update = true;
 		threadEnd_Send = true;
+		threadEnd_Read = true;
 
 		Sleep(0);
-
-		//delete kirbyskill;
 
 		DeleteCriticalSection(&criticalsection);
 
@@ -403,8 +406,8 @@ int InitServer(HWND hWnd)
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 	
-	int sendBufSize = sizeof(TOTALDATA) + 1;  // 송신 버퍼 크기 (예: 8KB)
-	int recvBufSize = sizeof(TOTALDATA) + 1;  // 수신 버퍼 크기 (예: 8KB)
+	int sendBufSize = sizeof(TOTALDATA) + 1;
+	int recvBufSize = sizeof(TOTALDATA) + 1;
 
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -455,7 +458,7 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 	socketList.push_back(cs);
 	totalData.udata[userID] = userData;
 
-	Player* player = new Player(userID);
+	Player* player = new Player(userID, BASESIZE);
 	vClient.push_back(player);
 
 	SetUserToData(player, userID);
@@ -547,8 +550,8 @@ unsigned __stdcall Update()
 	{
 		if (timeSpan_update.count() >= 0.02)
 		{
-			/*if (threadEnd_Update)
-				return 0;*/
+			if (threadEnd_Update)
+				return 0;
 			EnterCriticalSection(&criticalsection);
 
 			if (totalData.publicdata.isAllPlayerChoice)
@@ -580,6 +583,9 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
+		if (threadEnd_Send)
+			return 0;
+
 		if (timeSpan_send.count() >= 0.01)
 		{
 			EnterCriticalSection(&criticalsection);
@@ -604,6 +610,9 @@ unsigned __stdcall Read()
 {
 	while (TRUE)
 	{
+		if (threadEnd_Read)
+			return 0;
+
 		if (timeSpan_read.count() >= 0.001)
 		{
 			EnterCriticalSection(&criticalsection);
@@ -631,16 +640,12 @@ void InitUserData(PLAYERDATA& userData, int id)
 	userData.inGameStart = false;
 }
 
-void UpdateUser()
-{
-
-}
-
 void SetUserToData(Player*& player, short& ID)
 {
 	totalData.udata[ID].curHealth = player->GetcurHealth();
 	totalData.udata[ID].maxHealth = player->GetmaxHealth();
 	totalData.udata[ID].pos = player->GetPosition();
+	totalData.udata[ID].radius = player->GetplayerSize();
 }
 
 void SetUserData(PLAYERDATA& uData, ReceiveData rData)
@@ -680,6 +685,26 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 		uData.lookingDir.first = -lookingdir.first;
 		uData.lookingDir.second = -lookingdir.second;
 	// <<
+}
+
+void SetPlayerSize(int& playerIndex)
+{
+	switch (vClient[playerIndex]->GetCharacterType())
+	{
+	case ECharacterType::KIRBY:
+		vClient[playerIndex]->SetplayerSize(KIRBYSIZE);
+		break;
+	case ECharacterType::DEDEDE:
+		vClient[playerIndex]->SetplayerSize(DEDEDESIZE);
+		break;
+	case ECharacterType::METAKNIGHT:
+		vClient[playerIndex]->SetplayerSize(METAKNIGHTSIZE);
+		break;
+	case ECharacterType::MABOROA:
+		vClient[playerIndex]->SetplayerSize(MABOROASIZE);
+		break;
+	}
+	
 }
 
 void SetBasisSkillData(int& playerIndex)
@@ -1240,7 +1265,7 @@ int FindCloseMonster(POINT& myposition)
 	int y = myposition.y;
 
 	int monsternum = -1;
-	int min = 99999999;
+	int min = MIN_VALUE;
 
 	for (int i = 0; i < MONSTERNUM; i++)
 	{
@@ -1264,7 +1289,7 @@ int FindClosePlayer(POINT& myposition)
 	int y = myposition.y;
 
 	int playernum = -1;
-	int min = 99999999;
+	int min = MIN_VALUE;
 
 	for (int i = 0; i < PLAYERNUM; i++)
 	{
@@ -1325,8 +1350,8 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 {
-	//EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
-	EMonsterType mType = EMonsterType::SPEAR;
+	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+
 	POINT generatePos = SetRandomSpawnPos(playerIdx, mType);
 
 	if (!IsValidSpawnPos(playerIdx, generatePos))
@@ -2005,7 +2030,7 @@ void Rigidbody()
 			int distancePToMS = sqrt(pow(vClient[i]->GetPosition().x - monsterArr[j]->GetPosition().x, 2)
 				+ pow(vClient[i]->GetPosition().y - monsterArr[j]->GetPosition().y, 2));
 
-			int radiusSum = 20 + 20;	//vClient[i].size()와 monsterArr[j].size()의 합
+			int radiusSum = vClient[i]->GetplayerSize() + 20;	//vClient[i].size()와 monsterArr[j].size()의 합
 
 			if (distancePToMS < radiusSum)
 			{

@@ -49,6 +49,8 @@
 
 #define ALL_SKILL_LAST_INDEX		9
 
+#define MIN_VALUE	9999999
+
 enum OBJECTINDEX
 {
 	PLAYERINDEX = 0,

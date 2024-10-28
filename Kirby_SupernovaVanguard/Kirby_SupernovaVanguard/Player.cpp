@@ -10,6 +10,17 @@ void Player::ObjectUpdate(TOTALDATA& pData, int i)
 	SetMousePosition(pData.udata[i].mousePos);
     SetmaxHealth(pData.udata[i].maxHealth);
     SetcurHealth(pData.udata[i].curHealth);
+    SetplayerSize(pData.udata[i].radius);
+    
+    switch (GetCollider()->GetColliderShape())
+    {
+    case CIRCLE:
+        ((Circle2D*)GetCollider())->SetRadius(pData.udata[i].radius);
+        break;
+    case RECTANGLE:
+
+        break;
+    }
 }
 
 void Player::SetPlayerAni()
