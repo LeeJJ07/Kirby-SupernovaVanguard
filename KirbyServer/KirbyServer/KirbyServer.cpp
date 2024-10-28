@@ -21,6 +21,9 @@ int curplayerindex = PLAYERINDEX;
 int curmonsterindex = MONSTERINDEX;
 int curskillindex = SKILLINDEX;
 
+std::random_device rd; // 시드용 random_device
+std::mt19937 gen(rd()); // 시드를 기반으로 하는 난수 생성 엔진
+
 // >> : multithread
 DWORD dwThID1, dwThID2, dwThID3;
 HANDLE hThreads[3];
@@ -499,18 +502,14 @@ void ReadData()
 			}
 			else if (temp.isChoice && a[i] == 0)
 			{
-				//여기서 고른 스킬 세팅 및 스킬 레벨업
 				choiceClientNum++;
 				a[i] = temp.newskill;
-				//여기서 해당 스킬이 있는건지 없는건지 판별해야하네
-				//없으면 SetSkillData
 				if (a[i] != -1 && vClient[i]->GetSkillLevel(a[i]) == 0)
 					SetSkillData(i, a[i]);
 				else if (a[i] != -1)
 					UpgradeSkillData(i, a[i]);
 				else
 					Healing(i);
-				//있으면 UpgradeSkillData
 			}
 		}
 	}
@@ -529,8 +528,7 @@ void ReadData()
 	}
 }
 
-// 모든 유저들에게 업데이트 된 정보를 전달
-void SendToAll()//pair<SOCKET, UserData> cs
+void SendToAll()
 {
 	for (int i = 0; i < PLAYERNUM; i++)
 	{
@@ -1933,7 +1931,7 @@ void SetRandomChoiceSkill() {
 			}
 		}
 		else {
-			std::random_shuffle(randIdx.begin(), randIdx.end());
+			std::shuffle(randIdx.begin(), randIdx.end(), gen);
 			for (int j = 0; j < 3; j++) {
 				totalData.udata[i].levelUpSkillIndex[j] = { randIdx[j], vClient[i]->GetSkillLevel(randIdx[j]) };
 			}
