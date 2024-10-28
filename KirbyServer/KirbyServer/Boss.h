@@ -2,16 +2,27 @@
 
 #include "Monster.h"
 
+#define PHASECHANGETIME 8
+#define PHASENUM 2
+
+extern int BossID;
+
 class Monster;
+
+enum BossPhase
+{
+	Electric,
+	Flame,
+};
 
 class Boss: public Monster
 {
 private:
 	POINT curTargetPos;
+	int phase = 0;
 
-	std::chrono::high_resolution_clock::time_point t1_activate;
-	std::chrono::high_resolution_clock::time_point t2_activate;
-
+	std::chrono::high_resolution_clock::time_point t1_phaseSwitch;
+	std::chrono::high_resolution_clock::time_point t2_phaseSwitch;
 public:
 	Boss()
 		:Monster(), curTargetPos({ 0, 0 })
@@ -21,14 +32,16 @@ public:
 		:Monster(p, mType, cs, targetPos, damage, maxHealth, speed, isEnabled), curTargetPos(targetPos)
 	{}
 
-	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }
-	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_activate; }
+	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_phaseSwitch; }
+	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_phaseSwitch; }
 
-	void Settime_1() { t1_activate = std::chrono::high_resolution_clock::now(); }
-	void Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
+	void Settime_1() { t1_phaseSwitch = std::chrono::high_resolution_clock::now(); }
+	void Settime_2() { t2_phaseSwitch = std::chrono::high_resolution_clock::now(); }
 
 public:
 	void StateUpdate() override;
 	void Update() override;
 };
 
+void InitLasorSkill(Monster*&);
+void InitFireballSkill(Monster*&);

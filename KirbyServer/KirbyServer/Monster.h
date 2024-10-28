@@ -11,6 +11,8 @@ class Monster;
 extern std::vector<Monster*> vMonster;
 extern int monsterCount;
 
+static std::vector<Monster*> monsterArr(MONSTERNUM);
+
 class Monster : public Object
 {
 protected:

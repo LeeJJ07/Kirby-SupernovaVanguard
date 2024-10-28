@@ -21,8 +21,6 @@ int curplayerindex = PLAYERINDEX;
 int curmonsterindex = MONSTERINDEX;
 int curskillindex = SKILLINDEX;
 
-std::vector<Monster*> monsterArr(MONSTERNUM);
-
 // >> : multithread
 DWORD dwThID1, dwThID2, dwThID3;
 HANDLE hThreads[3];
@@ -424,7 +422,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -1383,6 +1381,8 @@ void InitBoss(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
 	m = new Boss(generatePos, BOSS, CHASE, {totalData.udata[0].pos}, BOSS_BASE_DAMAGE, BOSS_BASE_HEALTH, BOSS_BASE_SPEED, TRUE);
 
+	BossID = ID;
+
 	MonsterSkill* monsterSkill = new FireballSkill(ID, 0);
 
 	SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
@@ -2123,4 +2123,26 @@ void GenerateFireballSkill(int& monsterID)
 			count++;
 		}
 	}
+}
+
+void InitLasorSkill(Monster*& monster)
+{
+	MonsterSkill* monsterSkill = new LaserSkill(BossID, 0);
+
+	SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
+
+	std::vector<SkillManager*> sm = monster->GetSkillManager();
+	sm.push_back(skillmanager);
+	monster->SetSkillManager(sm);
+}
+
+void InitFireballSkill(Monster*& monster)
+{
+	MonsterSkill* monsterSkill = new FireballSkill(BossID, 0);
+
+	SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
+
+	std::vector<SkillManager*> sm = monster->GetSkillManager();
+	sm.push_back(skillmanager);
+	monster->SetSkillManager(sm);
 }
