@@ -274,7 +274,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 						GenerateGaoGao(i);
 					}
 				}*/
-				static bool isGenerate = false;
+
 				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
 				{
 					init_boss = true;
@@ -283,11 +283,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					if (totalData.udata[pIdx].dataType == 0)
 						break;
-					if(!isGenerate)
-					{
-						GenerateMonster(pIdx);
-						isGenerate = true;
-					}
+
+					GenerateMonster(pIdx);
 				}
 				if(!isGameStart)
 				{
@@ -413,7 +410,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("211.235.59.106");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -719,6 +716,7 @@ void GenerateSkill()
 	for (int i = 0; i < socketList.size(); i++)
 	{
 		std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
+		static bool electricCreate[4];
 		for (int j = 0; j < temp.size(); j++)
 		{
 			temp[j]->Settime_2();
@@ -849,6 +847,8 @@ void GenerateSkill()
 						break;
 						case SKILLTYPE::ELECTRICFIELDSKILL:
 						{
+							if (electricCreate[i])
+								continue;
 							ElectricfieldSkill* electricfieldskill = new ElectricfieldSkill(i, 0);
 							electricfieldskill->Setdirection({ 0,0 });
 							electricfieldskill->Settime_1();
@@ -859,6 +859,7 @@ void GenerateSkill()
 							electricfieldskill->Setposition({ totalData.udata[i].pos.x + electricfieldskill->Getoffset().x, totalData.udata[i].pos.y + electricfieldskill->Getoffset().y });
 							electricfieldskill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = electricfieldskill;
+							electricCreate[i] = true;
 						}
 							break;
 						case SKILLTYPE::KUNAISKILL:
@@ -1692,7 +1693,7 @@ void MonsterCollisionUpdate()
 
 		for (int j = 0; j < vSkill.size(); j++)
 		{
-			if (vSkill[j] == nullptr)
+			if (vSkill[j] == nullptr || !(vSkill[j]->Getcanhit()))
 				continue;
 
 			if (vSkill[j]->GetcolliderShape() == CIRCLE)
@@ -1708,9 +1709,8 @@ void MonsterCollisionUpdate()
 				}
 				if (monsterArr[i]->GetcurHealth() <= 0)
 				{
-					totalData.mdata[i].dataType = 0;
-					delete monsterArr[i];
-					monsterArr[i] = nullptr;
+					MonsterDie(monsterArr[i], i);
+					vSkill[j]->Settargetnum(0);
 					break;
 				}
 			}
@@ -1739,7 +1739,8 @@ void MonsterCollisionUpdate()
 				}
 				if (monsterArr[i]->GetcurHealth() <= 0)
 				{
-					MonsterDie(monsterArr[i], j);
+					MonsterDie(monsterArr[i], i);
+					vSkill[j]->Settargetnum(0);
 					break;
 				}
 			}
@@ -1842,7 +1843,7 @@ void MonsterHit(Monster*& monster,Skill*& skill)
 
 void MonsterDie(Monster*& monster, int& id)
 {
-	totalData.publicdata.exp = monster->GetexpValue();
+	totalData.publicdata.exp += monster->GetexpValue();
 	totalData.mdata[id].dataType = 0;
 	delete monster;
 	monster = nullptr;

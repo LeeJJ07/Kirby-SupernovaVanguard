@@ -2,6 +2,16 @@
 
 #include "Player.h"
 
+#define KIRBYTICK	0.1f
+#define DEDEDETICK	0.5f
+#define METAKNIGHTTICK	0.1f
+#define MABEROATICK	0.05f
+#define ELECTRICFIELDTICK	0.8f
+#define KUNAITICK	0.02f
+#define MAGICARROWTICK	0.33f
+#define TORNADOTICK	0.4f
+#define TRUCKTICK	0.5f
+
 enum SKILLTYPE {
 	KIRBYSKILL = 1,
 	DEDEDESKILL,
@@ -32,6 +42,10 @@ private:
 	POINT offset;
 	POINT position;
 	POINT direction;
+
+	bool canhit = true;
+	std::chrono::high_resolution_clock::time_point t1_attacktick;
+	std::chrono::high_resolution_clock::time_point t2_attacktick;
 public:
 	Skill() :masternum(0), targetnum(0), skilltype(KIRBYSKILL), collidershape(ECOLLIDERSHAPE::CIRCLE),
 		speed(1), damage(1), size(0), size2(0), coolTime(5.0), offset({0,0}), position({0,0}), direction({1,0}), pierceCount(1){}
@@ -55,8 +69,12 @@ public:
 	float	Getsize2() { return size2; }
 	ECOLLIDERSHAPE	GetcolliderShape() { return collidershape; }
 	POINT	Getoffset()	{ return offset; }
+
+	bool	Getcanhit()	{ return canhit; }
 	POINT	Getposition()	{ return position; }
 	POINT	Getdirection()	{ return direction; }
+	std::chrono::high_resolution_clock::time_point Gett1_attacktick() { return t1_attacktick; }
+	std::chrono::high_resolution_clock::time_point Gett2_attacktick() { return t2_attacktick; }
 
 	void	Setisactivate(bool isactivate)	{ this->isactivate = isactivate; }
 	void	Setmasternum(int masternum) { this->masternum = masternum; }
@@ -74,6 +92,10 @@ public:
 	void	Setoffset(POINT offset)	{ this->offset = offset; }
 	void	Setposition(POINT position)	{ this->position = { position.x, position.y }; }
 	void	Setdirection(POINT direction)	{ this->direction = direction; }
+
+	void	Setcanhit(bool canhit) { this->canhit = canhit; }
+	void	Sett1_attacktick() { t1_attacktick = std::chrono::high_resolution_clock::now(); }
+	void	Sett2_attacktick() { t2_attacktick = std::chrono::high_resolution_clock::now(); }
 
 	virtual	void SetCollider(Collider2D* collider) = 0;
 };

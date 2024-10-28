@@ -61,8 +61,8 @@ void UpdateElectricfieldSkill(Skill*& skill)
 	electricfieldskill = dynamic_cast<ElectricfieldSkill*>(skill);
 
 	POINT newpos;
-	newpos.x = electricfieldskill->Getposition().x + electricfieldskill->Getdirection().x * electricfieldskill->Getspeed();
-	newpos.y = electricfieldskill->Getposition().y + electricfieldskill->Getdirection().y * electricfieldskill->Getspeed();
+	newpos.x = totalData.udata[electricfieldskill->Getmasternum()].pos.x + electricfieldskill->Getoffset().x;
+	newpos.y = totalData.udata[electricfieldskill->Getmasternum()].pos.y + electricfieldskill->Getoffset().y;
 	electricfieldskill->Setposition(newpos);
 
 	electricfieldskill->GetCollider()->SetPosition(electricfieldskill->Getposition());
@@ -73,10 +73,24 @@ void UpdateElectricfieldSkill(Skill*& skill)
 
 	electricfieldskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(electricfieldskill->Gettime_2() - electricfieldskill->Gettime_1()).count();
-	if (skilldestroytime > 0.1)
+
+	electricfieldskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(electricfieldskill->Gett2_attacktick() - electricfieldskill->Gett1_attacktick()).count();
+
+	if (hittime > ELECTRICFIELDTICK)
+	{
+		electricfieldskill->Setcanhit(true);
+		electricfieldskill->Sett1_attacktick();
+	}
+	else
+	{
+		electricfieldskill->Setcanhit(false);
+	}
+
+	/*if (skilldestroytime > 0.1)
 	{
 		OBJECTIDARR[electricfieldskill->GetID()] = false;
 		delete skill;
 		skill = nullptr;
-	}
+	}*/
 }

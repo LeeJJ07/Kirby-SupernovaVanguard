@@ -76,6 +76,20 @@ void UpdateKunaiSkill(Skill*& skill)
 
 	kunaiskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(kunaiskill->Gettime_2() - kunaiskill->Gettime_1()).count();
+
+	kunaiskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(kunaiskill->Gett2_attacktick() - kunaiskill->Gett1_attacktick()).count();
+
+	if (hittime >KUNAITICK)
+	{
+		kunaiskill->Setcanhit(true);
+		kunaiskill->Sett1_attacktick();
+	}
+	else
+	{
+		kunaiskill->Setcanhit(false);
+	}
+
 	if (skilldestroytime > TKUNAISKILLDESTROY)
 	{
 		OBJECTIDARR[kunaiskill->GetID()] = false;

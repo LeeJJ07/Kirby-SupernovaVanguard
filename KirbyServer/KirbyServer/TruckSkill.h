@@ -77,6 +77,20 @@ void UpdateTruckSkill(Skill*& skill)
 
 	truckskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(truckskill->Gettime_2() - truckskill->Gettime_1()).count();
+
+	truckskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(truckskill->Gett2_attacktick() - truckskill->Gett1_attacktick()).count();
+
+	if (hittime > TRUCKTICK)
+	{
+		truckskill->Setcanhit(true);
+		truckskill->Sett1_attacktick();
+	}
+	else
+	{
+		truckskill->Setcanhit(false);
+	}
+
 	if (skilldestroytime > TTRUCKSKILLDESTROY)
 	{
 		OBJECTIDARR[truckskill->GetID()] = false;

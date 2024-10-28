@@ -22,7 +22,7 @@ protected:
 	int damage;
 	int maxHealth;
 	int curHealth;
-	int expValue = 10;
+	int expValue = 50;
 	float speed;
 
 	bool isEnabled;

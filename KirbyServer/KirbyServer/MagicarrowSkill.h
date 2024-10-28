@@ -77,6 +77,20 @@ void UpdateMagicArrowSkill(Skill*& skill)
 
 	magicarrowskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(magicarrowskill->Gettime_2() - magicarrowskill->Gettime_1()).count();
+
+	magicarrowskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(magicarrowskill->Gett2_attacktick() - magicarrowskill->Gett1_attacktick()).count();
+
+	if (hittime > MAGICARROWTICK)
+	{
+		magicarrowskill->Setcanhit(true);
+		magicarrowskill->Sett1_attacktick();
+	}
+	else
+	{
+		magicarrowskill->Setcanhit(false);
+	}
+
 	if (skilldestroytime > TMAGICARROWSKILLDESTROY)
 	{
 		OBJECTIDARR[magicarrowskill->GetID()] = false;

@@ -81,6 +81,20 @@ void UpdateDededeSkill(Skill*& skill)
 
 	dededeskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(dededeskill->Gettime_2() - dededeskill->Gettime_1()).count();
+
+	dededeskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(dededeskill->Gett2_attacktick() - dededeskill->Gett1_attacktick()).count();
+
+	if (hittime > DEDEDETICK)
+	{
+		dededeskill->Setcanhit(true);
+		dededeskill->Sett1_attacktick();
+	}
+	else
+	{
+		dededeskill->Setcanhit(false);
+	}
+
 	if (skilldestroytime > TDEDEDESKILLDESTROY)
 	{
 		OBJECTIDARR[dededeskill->GetID()] = false;

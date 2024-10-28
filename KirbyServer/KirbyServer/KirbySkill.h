@@ -94,6 +94,20 @@ void UpdateKirbySkill(Skill* &skill)
 
 	kirbyskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(kirbyskill->Gettime_2() - kirbyskill->Gettime_1()).count();
+
+	kirbyskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(kirbyskill->Gett2_attacktick() - kirbyskill->Gett1_attacktick()).count();
+	
+	if (hittime > KIRBYTICK)
+	{
+		kirbyskill->Setcanhit(true);
+		kirbyskill->Sett1_attacktick();
+	}
+	else
+	{
+		kirbyskill->Setcanhit(false);
+	}
+
 	if (skilldestroytime > TKIRBYSKILLDESTROY)
 	{
 		OBJECTIDARR[kirbyskill->GetID()] = false;

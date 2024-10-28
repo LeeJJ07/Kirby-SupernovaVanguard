@@ -528,7 +528,7 @@ void DrawPlayerHp(HDC& hdc)
 		RECT HpBar;
 
 		HpBar.left = vClient[i]->GetPosition().x - CURHP_WIDTH;
-		HpBar.right = vClient[i]->GetPosition().x + CURHP_WIDTH * hpPer;
+		HpBar.right = HpBar.left + CURHP_WIDTH * 2 * hpPer;
 		HpBar.top = vClient[i]->GetPosition().y - CURHP_HEIGHT + offsetY;
 		HpBar.bottom = vClient[i]->GetPosition().y + CURHP_HEIGHT + offsetY;
 		Rectangle(hdc, HpBar.left, HpBar.top, HpBar.right, HpBar.bottom);
@@ -564,7 +564,7 @@ void DrawMonsterHp(HDC& hdc)
 		RECT HpBar;
 
 		HpBar.left = vMonster[i]->GetPosition().x - CURHP_WIDTH;
-		HpBar.right = vMonster[i]->GetPosition().x + CURHP_WIDTH * hpPer;
+		HpBar.right = HpBar.left + CURHP_WIDTH * 2 * hpPer;
 		HpBar.top = vMonster[i]->GetPosition().y - CURHP_HEIGHT + offsetY;
 		HpBar.bottom = vMonster[i]->GetPosition().y + CURHP_HEIGHT + offsetY;
 		Rectangle(hdc, HpBar.left, HpBar.top, HpBar.right, HpBar.bottom);

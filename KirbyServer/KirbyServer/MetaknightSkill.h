@@ -76,6 +76,20 @@ void UpdateMetaknightSkill(Skill*& skill)
 
 	metaknightskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(metaknightskill->Gettime_2() - metaknightskill->Gettime_1()).count();
+
+	metaknightskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(metaknightskill->Gett2_attacktick() - metaknightskill->Gett1_attacktick()).count();
+
+	if (hittime > METAKNIGHTTICK)
+	{
+		metaknightskill->Setcanhit(true);
+		metaknightskill->Sett1_attacktick();
+	}
+	else
+	{
+		metaknightskill->Setcanhit(false);
+	}
+
 	if (skilldestroytime > 0.5)
 	{
 		OBJECTIDARR[metaknightskill->GetID()] = false;
