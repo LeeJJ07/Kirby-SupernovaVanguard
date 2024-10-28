@@ -43,13 +43,9 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void DoubleBuffering(HDC, std::vector<Object*>);
-<<<<<<< HEAD
-void DrawCamera(HDC);
 void DrawPlayerHp(HDC&);
 void DrawMonsterHp(HDC&);
-=======
 void DrawCamera(HDC hdc, int cLeft, int cTop);
->>>>>>> LevelUp
 void DrawEXP(HDC&,int&,int&);
 void DrawTime(HDC& hdc, int& cameraLeft, int& cameraTop);
 void DrawLevelUp(HDC& hdc, int& cameraLeft, int& cameraTop);
@@ -680,11 +676,7 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 	if (uData.publicdata.isAllPlayerChoice)
 		return;
 	// 반투명 효과를 위해 카메라 뷰의 전체 크기를 덮음
-<<<<<<< HEAD
-	BLENDFUNCTION blend = { AC_SRC_OVER, 0, 128, 0 }; // 128은 투명도 (0-255 범위)
-=======
 	BLENDFUNCTION blend = { AC_SRC_OVER, 0, 220, 0 }; // 128은 투명도 (0-255 범위)
->>>>>>> parent of c51fcaf (Revert "Merge branch 'LevelUp'")
 	HDC hScreenDC = GetDC(NULL);
 	HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
 	HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, CAMERA_WIDTH, CAMERA_HEIGHT);
@@ -699,21 +691,14 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 	// AlphaBlend로 그리기
 	AlphaBlend(bufferdc, cameraLeft, cameraTop, CAMERA_WIDTH, CAMERA_HEIGHT, hMemoryDC, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, blend);
 
-<<<<<<< HEAD
-	// 메모리 DC 및 비트맵 정리
-=======
-
 	// 여기에서 해당 레벨업 했을 때의 렌더링 부분 ( 고려사항 -> 스킬 타입과 레벨에 따라 다른 출력 )
 	//########################################
->>>>>>> parent of c51fcaf (Revert "Merge branch 'LevelUp'")
 	DeleteObject(hBitmap);
 	DeleteDC(hMemoryDC);
 	ReleaseDC(NULL, hScreenDC);
 
-<<<<<<< HEAD
 	// 여기에서 해당 레벨업 했을 때의 렌더링 부분 ( 고려사항 -> 스킬 타입과 레벨에 따라 다른 출력 )
 	//########################################
-=======
 	HDC hMemDC = CreateCompatibleDC(bufferdc);
 	HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, hSkillSelectTitleImage);
 
@@ -761,7 +746,6 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 		skillSelector[i]->Draw(bufferdc, cameraLeft, cameraTop);
 
 	// 메모리 DC 및 비트맵 정리
->>>>>>> parent of c51fcaf (Revert "Merge branch 'LevelUp'")
 }
 
 void DrawCollider(HDC& hdc)
@@ -836,7 +820,6 @@ unsigned __stdcall Read()
 
 			ReadMessage(cSocket, vClient, uData);
 
-<<<<<<< HEAD
 			if (uData.publicdata.islevelUp && !isChoiceSkill)
 			{
 				if (GetAsyncKeyState('5') & 0x8000)
@@ -866,8 +849,6 @@ unsigned __stdcall Read()
 					isChoiceSkill = true;
 				}
 			}
-=======
->>>>>>> LevelUp
 			if (uData.publicdata.islevelUp && isChoiceSkill)
 			{
 				aD.isChoice = true;

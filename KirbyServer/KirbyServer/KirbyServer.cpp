@@ -420,15 +420,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-<<<<<<< HEAD
 	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
-=======
-<<<<<<< HEAD
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
-=======
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
->>>>>>> LevelUp
->>>>>>> parent of c51fcaf (Revert "Merge branch 'LevelUp'")
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -1743,7 +1735,6 @@ void InitLevel()
 	totalData.publicdata.maxExp = levelExp[totalData.publicdata.level];
 	totalData.publicdata.exp = 0;
 }
-<<<<<<< HEAD
 void MonsterCollisionUpdate()
 {
 	for (int i = 0; i < monsterArr.size(); i++)
@@ -1803,7 +1794,10 @@ void MonsterCollisionUpdate()
 					vSkill[j]->Settargetnum(0);
 					break;
 				}
-=======
+			}
+		}
+	}
+}
 
 // >> : 초이스 스킬 랜덤 생성
 // 5 6 7 8 9 중에서 생성, 패시브 더 추가되면 ALL_SKILL_LAST_INDEX 값 다시 세팅
@@ -1832,13 +1826,11 @@ void SetRandomChoiceSkill() {
 			std::random_shuffle(randIdx.begin(), randIdx.end());
 			for (int j = 0; j < 3; j++) {
 				totalData.udata[i].levelUpSkillIndex[j] = { randIdx[j], vClient[i]->GetSkillLevel(randIdx[j]) };
->>>>>>> LevelUp
 			}
 		}
 	}
 }
 
-<<<<<<< HEAD
 void PlayerCollisionUpdate()
 {
 	for (int i = 0; i < vClient.size(); i++)
@@ -2017,10 +2009,5 @@ void Rigidbody()
 			}
 		}
 	}
-<<<<<<< HEAD
 }
-=======
-=======
 // <<
->>>>>>> LevelUp
->>>>>>> parent of c51fcaf (Revert "Merge branch 'LevelUp'")
