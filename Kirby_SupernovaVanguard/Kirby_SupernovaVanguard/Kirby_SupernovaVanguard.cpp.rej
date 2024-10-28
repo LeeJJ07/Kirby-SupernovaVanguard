@@ -1,0 +1,9 @@
+diff a/Kirby_SupernovaVanguard/Kirby_SupernovaVanguard/Kirby_SupernovaVanguard.cpp b/Kirby_SupernovaVanguard/Kirby_SupernovaVanguard/Kirby_SupernovaVanguard.cpp	(rejected hunks)
+@@ -12,6 +12,7 @@
+ #include "Multithread.h"
+ #include "Exp.h"
+ #include "Animation.h"
++#include "SkillSelector.h"
+ 
+ #define MAX_LOADSTRING 100
+ #define TIMER_START 1
