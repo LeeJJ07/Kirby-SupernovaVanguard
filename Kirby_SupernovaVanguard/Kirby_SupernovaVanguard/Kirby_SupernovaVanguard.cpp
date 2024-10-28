@@ -20,7 +20,9 @@
 
 // >> : animation
 std::map<ObjectImage, Animation*> imageDatas;
+std::map<ESKILLTYPE, std::pair< HBITMAP, BITMAP>> imDatas;
 void LoadImages();
+void LoadSkillImage();
 void CleanUpImageDatas();
 // <<
 
@@ -153,7 +155,8 @@ void DrawSendNum(HDC);
 // <<
 
 // >> : LevelUp
-static bool isChoiceSkill;
+bool isChoiceSkill;
+bool isSetSkill;
 SkillSelector* skillSelector[3];
 
 static HBITMAP hSkillSelectTitleImage;
@@ -263,6 +266,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		GetClientRect(hWnd, &rectView);
 
 		LoadImages(); // 이미지 로드
+		LoadSkillImage();
 
 		curScene = START;
 
@@ -334,10 +338,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_LBUTTONDOWN:
 	{
+		cursorX = LOWORD(lParam);
+		cursorY = HIWORD(lParam);
 		// 이부분 세 개가 스킬 선택 부분이네
 		if (uData.publicdata.islevelUp && !isChoiceSkill)
 		{
-			aD.newskill = 5;
+			int curskill;
+			for (curskill = 0; curskill < 3; curskill++)
+			{
+				if (cursorX > (SCREEN_SIZE_X / 2 + 450 * (curskill - 1) - SKILL_SELECTOR_WIDTH / 2)
+					&& cursorX < (SCREEN_SIZE_X / 2 + 450 * (curskill - 1) + SKILL_SELECTOR_WIDTH / 2)
+					&& cursorY >(SCREEN_SIZE_Y / 2 - SKILL_SELECTOR_HEIGHT / 2)
+					&& cursorY < (SCREEN_SIZE_Y / 2 + SKILL_SELECTOR_HEIGHT / 2))
+					break;
+			}
+			if (curskill == 3)
+				break;
+			aD.newskill = uData.udata[myID].levelUpSkillIndex[curskill].first;
 			isChoiceSkill = true;
 		}
 	}
@@ -681,30 +698,24 @@ void DrawTime(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 	if (uData.publicdata.isAllPlayerChoice)
 		return;
-	// 반투명 효과를 위해 카메라 뷰의 전체 크기를 덮음
-	BLENDFUNCTION blend = { AC_SRC_OVER, 0, 220, 0 }; // 128은 투명도 (0-255 범위)
+
+	BLENDFUNCTION blend = { AC_SRC_OVER, 0, 220, 0 };
 	HDC hScreenDC = GetDC(NULL);
 	HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
 	HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, CAMERA_WIDTH, CAMERA_HEIGHT);
 	SelectObject(hMemoryDC, hBitmap);
 
-	// 전체를 회색으로 채우기
 	RECT rect = { 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT };
 	HBRUSH hBrush = CreateSolidBrush(RGB(50, 50, 50));
 	FillRect(hMemoryDC, &rect, hBrush);
 	DeleteObject(hBrush);
 
-	// AlphaBlend로 그리기
 	AlphaBlend(bufferdc, cameraLeft, cameraTop, CAMERA_WIDTH, CAMERA_HEIGHT, hMemoryDC, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, blend);
 
-	// 여기에서 해당 레벨업 했을 때의 렌더링 부분 ( 고려사항 -> 스킬 타입과 레벨에 따라 다른 출력 )
-	//########################################
 	DeleteObject(hBitmap);
 	DeleteDC(hMemoryDC);
 	ReleaseDC(NULL, hScreenDC);
 
-	// 여기에서 해당 레벨업 했을 때의 렌더링 부분 ( 고려사항 -> 스킬 타입과 레벨에 따라 다른 출력 )
-	//########################################
 	HDC hMemDC = CreateCompatibleDC(bufferdc);
 	HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, hSkillSelectTitleImage);
 
@@ -719,7 +730,7 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 
 	// 큰 텍스트 출력 설정
 	HFONT hFontLarge = CreateCustomFont(52, L"Y 최애 TTF Regular"); // 큰 폰트 설정
-	HFONT hOldFont = (HFONT)SelectObject(bufferdc, hFontLarge);
+	HFONT hOldFont1 = (HFONT)SelectObject(bufferdc, hFontLarge);
 
 	// 텍스트 색상 설정 (예: 흰색)
 	SetTextColor(bufferdc, RGB(255, 255, 255));
@@ -737,21 +748,32 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 
 	// 작은 텍스트 출력 설정
 	HFONT hFontSmall = CreateCustomFont(24, L"Y 최애 TTF Regular"); // 작은 폰트 설정
-	SelectObject(bufferdc, hFontSmall); // 작은 폰트 적용
+	HFONT hOldFont2 = (HFONT)SelectObject(bufferdc, hFontSmall);
 
 	// 아래쪽에 "배울 스킬을 선택하시오" 추가
-	int subTextY = textY + 600; // 추가된 텍스트의 Y 위치 (조정 가능)
+	int subTextY = textY + 650; // 추가된 텍스트의 Y 위치 (조정 가능)
 	TextOut(bufferdc, textX, subTextY, L"배울 스킬을 선택하시오", lstrlen(L"배울 스킬을 선택하시오"));
 
 	// 폰트 해제 및 정리
-	SelectObject(bufferdc, hOldFont);
+	SelectObject(bufferdc, hOldFont1);
+	SelectObject(bufferdc, hOldFont2);
 	DeleteObject(hFontLarge);
 	DeleteObject(hFontSmall);
 
-	for (int i = 0; i < 3; i++)
-		skillSelector[i]->Draw(bufferdc, cameraLeft, cameraTop);
+	
+	hFontLarge = CreateCustomFont(28, L"Y 최애 TTF Regular");
+	hFontSmall = CreateCustomFont(20, L"Y 최애 TTF Regular");
 
-	// 메모리 DC 및 비트맵 정리
+	// 스킬 선택창 및 텍스트 그리기
+	for (int i = 0; i < 3; i++)
+	{
+		skillSelector[i]->Draw(bufferdc, cameraLeft, cameraTop, hFontLarge, hFontSmall, imDatas);
+	}
+
+	// 폰트 삭제 및 정리
+	DeleteObject(hFontLarge);
+	DeleteObject(hFontSmall);
+
 }
 
 void DrawCollider(HDC& hdc)
@@ -831,11 +853,18 @@ unsigned __stdcall Read()
 			if (uData.publicdata.islevelUp && isChoiceSkill)
 			{
 				aD.isChoice = true;
+				isSetSkill = false;
 			}
 			if (!uData.publicdata.islevelUp)
 			{
 				aD.isChoice = false;
 				isChoiceSkill = false;
+			}
+			if (uData.publicdata.islevelUp && !isChoiceSkill && !isSetSkill)
+			{
+				for (int i = 0; i < 3; i++)
+					skillSelector[i]->SetInfo(uData.udata[myID].levelUpSkillIndex[i]);
+				isSetSkill = true;
 			}
 			t1_read = std::chrono::high_resolution_clock::now();
 
@@ -1106,3 +1135,36 @@ void UnloadCustomFont()
 }
 
 // <<
+
+void LoadSkillImage()
+{
+	imDatas[HEAL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/healSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	GetObject(imDatas[HEAL].first, sizeof(BITMAP), &imDatas[HEAL].second);
+
+	imDatas[KIRBYSKILL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/kirSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	GetObject(imDatas[KIRBYSKILL].first, sizeof(BITMAP), &imDatas[KIRBYSKILL].second);
+
+	imDatas[DEDEDESKILL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/ddSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	GetObject(imDatas[DEDEDESKILL].first, sizeof(BITMAP), &imDatas[DEDEDESKILL].second);
+
+	imDatas[METAKNIGHTSKILL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/metaSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	GetObject(imDatas[METAKNIGHTSKILL].first, sizeof(BITMAP), &imDatas[METAKNIGHTSKILL].second);
+
+	imDatas[MABEROASKILL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/maboSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	GetObject(imDatas[MABEROASKILL].first, sizeof(BITMAP), &imDatas[MABEROASKILL].second);
+
+	imDatas[ELECTRICFIELDSKILL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/elecSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	GetObject(imDatas[ELECTRICFIELDSKILL].first, sizeof(BITMAP), &imDatas[ELECTRICFIELDSKILL].second);
+
+	imDatas[KUNAISKILL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/kuSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	GetObject(imDatas[KUNAISKILL].first, sizeof(BITMAP), &imDatas[KUNAISKILL].second);
+
+	imDatas[MAGICARROWSKILL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/marSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	GetObject(imDatas[MAGICARROWSKILL].first, sizeof(BITMAP), &imDatas[MAGICARROWSKILL].second);
+
+	imDatas[TORNADOSKILL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/torSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	GetObject(imDatas[TORNADOSKILL].first, sizeof(BITMAP), &imDatas[TORNADOSKILL].second);
+
+	imDatas[TRUCKSKILL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/trkSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+	GetObject(imDatas[TRUCKSKILL].first, sizeof(BITMAP), &imDatas[TRUCKSKILL].second);
+}

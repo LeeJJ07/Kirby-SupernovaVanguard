@@ -1,5 +1,8 @@
 #pragma once
 #include "framework.h"
+#include "Skill.h"
+
+class Skill;
 
 class SkillSelector
 {
@@ -10,6 +13,10 @@ private:
 	POINT pos;
 	int width, height;
 	int skillIdx;
+	int curSkillLevel;
+
+	std::wstring skillName;
+	std::wstring skillDescript;
 
 public:
 	void Load();
@@ -18,10 +25,15 @@ public:
 
 	HBITMAP GetBitmap() { return m_hBit; }
 
-	void Draw(HDC& hdc, int& cameraLeft, int& cameraTop);
+	void Draw(HDC& hdc, int& cameraLeft, int& cameraTop, HFONT& hLargeFont, HFONT& hSmallFont, std::map<ESKILLTYPE, std::pair< HBITMAP, BITMAP>>& imDatas);
 
 public:
 	SkillSelector(POINT pos);
 	~SkillSelector();
+
+	void SetSkillIdx(int idx) { this->skillIdx = idx; }
+	void SetSkillLevel(int level) { this->curSkillLevel = level; }
+
+	void SetInfo(std::pair<short, int>& skillInfo);
 };
 
