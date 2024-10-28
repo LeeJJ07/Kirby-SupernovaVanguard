@@ -15,6 +15,7 @@ private:
 	ECharacterState characterState;
 	int maxHealth;
 	int curHealth;
+	int playerSize;
 
 	POINT mousePosition;
 	std::map<ECharacterState, Animation* > ani;
@@ -35,11 +36,13 @@ public:
 	POINT	GetMousePosition()	{ return mousePosition; }
 	int		GetmaxHealth()	{ return maxHealth; }
 	int		GetcurHealth()	{ return curHealth; }
+	int		GetplayerSize()	{ return playerSize; }
 
 	void	SetCharacterType(ECharacterType characterType)	{ this->characterType = characterType; }
 	void	SetMousePosition(POINT mousePos)	{ mousePosition = mousePos; }
 	void	SetmaxHealth(int maxHealth)	{ this->maxHealth = maxHealth; }
 	void	SetcurHealth(int curHealth) { this->curHealth = curHealth; }
+	void	SetplayerSize(int playerSize) { this->playerSize = playerSize; }
 
 	void	ObjectUpdate(TOTALDATA&, int i);
 	void	SetPlayerAni();

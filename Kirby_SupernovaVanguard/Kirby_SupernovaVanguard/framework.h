@@ -24,6 +24,9 @@
 #pragma comment (lib,"Gdiplus.lib")
 #pragma comment(lib, "msimg32.lib")
 
+#define MAX_MAP_SIZE_X 4000
+#define MAX_MAP_SIZE_Y 2000
+
 #define SCREEN_SIZE_X				1920
 #define SCREEN_SIZE_Y				1200
 

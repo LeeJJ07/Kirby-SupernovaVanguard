@@ -1,231 +1,53 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Camera.cpp">
-      <Filter>클래스파일\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="SelectScene.cpp">
-      <Filter>클래스파일\Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="StartScene.cpp">
-      <Filter>클래스파일\Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="GameScene.cpp">
-      <Filter>클래스파일\Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>클래스파일\Maps</Filter>
-    </ClCompile>
-    <ClCompile Include="Kirby_SupernovaVanguard.cpp">
-      <Filter>클래스파일\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Multithread.h">
-      <Filter>클래스파일\Thread</Filter>
-    </ClCompile>
-    <ClCompile Include="Socket.cpp">
-      <Filter>클래스파일\Socket</Filter>
-    </ClCompile>
-    <ClCompile Include="Collider2D.cpp">
-      <Filter>클래스파일\Colliders</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerData.cpp">
-      <Filter>클래스파일\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>클래스파일\Objects\Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Monster.cpp">
-      <Filter>클래스파일\Objects\Monster</Filter>
-    </ClCompile>
-    <ClCompile Include="Circle2D.cpp">
-      <Filter>클래스파일\Colliders\Circle</Filter>
-    </ClCompile>
-    <ClCompile Include="Skill.cpp">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClCompile>
-    <ClCompile Include="Rectangle2D.cpp">
-      <Filter>클래스파일\Colliders\Rectangle</Filter>
-    </ClCompile>
     <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="MonsterSkill.cpp">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClCompile>
+    <ClCompile Include="Circle2D.cpp" />
+    <ClCompile Include="Collider2D.cpp" />
+    <ClCompile Include="GameScene.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Kirby_SupernovaVanguard.cpp" />
+    <ClCompile Include="Monster.cpp" />
+    <ClCompile Include="MonsterSkill.cpp" />
+    <ClCompile Include="Multithread.h" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Rectangle2D.cpp" />
+    <ClCompile Include="SelectScene.cpp" />
+    <ClCompile Include="Skill.cpp" />
     <ClCompile Include="SkillSelector.cpp" />
+    <ClCompile Include="Socket.cpp" />
+    <ClCompile Include="StartScene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h">
-      <Filter>클래스파일\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="Collider2D.h">
-      <Filter>클래스파일\Colliders</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>클래스파일\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="StartScene.h">
-      <Filter>클래스파일\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="SelectScene.h">
-      <Filter>클래스파일\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="GameScene.h">
-      <Filter>클래스파일\Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>클래스파일\Maps</Filter>
-    </ClInclude>
-    <ClInclude Include="Kirby_SupernovaVanguard.h">
-      <Filter>클래스파일\Main</Filter>
-    </ClInclude>
-    <ClInclude Include="framework.h">
-      <Filter>클래스파일\FrameWork</Filter>
-    </ClInclude>
-    <ClInclude Include="Socket.h">
-      <Filter>클래스파일\Socket</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>클래스파일\FrameWork</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>클래스파일\FrameWork</Filter>
-    </ClInclude>
-    <ClInclude Include="ActionData.h">
-      <Filter>클래스파일\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerData.h">
-      <Filter>클래스파일\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>클래스파일\Objects\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Monster.h">
-      <Filter>클래스파일\Objects\Monster</Filter>
-    </ClInclude>
-    <ClInclude Include="Circle2D.h">
-      <Filter>클래스파일\Colliders\Circle</Filter>
-    </ClInclude>
-    <ClInclude Include="Rectangle2D.h">
-      <Filter>클래스파일\Colliders\Rectangle</Filter>
-    </ClInclude>
-    <ClInclude Include="AllSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="KirbySkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="KunaiSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="MaberoaSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="MagicarrowSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="MetaknightSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="Skill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="TornadoSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="TruckSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="DededeSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-    <ClInclude Include="EletricfieldSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
+    <ClInclude Include="ActionData.h" />
     <ClInclude Include="Animation.h" />
-    <ClInclude Include="MonsterSkill.h">
-      <Filter>클래스파일\Objects\Skill</Filter>
-    </ClInclude>
-<<<<<<< HEAD
-    <ClInclude Include="Hp.h">
-      <Filter>클래스파일\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="Exp.h">
-      <Filter>클래스파일\UI</Filter>
-    </ClInclude>
-=======
-<<<<<<< HEAD
->>>>>>> parent of c10b91f (feat: 레벨업 유아이 구현중)
-=======
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Circle2D.h" />
+    <ClInclude Include="Exp.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="Collider2D.h" />
+    <ClInclude Include="GameScene.h" />
+    <ClInclude Include="Hp.h" />
+    <ClInclude Include="Kirby_SupernovaVanguard.h" />
+    <ClInclude Include="Monster.h" />
+    <ClInclude Include="MonsterSkill.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Rectangle2D.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="SelectScene.h" />
+    <ClInclude Include="Skill.h" />
     <ClInclude Include="SkillSelector.h" />
->>>>>>> LevelUp
->>>>>>> parent of c51fcaf (Revert "Merge branch 'LevelUp'")
+    <ClInclude Include="Socket.h" />
+    <ClInclude Include="StartScene.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="PlayerData.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Kirby_SupernovaVanguard.ico">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="small.ico">
-      <Filter>리소스 파일</Filter>
-    </Image>
+    <ResourceCompile Include="Kirby_SupernovaVanguard.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{727fec7f-68a9-43ac-91d2-60403eabd342}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일">
-      <UniqueIdentifier>{061cd5c4-39f0-4f91-8caa-ec8f136e0d77}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Camera">
-      <UniqueIdentifier>{a2c2f9c3-6dcb-44c7-9b62-6c82f7427584}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Objects">
-      <UniqueIdentifier>{f10875f5-f1fe-4d11-b0d2-f56ce52dd932}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Scenes">
-      <UniqueIdentifier>{50713c9e-7853-4cc3-b4d2-5a7db138cf61}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Colliders">
-      <UniqueIdentifier>{dd69e3ee-b3fb-4404-9ad5-d7634536e947}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Maps">
-      <UniqueIdentifier>{6a061287-d02b-4b95-af82-16494df0a7ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Main">
-      <UniqueIdentifier>{379e11b4-5b6a-4abe-9f07-9e3171b4be30}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\FrameWork">
-      <UniqueIdentifier>{ee39b205-9765-4ac7-adec-446310f6a3e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Socket">
-      <UniqueIdentifier>{8e6bb875-253a-49f3-a42e-0da5fd908d18}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Thread">
-      <UniqueIdentifier>{a4ab6e69-f9a0-481d-9b8a-a6180783a872}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Objects\Player">
-      <UniqueIdentifier>{80d69283-a0a0-47c0-b80f-b60a0ac68231}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Objects\Monster">
-      <UniqueIdentifier>{f56c6962-676e-4ecd-b540-53c06ded0557}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Data">
-      <UniqueIdentifier>{3e4d9098-e034-4cb2-90e8-52882527efba}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Colliders\Circle">
-      <UniqueIdentifier>{8e4ccfaf-72b8-4d26-8b57-893b5e3e223f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Colliders\Rectangle">
-      <UniqueIdentifier>{e8349358-f465-40e7-a760-56fce2d35f7e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\Objects\Skill">
-      <UniqueIdentifier>{8bdb0f94-66f5-40fc-a2f5-63f9b956c960}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\UI">
-      <UniqueIdentifier>{739bc25e-6390-4f93-9e3f-fe573368f95f}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Kirby_SupernovaVanguard.rc">
-      <Filter>리소스 파일</Filter>
-    </ResourceCompile>
+    <Image Include="Kirby_SupernovaVanguard.ico" />
+    <Image Include="small.ico" />
   </ItemGroup>
 </Project>

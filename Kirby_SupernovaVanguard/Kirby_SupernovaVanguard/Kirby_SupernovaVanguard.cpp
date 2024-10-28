@@ -4,11 +4,10 @@
 #include "ActionData.h"
 #include "StartScene.h"
 #include "SelectScene.h"
-#include "AllSkill.h"
+#include "skill.h"
 #include "MonsterSkill.h"
 #include "Camera.h"
 #include "Socket.h"
-#include "Map.h"
 #include "Multithread.h"
 #include "Exp.h"
 #include "Hp.h"
@@ -340,31 +339,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			aD.newskill = 5;
 			isChoiceSkill = true;
-			/*if (GetAsyncKeyState('5') & 0x8000)
-			{
-				aD.newskill = 5;
-				isChoiceSkill = true;
-			}
-			if (GetAsyncKeyState('6') & 0x8000)
-			{
-				aD.newskill = 6;
-				isChoiceSkill = true;
-			}
-			if (GetAsyncKeyState('7') & 0x8000)
-			{
-				aD.newskill = 7;
-				isChoiceSkill = true;
-			}
-			if (GetAsyncKeyState('8') & 0x8000)
-			{
-				aD.newskill = 8;
-				isChoiceSkill = true;
-			}
-			if (GetAsyncKeyState('9') & 0x8000)
-			{
-				aD.newskill = 9;
-				isChoiceSkill = true;
-			}*/
 		}
 	}
 	break;
@@ -500,7 +474,39 @@ void DoubleBuffering(HDC hdc)
 
 void DrawCamera(HDC hdc, int cLeft, int cTop)
 {
-	for (int i = 0; i < FINALINDEX; i++)
+	for (int i = MONSTERINDEX; i < FINALINDEX; i++)
+	{
+		if (objArr[i] == nullptr)
+			continue;
+
+		if (objArr[i]->GetPosition().x < cLeft
+			|| objArr[i]->GetPosition().x > cLeft + CAMERA_WIDTH
+			|| objArr[i]->GetPosition().y < cTop
+			|| objArr[i]->GetPosition().y > cTop + CAMERA_HEIGHT)
+			continue;
+
+		switch (objArr[i]->GetCollider()->GetColliderType())
+		{
+		case TERRAIN:
+			break;
+		case PLAYER:
+			((Player*)objArr[i])->DrawPlayer(hdc);
+			break;
+		case MONSTER:
+			((Monster*)objArr[i])->Draw(hdc);
+			break;
+		case PMISSILE:
+			((Skill*)objArr[i])->DrawSkill(hdc);
+			break;
+		case EMISSILE:
+			((MonsterSkill*)objArr[i])->DrawMonsterSkill(hdc);
+			break;
+		default:
+			continue;
+		}
+	}
+
+	for (int i = PLAYERINDEX; i < MONSTERINDEX; i++)
 	{
 		if (objArr[i] == nullptr)
 			continue;
@@ -775,8 +781,8 @@ unsigned __stdcall Send()
 	{
 		if (timeSpan_send.count() >= 0.0025 && cs.DebugInfo != NULL)
 		{
-			/*if (threadEnd_Send)
-				return 0;*/
+			if (threadEnd_Send)
+				return 0;
 			if (curScene == GAME)
 			{
 				POINT cursorPos;
@@ -816,39 +822,12 @@ unsigned __stdcall Read()
 	{
 		if (timeSpan_read.count() >= 0.01)
 		{
+			if (threadEnd_Read)
+				return 0;
 			EnterCriticalSection(&cs);
 
 			ReadMessage(cSocket, vClient, uData);
 
-			if (uData.publicdata.islevelUp && !isChoiceSkill)
-			{
-				if (GetAsyncKeyState('5') & 0x8000)
-				{
-					aD.newskill = 5;
-					isChoiceSkill = true;
-				}
-				if (GetAsyncKeyState('6') & 0x8000)
-				{
-					aD.newskill = 6;
-					isChoiceSkill = true;
-				}
-
-				if (GetAsyncKeyState('7') & 0x8000)
-				{
-					aD.newskill = 7;
-					isChoiceSkill = true;
-				}
-				if (GetAsyncKeyState('8') & 0x8000)
-				{
-					aD.newskill = 8;
-					isChoiceSkill = true;
-				}
-				if (GetAsyncKeyState('9') & 0x8000)
-				{
-					aD.newskill = 9;
-					isChoiceSkill = true;
-				}
-			}
 			if (uData.publicdata.islevelUp && isChoiceSkill)
 			{
 				aD.isChoice = true;
@@ -870,6 +849,8 @@ unsigned __stdcall Paint(HWND pParam)
 {
 	while (TRUE)
 	{
+		if (threadEnd_Paint)
+			return 0;
 		PAINTSTRUCT ps;
 		if (curScene == START)
 		{
@@ -878,8 +859,6 @@ unsigned __stdcall Paint(HWND pParam)
 		}
 		if (timeSpan_render.count() >= 0.0075 && cs.DebugInfo != NULL)
 		{
-			/*if (threadEnd_Paint)
-				return 0;*/
 			EnterCriticalSection(&cs);
 
 			HDC hdc = BeginPaint(pParam, &ps);

@@ -69,6 +69,7 @@ public:
 	{
 		for (auto it = ani.begin(); it != ani.end(); it++)
 			delete (*it).second;
+
 		ani.clear();
 	}
 
