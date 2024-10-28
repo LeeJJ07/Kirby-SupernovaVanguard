@@ -12,6 +12,7 @@
 #include "Multithread.h"
 #include "Exp.h"
 #include "Animation.h"
+#include "SkillSelector.h"
 
 #define MAX_LOADSTRING 100
 #define TIMER_START 1
@@ -21,7 +22,12 @@
 std::map<ObjectImage, Animation*> imageDatas;
 void LoadImages();
 void CleanUpImageDatas();
+// <<
 
+// >> : font
+void LoadCustomFont();
+HFONT CreateCustomFont(int fontSize, LPCWSTR fontName);
+void UnloadCustomFont();
 // <<
 
 enum SceneState { START, SELECT, GAME };
@@ -146,6 +152,10 @@ void DrawSendNum(HDC);
 
 // >> : LevelUp
 static bool isChoiceSkill;
+SkillSelector* skillSelector[3];
+
+static HBITMAP hSkillSelectTitleImage;
+static BITMAP m_skillSelectTitleBitInfo;
 // <<
 
 unsigned long ulStackSize = 0;
@@ -213,6 +223,18 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 	hImage = (HBITMAP)LoadImage(NULL, TEXT("Images/Backgrounds/spacebackground.bmp"), IMAGE_BITMAP, 0, 0,
 		LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+
+	hSkillSelectTitleImage = (HBITMAP)LoadImage(NULL, TEXT("Images/Backgrounds/levelUpTitle.bmp"), IMAGE_BITMAP, 0, 0,
+		LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+	if (hSkillSelectTitleImage == NULL)
+	{
+		DWORD dwError = GetLastError();
+		MessageBox(NULL, _T("이미지 로드 에러"), _T("에러"), MB_OK);
+	}
+	else
+		GetObject(hSkillSelectTitleImage, sizeof(BITMAP), &m_skillSelectTitleBitInfo);
+
+	LoadCustomFont();
 
 	int width = GetSystemMetrics(SM_CXSCREEN);
 	int height = GetSystemMetrics(SM_CYSCREEN);
@@ -415,6 +437,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		DeleteObject(mapBit);
 		DeleteObject(bufferBitmap);
 
+		for (int i = 0; i < 3; i++)
+			delete skillSelector[i];
+
+		DeleteObject(hImage);
+		DeleteObject(hSkillSelectTitleImage);
+
+		UnloadCustomFont();
+
 		CleanUpImageDatas();
 
 		PostQuitMessage(0);
@@ -568,7 +598,7 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 	if (uData.publicdata.isAllPlayerChoice)
 		return;
 	// 반투명 효과를 위해 카메라 뷰의 전체 크기를 덮음
-	BLENDFUNCTION blend = { AC_SRC_OVER, 0, 128, 0 }; // 128은 투명도 (0-255 범위)
+	BLENDFUNCTION blend = { AC_SRC_OVER, 0, 220, 0 }; // 128은 투명도 (0-255 범위)
 	HDC hScreenDC = GetDC(NULL);
 	HDC hMemoryDC = CreateCompatibleDC(hScreenDC);
 	HBITMAP hBitmap = CreateCompatibleBitmap(hScreenDC, CAMERA_WIDTH, CAMERA_HEIGHT);
@@ -583,13 +613,60 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 	// AlphaBlend로 그리기
 	AlphaBlend(bufferdc, cameraLeft, cameraTop, CAMERA_WIDTH, CAMERA_HEIGHT, hMemoryDC, 0, 0, CAMERA_WIDTH, CAMERA_HEIGHT, blend);
 
-	// 메모리 DC 및 비트맵 정리
+
+	// 여기에서 해당 레벨업 했을 때의 렌더링 부분 ( 고려사항 -> 스킬 타입과 레벨에 따라 다른 출력 )
+	//########################################
 	DeleteObject(hBitmap);
 	DeleteDC(hMemoryDC);
 	ReleaseDC(NULL, hScreenDC);
 
-	// 여기에서 해당 레벨업 했을 때의 렌더링 부분 ( 고려사항 -> 스킬 타입과 레벨에 따라 다른 출력 )
-	//########################################
+	HDC hMemDC = CreateCompatibleDC(bufferdc);
+	HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, hSkillSelectTitleImage);
+
+	TransparentBlt(
+		bufferdc, cameraLeft + CAMERA_WIDTH / 2 - SKILL_SELECTOR_TITLE_WIDTH / 2, cameraTop + 100, SKILL_SELECTOR_TITLE_WIDTH , SKILL_SELECTOR_TITLE_HEIGHT,
+		hMemDC, 0, 0, m_skillSelectTitleBitInfo.bmWidth, m_skillSelectTitleBitInfo.bmHeight,
+		RGB(255, 255, 255)
+	);
+
+	SelectObject(hMemDC, hOldBitmap);
+	DeleteDC(hMemDC);
+
+	// 큰 텍스트 출력 설정
+	HFONT hFontLarge = CreateCustomFont(52, L"Y 최애 TTF Regular"); // 큰 폰트 설정
+	HFONT hOldFont = (HFONT)SelectObject(bufferdc, hFontLarge);
+
+	// 텍스트 색상 설정 (예: 흰색)
+	SetTextColor(bufferdc, RGB(255, 255, 255));
+	SetBkMode(bufferdc, TRANSPARENT);
+
+	// 텍스트 위치 조정
+	int textX = cameraLeft + CAMERA_WIDTH / 2;
+	int textY = cameraTop + 95 + SKILL_SELECTOR_TITLE_HEIGHT / 2;
+
+	// 텍스트 중앙 정렬 설정
+	SetTextAlign(bufferdc, TA_CENTER | TA_TOP);
+
+	// "SELECT SKILL" 텍스트 출력
+	TextOut(bufferdc, textX, textY, L"SELECT  SKILL", lstrlen(L"SELECT  SKILL"));
+
+	// 작은 텍스트 출력 설정
+	HFONT hFontSmall = CreateCustomFont(24, L"Y 최애 TTF Regular"); // 작은 폰트 설정
+	SelectObject(bufferdc, hFontSmall); // 작은 폰트 적용
+
+	// 아래쪽에 "배울 스킬을 선택하시오" 추가
+	int subTextY = textY + 600; // 추가된 텍스트의 Y 위치 (조정 가능)
+	TextOut(bufferdc, textX, subTextY, L"배울 스킬을 선택하시오", lstrlen(L"배울 스킬을 선택하시오"));
+
+	// 폰트 해제 및 정리
+	SelectObject(bufferdc, hOldFont);
+	DeleteObject(hFontLarge);
+	DeleteObject(hFontSmall);
+
+	for (int i = 0; i < 3; i++)
+		skillSelector[i]->Draw(bufferdc, cameraLeft, cameraTop);
+
+	// 메모리 DC 및 비트맵 정리
 }
 
 void DrawCollider(HDC& hdc)
@@ -895,6 +972,15 @@ void LoadImages()
 	}
 
 	file.close();
+
+	// >> : 스킬 셀렉터 설정
+	for (int i = 0; i < 3; i++)
+	{
+		skillSelector[i] = new SkillSelector({ SCREEN_SIZE_X / 2 + (i - 1) * 450, SCREEN_SIZE_Y / 2 });
+		skillSelector[i]->Load();
+	}
+
+	// << :
 }
 
 void CleanUpImageDatas()
@@ -906,3 +992,30 @@ void CleanUpImageDatas()
 	}
 	imageDatas.clear();  // map을 비움
 }
+
+
+// >> : 폰트
+void LoadCustomFont()
+{
+	// 폰트 파일 경로를 지정합니다
+	LPCWSTR fontPath = L"Fonts/YOnepick-Regular.ttf";
+
+	// AddFontResourceEx로 폰트를 메모리에 로드합니다
+	AddFontResourceEx(fontPath, FR_PRIVATE, 0);
+}
+HFONT CreateCustomFont(int fontSize, LPCWSTR fontName)
+{
+	HFONT hFont = CreateFont(
+		fontSize, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+		DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontName);
+	return hFont;
+}
+
+void UnloadCustomFont()
+{
+	LPCWSTR fontPath = L"Fonts/YOnepick-Regular.ttf";
+	RemoveFontResourceEx(fontPath, FR_PRIVATE, 0);
+}
+
+// <<
