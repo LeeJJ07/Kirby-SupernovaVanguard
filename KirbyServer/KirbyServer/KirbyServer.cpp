@@ -70,6 +70,8 @@ void UpdateUi();
 void SetBasisSkillData(int&);
 void SetEmptySkillData(int&);
 void SetSkillData(int&, int);
+void UpgradeSkillData(int&, int);
+void Healing(int&);
 void SetSkillToDatasheet();
 void SetMonsterSkillToDatasheet();
 float UpdateAngle(PAIR&);
@@ -422,7 +424,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -486,13 +488,17 @@ void ReadData()
 			}
 			else if (temp.isChoice && a[i] == 0)
 			{
-
 				//여기서 고른 스킬 세팅 및 스킬 레벨업
 				choiceClientNum++;
 				a[i] = temp.newskill;
 				//여기서 해당 스킬이 있는건지 없는건지 판별해야하네
 				//없으면 SetSkillData
-				SetSkillData(i, a[i]);
+				if (a[i] != -1 && vClient[i]->GetSkillLevel(a[i]) == 0)
+					SetSkillData(i, a[i]);
+				else if (a[i] != -1)
+					UpgradeSkillData(i, a[i]);
+				else
+					Healing(i);
 				//있으면 UpgradeSkillData
 			}
 		}
@@ -735,6 +741,23 @@ void SetSkillData(int& playerIndex, int skillnum)
 	vClient[playerIndex]->SetSkillManager(sm);
 
 	vClient[playerIndex]->SetSkillLevel(skillnum, 1);
+}
+void UpgradeSkillData(int& playerIndex, int skillnum)
+{
+	for (int i = 0; i < vClient[playerIndex]->GetSkillManager().size(); i++)
+	{
+		if (vClient[playerIndex]->GetSkillManager()[i]->Gettype() != skillnum)
+			continue;
+		vClient[playerIndex]->GetSkillManager()[i]->SetCurLevel(vClient[playerIndex]->GetSkillManager()[i]->GetCurLevel() + 1);
+		vClient[playerIndex]->SetSkillLevel(skillnum, vClient[playerIndex]->GetSkillLevel(skillnum) + 1);
+		break;
+	}
+}
+void Healing(int& playerIndex)
+{
+	vClient[playerIndex]->SetcurHealth(
+		vClient[playerIndex]->GetcurHealth() + 50 > vClient[playerIndex]->GetmaxHealth()
+		? vClient[playerIndex]->GetmaxHealth() : vClient[playerIndex]->GetcurHealth() + 50);
 }
 
 void GenerateSkill()
