@@ -44,7 +44,15 @@ int InitClient(HWND hWnd, SOCKET &s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
+<<<<<<< HEAD
 	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+=======
+<<<<<<< HEAD
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+=======
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+>>>>>>> LevelUp
+>>>>>>> parent of c51fcaf (Revert "Merge branch 'LevelUp'")
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
