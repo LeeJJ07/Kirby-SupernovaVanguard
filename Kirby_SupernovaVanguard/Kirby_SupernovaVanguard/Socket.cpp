@@ -25,8 +25,8 @@ int InitClient(HWND hWnd, SOCKET &s)
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 
-	int sendBufSize = sizeof(TOTALDATA) + 1;  // ¼Û½Å ¹öÆÛ Å©±â (¿¹: 8KB)
-	int recvBufSize = sizeof(TOTALDATA) + 1;  // ¼ö½Å ¹öÆÛ Å©±â (¿¹: 8KB)
+	int sendBufSize = sizeof(TOTALDATA) + 1;  // ï¿½Û½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ (ï¿½ï¿½: 8KB)
+	int recvBufSize = sizeof(TOTALDATA) + 1;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ (ï¿½ï¿½: 8KB)
 	
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -44,7 +44,7 @@ int InitClient(HWND hWnd, SOCKET &s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("192.168.0.3");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
@@ -97,6 +97,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 			if (pD.mdata[i].dataType != MONSTERTYPE)
 			{
 				objArr[i + MONSTERINDEX] = nullptr;
+				vMonster[i] = nullptr;
 				continue;
 			}
 
@@ -122,7 +123,7 @@ void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)
 				continue;
 			}
 
-			if(vSkill[i] == nullptr)
+			if(vSkill[i] == nullptr || vSkill[i]->GetCollider()->GetColliderShape() != pD.sdata[i].colliderShape)
 			{
 				vSkill[i] = new Skill((ESKILLTYPE)pD.sdata[i].skillType);
 				CreateObject((Skill*)vSkill[i], i + SKILLINDEX);

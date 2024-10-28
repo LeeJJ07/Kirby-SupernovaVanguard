@@ -139,12 +139,15 @@
     <ClInclude Include="EletricfieldSkill.h">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClInclude>
-    <ClInclude Include="Exp.h">
-      <Filter>클래스파일\UI\Exp</Filter>
-    </ClInclude>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="MonsterSkill.h">
       <Filter>클래스파일\Objects\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="Hp.h">
+      <Filter>클래스파일\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Exp.h">
+      <Filter>클래스파일\UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -209,9 +212,6 @@
     </Filter>
     <Filter Include="클래스파일\UI">
       <UniqueIdentifier>{739bc25e-6390-4f93-9e3f-fe573368f95f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="클래스파일\UI\Exp">
-      <UniqueIdentifier>{1f9bb86d-b916-4e04-b6a3-d6c285c48a1f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

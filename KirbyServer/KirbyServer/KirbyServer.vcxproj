@@ -177,7 +177,6 @@
     <ClCompile Include="LandMineMonster.cpp" />
     <ClCompile Include="Monster.cpp" />
     <ClCompile Include="Object.cpp" />
-    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Rectangle2D.cpp" />
     <ClCompile Include="RunnerMonster.cpp" />
     <ClCompile Include="Socket.cpp" />

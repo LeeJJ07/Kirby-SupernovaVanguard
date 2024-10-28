@@ -13,7 +13,7 @@ public:
 	KunaiSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::KUNAISKILL, ECOLLIDERSHAPE::RECTANGLE, 0.8, 2, 30, 5, 0.25, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
+		: Skill(masternum, targetnum, SKILLTYPE::KUNAISKILL, ECOLLIDERSHAPE::RECTANGLE, 0.8, 4, 1, 30, 5, 0.25, { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
 		rectangle2D->SetPosition(this->Getposition());
@@ -76,9 +76,24 @@ void UpdateKunaiSkill(Skill*& skill)
 
 	kunaiskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(kunaiskill->Gettime_2() - kunaiskill->Gettime_1()).count();
+
+	kunaiskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(kunaiskill->Gett2_attacktick() - kunaiskill->Gett1_attacktick()).count();
+
+	if (hittime >KUNAITICK)
+	{
+		kunaiskill->Setcanhit(true);
+		kunaiskill->Sett1_attacktick();
+	}
+	else
+	{
+		kunaiskill->Setcanhit(false);
+	}
+
 	if (skilldestroytime > TKUNAISKILLDESTROY)
 	{
-		kunaiskill->Setisactivate(false);
 		OBJECTIDARR[kunaiskill->GetID()] = false;
+		delete skill;
+		skill = nullptr;
 	}
 }

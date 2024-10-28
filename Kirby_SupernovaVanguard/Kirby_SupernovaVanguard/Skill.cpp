@@ -123,15 +123,29 @@ void Skill::DrawSkill(HDC& hdc)
 	HBITMAP hTempBitmap = CreateCompatibleBitmap(hdc, WchangeValue, HchangeValue);
 	HBITMAP hOldTempBitmap = (HBITMAP)SelectObject(hTempDC, hTempBitmap);
 
-	// 크기 변환
-	StretchBlt(hTempDC, 0, 0, WchangeValue, HchangeValue, hMemDC, ani[eSkillState]->GetPrevWidth(), 0, width, height, SRCCOPY);
+	float angle = this->GetCollider()->Getangle();
+
+	if (angle < 90 || angle > 270)
+	{
+		StretchBlt(hTempDC, 0, 0, WchangeValue, HchangeValue,
+			hMemDC, ani[eSkillState]->GetPrevWidth(), 0,
+			width, height, SRCCOPY);
+	}
+	else
+	{
+		StretchBlt(hTempDC, WchangeValue, 0, -WchangeValue, HchangeValue,
+			hMemDC, ani[eSkillState]->GetPrevWidth(), 0,
+			width, height, SRCCOPY);
+	}
 
 	// 디바이스 컨텍스트에서 고급 그래픽 모드 설정
 
 	if (collider2D == 0)
 	{
 		SetGraphicsMode(hdc, GM_ADVANCED);
-		float radian = this->GetCollider()->Getangle() * 3.14f / 180;
+		if (angle >= 90 && angle <= 270)
+			angle -= 180;
+		float radian = angle * 3.14f / 180;
 
 		// 회전 변환 매트릭스 설정
 		XFORM xForm;

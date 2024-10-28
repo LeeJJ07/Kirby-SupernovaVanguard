@@ -22,6 +22,7 @@ protected:
 	int damage;
 	int maxHealth;
 	int curHealth;
+	int expValue = 50;
 	float speed;
 
 	bool isEnabled;
@@ -30,12 +31,24 @@ protected:
 	std::chrono::high_resolution_clock::time_point t2_targeting;
 
 	std::vector<SkillManager*> vSkillManager;
+	std::map<std::string, int> check;
+
+	
 public:
 	Monster() : monsterType(RUNNER), curState(CHASE), Object()
 	{
 		Circle2D* c = new Circle2D(true, MONSTER);
 		SetObject(c);
-
+		//string str = "ab";
+		//if (check[str] == 1) {
+		//	return;
+		//}
+		//else {
+		//	check[str] = 1;
+		//	//시간 돌리기
+		//}
+		//// 만약에 시간이 쿨타임이 찼다.
+		//// check[str] = 0;
 		this->targetPos = { 0, 0 };
 		this->damage = BASE_DAMAGE;
 		this->maxHealth = BASE_HEALTH;
@@ -83,24 +96,26 @@ public:
 	EMonsterState GetMonsterState() { return curState; }
 	void SetMonsterState(EMonsterState nextState) { this->curState = nextState; }
 
-	POINT GetTargetPos() { return targetPos; }
-	int GetDamage() { return damage; }
-	int GetMaxHealth() { return maxHealth; }
-	int GetCurHealth() { return curHealth; }
-	float GetSpeed() { return speed; }
-	bool GetEnabled() { return isEnabled; }
+	POINT	GetTargetPos() { return targetPos; }
+	int		GetDamage() { return damage; }
+	int		GetmaxHealth() { return maxHealth; }
+	int		GetcurHealth() { return curHealth; }
+	int		GetexpValue() { return expValue; }
+	float	GetSpeed() { return speed; }
+	bool	GetEnabled() { return isEnabled; }
 	std::chrono::high_resolution_clock::time_point Gett1_targeting() { return t1_targeting; }
 	std::chrono::high_resolution_clock::time_point Gett2_targeting() { return t2_targeting; }
 	std::vector<SkillManager*> GetSkillManager() { return vSkillManager; }
 
-	void SetTargetPos(POINT targetPos) { this->targetPos = targetPos; }
-	void SetDamage(int damage) { this->damage = damage; }
-	void SetMaxHealth(int maxHealth) { this->maxHealth = maxHealth; }
-	void SetCurHealth(int curHealth) { this->curHealth = curHealth; }
-	void SetSpeed(float speed) { this->speed = speed; }
-	void SetEnabled(bool isEnabled) { this->isEnabled = isEnabled; }
-	void Sett1_targeting() { t1_targeting = std::chrono::high_resolution_clock::now(); }
-	void Sett2_targeting() { t2_targeting = std::chrono::high_resolution_clock::now(); }
+	void	SetTargetPos(POINT targetPos) { this->targetPos = targetPos; }
+	void	SetDamage(int damage) { this->damage = damage; }
+	void	SetmaxHealth(int maxHealth) { this->maxHealth = maxHealth; }
+	void	SetcurHealth(int curHealth) { this->curHealth = curHealth; }
+	void	SetexpValue(int expValue) { this->expValue = expValue; }
+	void	SetSpeed(float speed) { this->speed = speed; }
+	void	SetEnabled(bool isEnabled) { this->isEnabled = isEnabled; }
+	void	Sett1_targeting() { t1_targeting = std::chrono::high_resolution_clock::now(); }
+	void	Sett2_targeting() { t2_targeting = std::chrono::high_resolution_clock::now(); }
 	void	SetSkillManager(std::vector<SkillManager*> vSkillManager) { this->vSkillManager = vSkillManager; }
 
 	virtual void StateUpdate() = 0;

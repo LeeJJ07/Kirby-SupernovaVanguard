@@ -28,9 +28,6 @@
     <ClCompile Include="GaoGao.cpp">
       <Filter>클래스\Object\Monster</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>클래스\Object\Player</Filter>
-    </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>클래스\Object</Filter>
     </ClCompile>

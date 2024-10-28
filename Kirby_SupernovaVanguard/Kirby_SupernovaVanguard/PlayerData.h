@@ -23,6 +23,17 @@ struct PLAYERDATA :public OBJECTDATA
 	POINT mousePos;
 	bool inGameStart;
 	char charactertype;
+	int	maxHealth;
+	int	curHealth;
+};
+
+struct MONSTERDATA :public OBJECTDATA
+{
+	int targetnum;
+	EMonsterType monsterType;
+	EMonsterState curState;
+	int	maxHealth;
+	int	curHealth;
 };
 
 struct SKILLDATA
@@ -61,13 +72,6 @@ struct MONSTERSKILLDATA
 	bool	isActivate;
 };
 
-struct MONSTERDATA :public OBJECTDATA
-{
-	int targetnum;
-	EMonsterType monsterType;
-	EMonsterState curState;
-};
-
 struct PUBLICDATA
 {
 	bool	isAllPlayerChoice;
@@ -86,6 +90,3 @@ struct TOTALDATA
 	SKILLDATA		sdata[SKILLNUM];
 	MONSTERSKILLDATA		msdata[MONSTERSKILLNUM];
 };
-
-void SetObjectData(TOTALDATA*&, Object*);
-void SetObject(Object*& p, TOTALDATA*& ud);

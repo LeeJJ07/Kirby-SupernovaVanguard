@@ -1,4 +1,4 @@
-﻿#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include "framework.h"
 #include "KirbyServer.h"
@@ -38,6 +38,11 @@ void UpdateTimer();
 void UpdateThread();
 // <<
 
+// >> : collision
+void MonsterCollisionUpdate();
+void PlayerCollisionUpdate();
+// <<
+
 // >> : send
 static std::chrono::high_resolution_clock::time_point t1_send;
 static std::chrono::high_resolution_clock::time_point t2_send;
@@ -65,6 +70,7 @@ void UpdateSkill();
 void UpdateMonsterSkill();
 void UpdateUi();
 void SetBasisSkillData(int&);
+void SetEmptySkillData(int&);
 void SetSkillData(int&, int);
 void SetSkillToDatasheet();
 void SetMonsterSkillToDatasheet();
@@ -74,6 +80,22 @@ float UpdateAngle(PAIR&);
 // >> : player
 std::vector<Player*> vClient;
 bool isLockOn = true;
+
+void InitUserData(PLAYERDATA& userData, int id);
+void UpdateUser();
+void SetUserToData(Player*&, short&);
+void SetUserData(PLAYERDATA& uData, ReceiveData rData);
+void PlayerHit(Player*& , MonsterSkill*& );
+void PlayerDie();
+// <<
+
+// >> : monster
+void MonsterHit(Monster*& , Skill*& );
+void MonsterDie(Monster*& , int& );
+// <<
+
+// >> : physic
+void Rigidbody();
 // <<
 
 // >> : UI
@@ -119,8 +141,6 @@ void CloseClient(SOCKET socket);
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID);
 bool IsValidSpawnPos(int playerIdx, POINT pos);
 POINT SetRandomSpawnPos(int playerIdx, EMonsterType mType);
-void InitUserData(PLAYERDATA& userData, int id);
-void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx);
 
 bool init_miniboss1 = false;
@@ -274,6 +294,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				{
 					if (totalData.udata[pIdx].dataType == 0)
 						break;
+
 					GenerateMonster(pIdx);
 				}
 				if(!isGameStart)
@@ -401,7 +422,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("192.168.0.3");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -435,6 +456,8 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 	Player* player = new Player(userID);
 	vClient.push_back(player);
 
+	SetUserToData(player, userID);
+
 	SendToAll(); // { cs , userData }
 
 	return cs;
@@ -453,6 +476,7 @@ void ReadData()
 			if (totalData.publicdata.isAllPlayerChoice)
 			{
 				SetUserData(totalData.udata[temp.id], temp);
+				vClient[temp.id]->SetPosition(totalData.udata[temp.id].pos);
 				vClient[temp.id]->SetisLockOn(temp.isLockOn);
 
 				if (totalData.udata[temp.id].inGameStart)
@@ -519,6 +543,9 @@ unsigned __stdcall Update()
 			if (totalData.publicdata.isAllPlayerChoice)
 			{
 				UpdateTimer();
+				MonsterCollisionUpdate();
+				PlayerCollisionUpdate();
+				Rigidbody();
 				UpdateMonster();
 				GenerateSkill();
 				UpdateSkill();
@@ -591,6 +618,18 @@ void InitUserData(PLAYERDATA& userData, int id)
 	userData.offset = { 0, 0 };
 	userData.radius = 10;
 	userData.inGameStart = false;
+}
+
+void UpdateUser()
+{
+
+}
+
+void SetUserToData(Player*& player, short& ID)
+{
+	totalData.udata[ID].curHealth = player->GetcurHealth();
+	totalData.udata[ID].maxHealth = player->GetmaxHealth();
+	totalData.udata[ID].pos = player->GetPosition();
 }
 
 void SetUserData(PLAYERDATA& uData, ReceiveData rData)
@@ -691,6 +730,7 @@ void GenerateSkill()
 	for (int i = 0; i < socketList.size(); i++)
 	{
 		std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
+		static bool electricCreate[4];
 		for (int j = 0; j < temp.size(); j++)
 		{
 			temp[j]->Settime_2();
@@ -701,7 +741,7 @@ void GenerateSkill()
 			{
 				int s;
 				bool isGenerateSkill = false;
-				for (s = SKILLINDEX; s < FINALINDEX; s++)
+				for (s = SKILLINDEX; s < MONSTERSKILLINDEX; s++)
 				{
 					if (!OBJECTIDARR[s])
 					{
@@ -821,6 +861,8 @@ void GenerateSkill()
 						break;
 						case SKILLTYPE::ELECTRICFIELDSKILL:
 						{
+							if (electricCreate[i])
+								continue;
 							ElectricfieldSkill* electricfieldskill = new ElectricfieldSkill(i, 0);
 							electricfieldskill->Setdirection({ 0,0 });
 							electricfieldskill->Settime_1();
@@ -831,6 +873,7 @@ void GenerateSkill()
 							electricfieldskill->Setposition({ totalData.udata[i].pos.x + electricfieldskill->Getoffset().x, totalData.udata[i].pos.y + electricfieldskill->Getoffset().y });
 							electricfieldskill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = electricfieldskill;
+							electricCreate[i] = true;
 						}
 							break;
 						case SKILLTYPE::KUNAISKILL:
@@ -1059,7 +1102,11 @@ void SetSkillToDatasheet()
 		Skill* skill = *it;
 
 		if (skill == nullptr)
+		{
+			SetEmptySkillData(i);
+			i++;
 			continue;
+		}
 
 		int ID = skill->GetID() - SKILLINDEX;
 		switch (skill->Getskilltype())
@@ -1092,7 +1139,25 @@ void SetSkillToDatasheet()
 			SetTruckSkillInDatasheet(skill, ID);
 			break;
 		}
+		i++;
 	}
+}
+
+void SetEmptySkillData(int& i)
+{
+	totalData.sdata[i].isActivate = false;
+	totalData.sdata[i].id = 0;
+	totalData.sdata[i].skillType = 0;
+	totalData.sdata[i].size = 0;
+	totalData.sdata[i].size2 = 0;
+	totalData.sdata[i].position = { 0,0 };
+	totalData.sdata[i].colliderPosition = { 0,0 };
+	totalData.sdata[i].colliderSize = 0;
+	totalData.sdata[i].colliderSize2 = 0;
+	totalData.sdata[i].colliderShape = 0;
+	totalData.sdata[i].targetnum = 0;
+	totalData.sdata[i].angle = 0;
+	totalData.sdata[i].dataType = NULL;
 }
 
 void SetMonsterSkillToDatasheet()
@@ -1492,7 +1557,7 @@ void GenerateBoss(int cx, int cy)
 
 void UpdateSkill()
 {
-	for (auto skill : vSkill)
+	for (auto& skill : vSkill)
 	{
 		if (skill == nullptr)
 			continue;
@@ -1573,6 +1638,7 @@ void UpdateMonster()
 		{
 			totalData.mdata[i].dataType = 0;
 			delete monsterArr[i];
+			monsterArr[i] = nullptr;
 			continue;
 		}
 
@@ -1605,6 +1671,8 @@ void SetMonsterData(MONSTERDATA& mData, Monster*& m)
 	mData.pos = m->GetPosition();
 	mData.lookingDir = m->GetLookingDir();
 	mData.curState = m->GetMonsterState();
+	mData.curHealth = m->GetcurHealth();
+	mData.maxHealth = m->GetmaxHealth();
 }
 
 
@@ -1656,3 +1724,245 @@ void InitLevel()
 	totalData.publicdata.maxExp = levelExp[totalData.publicdata.level];
 	totalData.publicdata.exp = 0;
 }
+void MonsterCollisionUpdate()
+{
+	for (int i = 0; i < monsterArr.size(); i++)
+	{
+		if (monsterArr[i] == nullptr)
+			continue;
+
+		for (int j = 0; j < vSkill.size(); j++)
+		{
+			if (vSkill[j] == nullptr || !(vSkill[j]->Getcanhit()))
+				continue;
+
+			if (vSkill[j]->GetcolliderShape() == CIRCLE)
+			{
+				int distanceMToS = sqrt(pow(monsterArr[i]->GetPosition().x - vSkill[j]->Getposition().x, 2)
+					+ pow(monsterArr[i]->GetPosition().y - vSkill[j]->Getposition().y, 2));
+
+				int radiusSum = 20 + vSkill[j]->Getsize();
+
+				if (distanceMToS < radiusSum)
+				{
+					MonsterHit(monsterArr[i], vSkill[j]);
+				}
+				if (monsterArr[i]->GetcurHealth() <= 0)
+				{
+					MonsterDie(monsterArr[i], i);
+					vSkill[j]->Settargetnum(0);
+					break;
+				}
+			}
+			else
+			{
+				int angle = vSkill[j]->Getangle();
+				int value1 = abs(vSkill[j]->Getsize() * cos(angle * 3.14 * 180));
+				int value2 = abs(vSkill[j]->Getsize2() * cos((180 - angle) * 3.14 * 180));
+				POINT vectorDistance = { monsterArr[i]->GetPosition().x - vSkill[j]->Getposition().x,monsterArr[i]->GetPosition().y - vSkill[j]->Getposition().y };
+
+				if (vectorDistance.x == 0)
+					vectorDistance.x = 1;
+				if (vectorDistance.y == 0)
+					vectorDistance.y = 1;
+
+				int d = round(sqrt((float)pow(vectorDistance.x, 2) + pow(vectorDistance.y, 2)));
+				int angle2 = atan(vectorDistance.y / vectorDistance.x);
+				int angle3 = atan(vectorDistance.x / vectorDistance.y);
+				int distance = abs(d * cos(angle2 * 3.14 * 180));
+				int distance2 = abs(d * cos(angle3 * 3.14 * 180));
+				int distanceMToS = 20 + value1 + value2;
+
+				if (distanceMToS > distance && distanceMToS > distance2)
+				{
+					MonsterHit(monsterArr[i], vSkill[j]);
+				}
+				if (monsterArr[i]->GetcurHealth() <= 0)
+				{
+					MonsterDie(monsterArr[i], i);
+					vSkill[j]->Settargetnum(0);
+					break;
+				}
+			}
+		}
+	}
+}
+
+void PlayerCollisionUpdate()
+{
+	for (int i = 0; i < vClient.size(); i++)
+	{
+		if (vClient[i] == nullptr)
+			continue;
+
+		for (int j = 0; j < vMonsterSkill.size(); j++)
+		{
+			if (vMonsterSkill[j] == nullptr)
+				continue;
+
+			if (vMonsterSkill[j]->GetcolliderShape() == CIRCLE)
+			{
+				int distancePToMS = sqrt(pow(vClient[i]->GetPosition().x - vMonsterSkill[j]->Getposition().x, 2)
+					+ pow(vClient[i]->GetPosition().y - vMonsterSkill[j]->Getposition().y, 2));
+
+				int radiusSum = 20 + vMonsterSkill[j]->Getsize();
+
+				if (distancePToMS < radiusSum)
+				{
+					vClient[i]->SetcurHealth(vClient[i]->GetcurHealth() - vMonsterSkill[j]->Getdamage());
+					OBJECTIDARR[vMonsterSkill[j]->GetID()] = false;
+					vMonsterSkill[j] = nullptr;
+				}
+				if (vClient[i]->GetcurHealth() <= 0)
+				{
+					vClient[i]->SetcurHealth(0);
+					break;
+				}
+			}
+			else
+			{
+				int angle = vMonsterSkill[j]->Getangle();
+				int value1 = abs(vMonsterSkill[j]->Getsize() * cos(angle * 3.14 * 180));
+				int value2 = abs(vMonsterSkill[j]->Getsize2() * cos((180 - angle) * 3.14 * 180));
+				POINT vectorDistance = { vClient[i]->GetPosition().x - vMonsterSkill[j]->Getposition().x,vClient[i]->GetPosition().y - vMonsterSkill[j]->Getposition().y };
+
+				if (vectorDistance.x == 0)
+					vectorDistance.x = 1;
+				if (vectorDistance.y == 0)
+					vectorDistance.y = 1;
+
+				int d = round(sqrt((float)pow(vectorDistance.x, 2) + pow(vectorDistance.y, 2)));
+				int angle2 =	atan(vectorDistance.y / vectorDistance.x);
+				int angle3 =	atan(vectorDistance.x / vectorDistance.y);
+				int distance =	abs(d * cos(angle2 * 3.14 * 180));
+				int distance2 =	abs(d * cos(angle3 * 3.14 * 180));
+				int distancePToMS = 20 + value1 + value2;
+
+				if (distancePToMS > distance && distancePToMS > distance2)
+				{
+					PlayerHit(vClient[i], vMonsterSkill[j]);
+					totalData.msdata[j].dataType = NULL;
+				}
+				if (vClient[i]->GetcurHealth() <= 0)
+				{
+					vClient[i]->SetcurHealth(0);
+					break;
+				}
+			}
+		}
+
+		short ID = i;
+		SetUserToData(vClient[i], ID);
+	}
+}
+
+void PlayerHit(Player*& player, MonsterSkill*& monsterskill)
+{
+	player->SetcurHealth(player->GetcurHealth() - monsterskill->Getdamage());
+	OBJECTIDARR[monsterskill->GetID()] = false;
+	delete monsterskill;
+	monsterskill = nullptr;
+}
+
+void PlayerDie()
+{
+
+}
+
+void MonsterHit(Monster*& monster,Skill*& skill)
+{
+	monster->SetcurHealth(monster->GetcurHealth() - skill->Getdamage());
+	int pierceCount = skill->GetpierceCount() - 1;
+	skill->SetpierceCount(pierceCount);
+	if (skill->GetpierceCount() == 0)
+	{
+		OBJECTIDARR[skill->GetID()] = false;
+		skill = nullptr;
+	}
+}
+
+void MonsterDie(Monster*& monster, int& id)
+{
+	totalData.publicdata.exp += monster->GetexpValue();
+	totalData.mdata[id].dataType = 0;
+	delete monster;
+	monster = nullptr;
+}
+
+void Rigidbody()
+{
+	for (int i = 0; i < vClient.size(); i++)
+	{
+		if (vClient[i] == nullptr)
+			continue;
+		for (int j = 0; j < monsterArr.size(); j++)
+		{
+			if (monsterArr[j] == nullptr)
+				continue;
+
+			int distancePToMS = sqrt(pow(vClient[i]->GetPosition().x - monsterArr[j]->GetPosition().x, 2)
+				+ pow(vClient[i]->GetPosition().y - monsterArr[j]->GetPosition().y, 2));
+
+			int radiusSum = 20 + 20;	//vClient[i].size()와 monsterArr[j].size()의 합
+
+			if (distancePToMS < radiusSum)
+			{
+				POINT vector = { vClient[i]->GetPosition().x - monsterArr[j]->GetPosition().x,
+					vClient[i]->GetPosition().y - monsterArr[j]->GetPosition().y };
+
+				if (vector.x == 0)
+					vector.x = 1;
+				if (vector.y == 0)
+					vector.y = 1;
+
+				int dis = sqrt(pow(vector.x, 2) + pow(vector.y, 2));
+
+				vector.x = vector.x * 5 / dis;
+				vector.y = vector.y * 5 / dis;
+
+				POINT newPos = { vClient[i]->GetPosition().x + vector.x,
+					vClient[i]->GetPosition().y + vector.y };
+				vClient[i]->SetPosition(newPos);
+
+				short ID = i;
+				SetUserToData(vClient[i], ID);
+			}
+		}
+	}
+
+	for (int i = 0; i < monsterArr.size(); i++)
+	{
+		if (monsterArr[i] == nullptr)
+			continue;
+		for (int j = 0; j < monsterArr.size(); j++)
+		{
+			if (monsterArr[j] == nullptr || i == j)
+				continue;
+
+			int distancePToMS = sqrt(pow(monsterArr[i]->GetPosition().x - monsterArr[j]->GetPosition().x, 2)
+				+ pow(monsterArr[i]->GetPosition().y - monsterArr[j]->GetPosition().y, 2));
+
+			int radiusSum = 20 + 20;	//monsterArr[i].size()와 monsterArr[j].size()의 합
+
+			if (distancePToMS < radiusSum)
+			{
+				POINT vector = { monsterArr[i]->GetPosition().x - monsterArr[j]->GetPosition().x,
+					monsterArr[i]->GetPosition().y - monsterArr[j]->GetPosition().y };
+
+				if (vector.x == 0)
+					vector.x = 1;
+				if (vector.y == 0)
+					vector.y = 1;
+
+				int dis = sqrt(pow(vector.x, 2) + pow(vector.y, 2));
+
+				vector.x = vector.x * 5 / dis;
+				vector.y = vector.y * 5 / dis;
+
+				POINT newPos = { monsterArr[i]->GetPosition().x + vector.x,
+					monsterArr[i]->GetPosition().y + vector.y };
+				monsterArr[i]->SetPosition(newPos);
+				totalData.mdata[i].pos = newPos;
+			}
+		}
+	}

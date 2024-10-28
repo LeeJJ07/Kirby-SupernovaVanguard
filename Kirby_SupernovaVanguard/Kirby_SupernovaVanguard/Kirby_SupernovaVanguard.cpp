@@ -11,6 +11,7 @@
 #include "Map.h"
 #include "Multithread.h"
 #include "Exp.h"
+#include "Hp.h"
 #include "Animation.h"
 
 #define MAX_LOADSTRING 100
@@ -37,6 +38,8 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void DoubleBuffering(HDC, std::vector<Object*>);
 void DrawCamera(HDC);
+void DrawPlayerHp(HDC&);
+void DrawMonsterHp(HDC&);
 void DrawEXP(HDC&,int&,int&);
 void DrawCollider(HDC&);
 void InitObjArr();
@@ -418,6 +421,9 @@ void DoubleBuffering(HDC hdc)
 
 	DrawCamera(bufferdc);
 
+	DrawPlayerHp(bufferdc);
+	DrawMonsterHp(bufferdc);
+
 	DrawEXP(bufferdc, cTop, cLeft);
 
 	if (isDrawCollider)
@@ -518,6 +524,78 @@ void DrawCamera(HDC hdc)
 		default:
 			continue;
 		}
+	}
+}
+
+void DrawPlayerHp(HDC& hdc)
+{
+	for (int i = 0; i < vClient.size(); i++)
+	{
+		if (vClient[i] == nullptr)
+			continue;
+
+		int offsetY = 20;
+
+		RECT MaxHpBar;
+
+		MaxHpBar.left = vClient[i]->GetPosition().x - MAXHP_WIDTH;
+		MaxHpBar.right = vClient[i]->GetPosition().x + MAXHP_WIDTH;
+		MaxHpBar.top = vClient[i]->GetPosition().y - MAXHP_HEIGHT + offsetY;
+		MaxHpBar.bottom = vClient[i]->GetPosition().y + MAXHP_HEIGHT + offsetY;
+		Rectangle(hdc, MaxHpBar.left, MaxHpBar.top, MaxHpBar.right, MaxHpBar.bottom);
+
+		HBRUSH brush;
+		brush = CreateSolidBrush(RGB(255, 0, 0));
+		HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
+
+		float hpPer = ((float)uData.udata[i].curHealth / uData.udata[i].maxHealth);
+
+		RECT HpBar;
+
+		HpBar.left = vClient[i]->GetPosition().x - CURHP_WIDTH;
+		HpBar.right = HpBar.left + CURHP_WIDTH * 2 * hpPer;
+		HpBar.top = vClient[i]->GetPosition().y - CURHP_HEIGHT + offsetY;
+		HpBar.bottom = vClient[i]->GetPosition().y + CURHP_HEIGHT + offsetY;
+		Rectangle(hdc, HpBar.left, HpBar.top, HpBar.right, HpBar.bottom);
+
+		SelectObject(hdc, oldBrush);
+		DeleteObject(brush);
+	}
+}
+
+void DrawMonsterHp(HDC& hdc)
+{
+	for (int i = 0; i < vMonster.size(); i++)
+	{
+		if (vMonster[i] == nullptr)
+			continue;
+
+		int offsetY = 20;
+
+		RECT MaxHpBar;
+
+		MaxHpBar.left = vMonster[i]->GetPosition().x - MAXHP_WIDTH;
+		MaxHpBar.right = vMonster[i]->GetPosition().x + MAXHP_WIDTH;
+		MaxHpBar.top = vMonster[i]->GetPosition().y - MAXHP_HEIGHT + offsetY;
+		MaxHpBar.bottom = vMonster[i]->GetPosition().y + MAXHP_HEIGHT + offsetY;
+		Rectangle(hdc, MaxHpBar.left, MaxHpBar.top, MaxHpBar.right, MaxHpBar.bottom);
+
+		HBRUSH brush;
+		brush = CreateSolidBrush(RGB(255, 0, 0));
+		HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
+
+		float hpPer = ((float)uData.mdata[i].curHealth / uData.mdata[i].maxHealth);
+
+		RECT HpBar;
+
+		HpBar.left = vMonster[i]->GetPosition().x - CURHP_WIDTH;
+		HpBar.right = HpBar.left + CURHP_WIDTH * 2 * hpPer;
+		HpBar.top = vMonster[i]->GetPosition().y - CURHP_HEIGHT + offsetY;
+		HpBar.bottom = vMonster[i]->GetPosition().y + CURHP_HEIGHT + offsetY;
+		Rectangle(hdc, HpBar.left, HpBar.top, HpBar.right, HpBar.bottom);
+
+		SelectObject(hdc, oldBrush);
+		DeleteObject(brush);
 	}
 }
 
@@ -639,6 +717,7 @@ unsigned __stdcall Read()
 					aD.newskill = 6;
 					isChoiceSkill = true;
 				}
+
 				if (GetAsyncKeyState('7') & 0x8000)
 				{
 					aD.newskill = 7;

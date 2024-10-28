@@ -13,6 +13,8 @@ class Player : public Object
 private:
 	ECharacterType characterType;
 	ECharacterState characterState;
+	int maxHealth;
+	int curHealth;
 
 	POINT mousePosition;
 	std::map<ECharacterState, Animation* > ani;
@@ -29,15 +31,19 @@ public:
 		ani.clear();
 	}
 
-	ECharacterType	GetCharacterType() { return characterType; }
-	POINT			GetMousePosition() { return mousePosition; }
+	ECharacterType	GetCharacterType()	{ return characterType; }
+	POINT	GetMousePosition()	{ return mousePosition; }
+	int		GetmaxHealth()	{ return maxHealth; }
+	int		GetcurHealth()	{ return curHealth; }
 
-	void			SetCharacterType(ECharacterType characterType) { this->characterType = characterType; }
-	void			SetMousePosition(POINT mousePos) { mousePosition = mousePos; }
+	void	SetCharacterType(ECharacterType characterType)	{ this->characterType = characterType; }
+	void	SetMousePosition(POINT mousePos)	{ mousePosition = mousePos; }
+	void	SetmaxHealth(int maxHealth)	{ this->maxHealth = maxHealth; }
+	void	SetcurHealth(int curHealth) { this->curHealth = curHealth; }
 
-	void			ObjectUpdate(TOTALDATA&, int i);
-	void			SetPlayerAni();
-	void			DrawPlayer(HDC&);
+	void	ObjectUpdate(TOTALDATA&, int i);
+	void	SetPlayerAni();
+	void	DrawPlayer(HDC&);
 };
 
 extern std::vector<Object*> vClient;

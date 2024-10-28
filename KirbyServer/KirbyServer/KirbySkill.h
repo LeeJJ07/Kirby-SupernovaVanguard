@@ -18,8 +18,8 @@ public:
 	KirbySkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::KIRBYSKILL, ECOLLIDERSHAPE::CIRCLE, 
-			0.1, 10, 5, 0, 3., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
+		: Skill(masternum, targetnum, SKILLTYPE::KIRBYSKILL, ECOLLIDERSHAPE::CIRCLE,
+			0.1, 10, 1000, 5, 0, 3., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		biggersize(1),
 		decelerationrate(0.01)
 	{
@@ -94,10 +94,25 @@ void UpdateKirbySkill(Skill* &skill)
 
 	kirbyskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(kirbyskill->Gettime_2() - kirbyskill->Gettime_1()).count();
+
+	kirbyskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(kirbyskill->Gett2_attacktick() - kirbyskill->Gett1_attacktick()).count();
+	
+	if (hittime > KIRBYTICK)
+	{
+		kirbyskill->Setcanhit(true);
+		kirbyskill->Sett1_attacktick();
+	}
+	else
+	{
+		kirbyskill->Setcanhit(false);
+	}
+
 	if (skilldestroytime > TKIRBYSKILLDESTROY)
 	{
-		kirbyskill->Setisactivate(false);
 		OBJECTIDARR[kirbyskill->GetID()] = false;
+		delete skill;
+		skill = nullptr;
 	}
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Collider2D.h"
 
-#define BASERADIUS 10
+#define BASERADIUS 20
 
 class Circle2D : public Collider2D
 {

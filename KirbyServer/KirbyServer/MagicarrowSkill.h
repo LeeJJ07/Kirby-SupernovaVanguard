@@ -14,7 +14,7 @@ public:
 	MagicArrowSkill(
 		int masternum,
 		int targetnum)
-		: Skill(masternum, targetnum, SKILLTYPE::MAGICARROWSKILL, ECOLLIDERSHAPE::RECTANGLE, 0.6, 5, 50, 15, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
+		: Skill(masternum, targetnum, SKILLTYPE::MAGICARROWSKILL, ECOLLIDERSHAPE::RECTANGLE, 0.6, 5, 3, 50, 15, 2., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 })
 	{
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
 		rectangle2D->SetPosition(this->Getposition());
@@ -77,9 +77,24 @@ void UpdateMagicArrowSkill(Skill*& skill)
 
 	magicarrowskill->Settime_2();
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(magicarrowskill->Gettime_2() - magicarrowskill->Gettime_1()).count();
+
+	magicarrowskill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(magicarrowskill->Gett2_attacktick() - magicarrowskill->Gett1_attacktick()).count();
+
+	if (hittime > MAGICARROWTICK)
+	{
+		magicarrowskill->Setcanhit(true);
+		magicarrowskill->Sett1_attacktick();
+	}
+	else
+	{
+		magicarrowskill->Setcanhit(false);
+	}
+
 	if (skilldestroytime > TMAGICARROWSKILLDESTROY)
 	{
-		magicarrowskill->Setisactivate(false);
 		OBJECTIDARR[magicarrowskill->GetID()] = false;
+		delete skill;
+		skill = nullptr;
 	}
 }
