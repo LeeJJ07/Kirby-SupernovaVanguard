@@ -23,6 +23,7 @@ struct PLAYERDATA :public OBJECTDATA
 	POINT mousePos;
 	bool inGameStart;
 	char charactertype;
+<<<<<<< HEAD
 	int	maxHealth;
 	int	curHealth;
 };
@@ -34,6 +35,10 @@ struct MONSTERDATA :public OBJECTDATA
 	EMonsterState curState;
 	int	maxHealth;
 	int	curHealth;
+=======
+
+	std::pair<short, int> levelUpSkillIndex[3]; //스킬 타입, 현재 레벨 받기
+>>>>>>> LevelUp
 };
 
 struct SKILLDATA

@@ -50,6 +50,7 @@
     <ClCompile Include="MonsterSkill.cpp">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClCompile>
+    <ClCompile Include="SkillSelector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -143,12 +144,16 @@
     <ClInclude Include="MonsterSkill.h">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="Hp.h">
       <Filter>클래스파일\UI</Filter>
     </ClInclude>
     <ClInclude Include="Exp.h">
       <Filter>클래스파일\UI</Filter>
     </ClInclude>
+=======
+    <ClInclude Include="SkillSelector.h" />
+>>>>>>> LevelUp
   </ItemGroup>
   <ItemGroup>
     <Image Include="Kirby_SupernovaVanguard.ico">

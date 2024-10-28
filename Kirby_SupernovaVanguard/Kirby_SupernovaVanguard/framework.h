@@ -20,11 +20,18 @@
 #include <fstream>
 #include <sstream>
 #include <gdiplus.h>
+#include <tchar.h>
 #pragma comment (lib,"Gdiplus.lib")
 #pragma comment(lib, "msimg32.lib")
 
 #define SCREEN_SIZE_X				1920
 #define SCREEN_SIZE_Y				1200
+
+#define SKILL_SELECTOR_WIDTH		500
+#define SKILL_SELECTOR_HEIGHT		500
+#define SKILL_SELECTOR_TITLE_WIDTH  1000
+#define SKILL_SELECTOR_TITLE_HEIGHT  300
+
 
 #define PAIR std::pair<double,double>
 #define PLAYERNUM			4
