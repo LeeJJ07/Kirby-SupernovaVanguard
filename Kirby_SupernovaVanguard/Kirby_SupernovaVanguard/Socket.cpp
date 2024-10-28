@@ -207,17 +207,13 @@ bool ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 void CloseClient(SOCKET& s, std::vector<Object*>& p, int id)
 {
 	p[id] = NULL;
-
 	closesocket(s);
 	WSACleanup();
 }
 
 void CountReadNum()
 {
-
 	textreadCount = readCount;
-
 	readCount = 0;
-
 	t1_readCount = std::chrono::high_resolution_clock::now();
 }

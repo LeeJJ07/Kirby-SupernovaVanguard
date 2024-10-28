@@ -1671,7 +1671,6 @@ void UpdateUi()
 	if (timeSpan_UI.count() >= 1)
 	{
 		totalData.publicdata.currentTime++;
-		totalData.publicdata.exp++;
 		t1_UI = std::chrono::high_resolution_clock::now();
 		timeSpan_UI = std::chrono::duration_cast<std::chrono::duration<double>>(t2_UI - t1_UI);
 	}

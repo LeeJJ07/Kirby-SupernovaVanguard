@@ -3,7 +3,9 @@
 #include "Object.h"
 #include "PlayerData.h"
 
-enum ESKILLTYPE {
+enum ESKILLTYPE
+{
+	HEAL = -1,
 	KIRBYSKILL = 1,
 	DEDEDESKILL,
 	METAKNIGHTSKILL,
