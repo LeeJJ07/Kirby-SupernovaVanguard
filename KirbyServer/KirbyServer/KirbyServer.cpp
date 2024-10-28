@@ -86,8 +86,8 @@ void SetPlayerSize(int&);
 void InitUserData(PLAYERDATA& userData, int id);
 void SetUserToData(Player*&, short&);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
-void PlayerHit(Player*& , MonsterSkill*& );
-void PlayerDie();
+void PlayerHit(Player*& , MonsterSkill*&, int&);
+void PlayerDie(Player*&);
 // <<
 
 // >> : monster
@@ -297,7 +297,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					if (totalData.udata[pIdx].dataType == 0)
 						break;
 
-					//GenerateMonster(pIdx);
+					GenerateMonster(pIdx);
 				}
 				if (!isGameStart)
 				{
@@ -322,6 +322,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			InvalidateRect(hWnd, NULL, TRUE);
 		}
 		break;
+		}
+		break;
+	case WM_CHAR:
+		if (wParam == VK_RETURN)
+		{
+			for (int i = 0; i < socketList.size(); i++)
+				vClient[i]->SetisAlive(false);
 		}
 		break;
 	case WM_CREATE:
@@ -594,6 +601,8 @@ unsigned __stdcall Send()
 			{
 				if (totalData.udata[i].dataType == NULL)
 					break;
+				if (socketList[i] == NULL)
+					continue;
 				send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
 			}
 
@@ -646,12 +655,16 @@ void SetUserToData(Player*& player, short& ID)
 	totalData.udata[ID].maxHealth = player->GetmaxHealth();
 	totalData.udata[ID].pos = player->GetPosition();
 	totalData.udata[ID].radius = player->GetplayerSize();
+	totalData.udata[ID].isAlive = player->GetisAlive();
 }
 
 void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 {
-	uData.pos.x += rData.playerMove.x;
-	uData.pos.y += rData.playerMove.y;
+	if (uData.isAlive)
+	{
+		uData.pos.x += rData.playerMove.x;
+		uData.pos.y += rData.playerMove.y;
+	}
 
 	uData.mousePos.x = rData.cursorMove.x;
 	uData.mousePos.y = rData.cursorMove.y;
@@ -791,6 +804,10 @@ void GenerateSkill()
 	{
 		std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
 		static bool electricCreate[4];
+
+		if (!vClient[i]->GetisAlive())
+			continue;
+
 		for (int j = 0; j < temp.size(); j++)
 		{
 			temp[j]->Settime_2();
@@ -1099,7 +1116,7 @@ void GenerateMonsterSkill()
 
 								spearSkill->Setdirection({ (long)(lookingdir.first),(long)(lookingdir.second) });
 								spearSkill->Setangle(UpdateAngle(lookingdir));
-
+								spearSkill->SetisOneOff(true);
 								spearSkill->Settime_1();
 								spearSkill->Settime_2();
 								spearSkill->Setisactivate(true);
@@ -1108,6 +1125,7 @@ void GenerateMonsterSkill()
 								spearSkill->Setposition({ totalData.mdata[i].pos.x + spearSkill->Getoffset().x, totalData.mdata[i].pos.y + spearSkill->Getoffset().y });
 								spearSkill->Setmasternum(i);
 								vMonsterSkill[s - MONSTERSKILLINDEX] = spearSkill;
+
 							}
 							break;
 							case MONSTERSKILLTYPE::FIREMANSKILL:
@@ -1122,7 +1140,7 @@ void GenerateMonsterSkill()
 
 								firemanSkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
 								firemanSkill->Setangle(UpdateAngle(lookingdir));
-
+								firemanSkill->SetisOneOff(false);
 								firemanSkill->Settime_1();
 								firemanSkill->Settime_2();
 								firemanSkill->Setisactivate(true);
@@ -1131,6 +1149,10 @@ void GenerateMonsterSkill()
 								firemanSkill->Setposition({ totalData.mdata[i].pos.x + firemanSkill->Getoffset().x, totalData.mdata[i].pos.y + firemanSkill->Getoffset().y });
 								firemanSkill->Setmasternum(i);
 								vMonsterSkill[s - MONSTERSKILLINDEX] = firemanSkill;
+
+								totalData.mdata[i].dataType = 0;
+								delete monsterArr[i];
+								monsterArr[i] = nullptr;
 							}
 							break;
 							case MONSTERSKILLTYPE::LASERSKILL:
@@ -1334,7 +1356,7 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 
 	for (int i = 1; i < PLAYERNUM; i++)
 	{
-		if (tData.udata[i].dataType == 0)
+		if (tData.udata[i].dataType == 0 || !tData.udata[i].isAlive)
 			continue;
 
 		int newdistance = pow(mData.pos.x - tData.udata[i].pos.x, 2) + pow(mData.pos.y - tData.udata[i].pos.y, 2);
@@ -1826,7 +1848,7 @@ void MonsterCollisionUpdate()
 
 		for (int j = 0; j < vSkill.size(); j++)
 		{
-			if (vSkill[j] == nullptr || !(vSkill[j]->Getcanhit()))
+			if (vSkill[j] == nullptr || !(vSkill[j]->Getcanhit()) || !vClient[vSkill[j]->Getmasternum()]->GetisAlive())
 				continue;
 
 			if (vSkill[j]->GetcolliderShape() == CIRCLE)
@@ -1834,7 +1856,7 @@ void MonsterCollisionUpdate()
 				int distanceMToS = sqrt(pow(monsterArr[i]->GetPosition().x - vSkill[j]->Getposition().x, 2)
 					+ pow(monsterArr[i]->GetPosition().y - vSkill[j]->Getposition().y, 2));
 
-				int radiusSum = 20 + vSkill[j]->Getsize();
+				int radiusSum = 20 + vSkill[j]->Getsize();	//monsterArr[i].Getsize()와 vSkill의 사이즈
 
 				if (distanceMToS < radiusSum)
 				{
@@ -1919,7 +1941,7 @@ void PlayerCollisionUpdate()
 {
 	for (int i = 0; i < vClient.size(); i++)
 	{
-		if (vClient[i] == nullptr)
+		if (vClient[i] == nullptr || !vClient[i]->GetisAlive())
 			continue;
 
 		for (int j = 0; j < vMonsterSkill.size(); j++)
@@ -1932,17 +1954,15 @@ void PlayerCollisionUpdate()
 				int distancePToMS = sqrt(pow(vClient[i]->GetPosition().x - vMonsterSkill[j]->Getposition().x, 2)
 					+ pow(vClient[i]->GetPosition().y - vMonsterSkill[j]->Getposition().y, 2));
 
-				int radiusSum = 20 + vMonsterSkill[j]->Getsize();
+				int radiusSum = vClient[i]->GetplayerSize() +vMonsterSkill[j]->Getsize();
 
 				if (distancePToMS < radiusSum)
 				{
-					vClient[i]->SetcurHealth(vClient[i]->GetcurHealth() - vMonsterSkill[j]->Getdamage());
-					OBJECTIDARR[vMonsterSkill[j]->GetID()] = false;
-					vMonsterSkill[j] = nullptr;
+					PlayerHit(vClient[i], vMonsterSkill[j], j);
 				}
 				if (vClient[i]->GetcurHealth() <= 0)
 				{
-					vClient[i]->SetcurHealth(0);
+					PlayerDie(vClient[i]);
 					break;
 				}
 			}
@@ -1963,12 +1983,11 @@ void PlayerCollisionUpdate()
 				int angle3 =	atan(vectorDistance.x / vectorDistance.y);
 				int distance =	abs(d * cos(angle2 * 3.14 * 180));
 				int distance2 =	abs(d * cos(angle3 * 3.14 * 180));
-				int distancePToMS = 20 + value1 + value2;
+				int distancePToMS = vClient[i]->GetplayerSize() + value1 + value2;
 
 				if (distancePToMS > distance && distancePToMS > distance2)
 				{
-					PlayerHit(vClient[i], vMonsterSkill[j]);
-					totalData.msdata[j].dataType = NULL;
+					PlayerHit(vClient[i], vMonsterSkill[j], j);
 				}
 				if (vClient[i]->GetcurHealth() <= 0)
 				{
@@ -1983,17 +2002,21 @@ void PlayerCollisionUpdate()
 	}
 }
 
-void PlayerHit(Player*& player, MonsterSkill*& monsterskill)
+void PlayerHit(Player*& player, MonsterSkill*& monsterskill, int& j)
 {
 	player->SetcurHealth(player->GetcurHealth() - monsterskill->Getdamage());
-	OBJECTIDARR[monsterskill->GetID()] = false;
-	delete monsterskill;
-	monsterskill = nullptr;
+	if(monsterskill->GetisOneOff())
+	{
+		totalData.msdata[j].dataType = NULL;
+		OBJECTIDARR[monsterskill->GetID()] = false;
+		delete monsterskill;
+		monsterskill = nullptr;
+	}
 }
 
-void PlayerDie()
+void PlayerDie(Player*& player)
 {
-
+	player->SetisAlive(false);
 }
 
 void MonsterHit(Monster*& monster,Skill*& skill)
@@ -2020,7 +2043,7 @@ void Rigidbody()
 {
 	for (int i = 0; i < vClient.size(); i++)
 	{
-		if (vClient[i] == nullptr)
+		if (vClient[i] == nullptr || !vClient[i]->GetisAlive())
 			continue;
 		for (int j = 0; j < monsterArr.size(); j++)
 		{
@@ -2117,7 +2140,7 @@ void GenerateLaserSkill(int& monsterID)
 
 			laserSkill->Setdirection({ dir.y,dir.x });
 			laserSkill->Setangle(0);
-
+			laserSkill->SetisOneOff(false);
 			laserSkill->Settime_1();
 			laserSkill->Settime_2();
 			laserSkill->Setisactivate(true);
@@ -2155,7 +2178,7 @@ void GenerateFireballSkill(int& monsterID)
 
 			fireballSkill->Setdirection({ dir.x,dir.y });
 			fireballSkill->Setangle(0);
-
+			fireballSkill->SetisOneOff(false);
 			fireballSkill->Settime_1();
 			fireballSkill->Settime_2();
 			fireballSkill->Setisactivate(true);

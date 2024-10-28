@@ -12,6 +12,7 @@ enum MONSTERSKILLTYPE {
 class MonsterSkill {
 private:
 	bool isactivate = false;
+	bool isOneOff = true;
 	int masternum;
 	int targetnum;
 	int skilltype;
@@ -35,6 +36,7 @@ public:
 	~MonsterSkill() {}
 
 	bool	Getisactivate() { return isactivate; }
+	bool	GetisOneOff() { return isOneOff; }
 	int	Getmasternum() { return masternum; }
 	int Gettargetnum() { return targetnum; }
 	int Getskilltype() { return skilltype; }
@@ -51,6 +53,7 @@ public:
 	POINT	Getdirection() { return direction; }
 
 	void	Setisactivate(bool isactivate) { this->isactivate = isactivate; }
+	void	SetisOneOff(bool isOneOff) { this->isOneOff = isOneOff; }
 	void	Setmasternum(int masternum) { this->masternum = masternum; }
 	void	Settargetnum(int targetnum) { this->targetnum = targetnum; }
 	void	Setskilltype(int skilltype) { this->skilltype = skilltype; }

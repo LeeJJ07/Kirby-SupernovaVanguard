@@ -17,9 +17,9 @@ enum EMONSTERSKILLSTATE {
 
 class MonsterSkill : public Object {
 private:
+	float angle;
 	int size;
 	int size2;
-	float angle;
 
 	EMONSTERSKILLTYPE monsterSkillType;
 	EMONSTERSKILLSTATE eMonsterSkillState;

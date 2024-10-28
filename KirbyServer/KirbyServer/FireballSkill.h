@@ -53,7 +53,7 @@ bool SetFireballSkillInDatasheet(MonsterSkill*& monsterskill, int& ID)
 	totalData.msdata[ID].size2 = monsterskill->Getsize2();
 	totalData.msdata[ID].position = monsterskill->Getposition();
 	totalData.msdata[ID].colliderShape = monsterskill->GetcolliderShape();
-	totalData.msdata[ID].targetnum = monsterskill->Gettargetnum();
+	totalData.msdata[ID].targetnum = monsterskill->Gettargetnum(); 
 	totalData.msdata[ID].angle = monsterskill->Getangle();
 	totalData.msdata[ID].dataType = SKILLTYPE;
 

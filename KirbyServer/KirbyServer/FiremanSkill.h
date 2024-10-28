@@ -14,7 +14,7 @@ public:
 	FiremanSkill(
 		int masternum,
 		int targetnum)
-		: MonsterSkill(masternum, targetnum, MONSTERSKILLTYPE::FIREMANSKILL, ECOLLIDERSHAPE::CIRCLE, 0, 20, 50, 0, 0.5, { 0,0 }, { totalData.mdata[masternum].pos.x, totalData.mdata[masternum].pos.y }, { 5,0 })
+		: MonsterSkill(masternum, targetnum, MONSTERSKILLTYPE::FIREMANSKILL, ECOLLIDERSHAPE::CIRCLE, 0, 20, 3, 0, 0.5, { 0,0 }, { totalData.mdata[masternum].pos.x, totalData.mdata[masternum].pos.y }, { 5,0 })
 	{
 		Circle2D* circle2D = new Circle2D(true, EMISSILE);
 		circle2D->SetPosition(this->Getposition());
@@ -76,7 +76,7 @@ void UpdateFiremanSkill(MonsterSkill*& monsterskill)
 	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(firemanSkill->Gettime_2() - firemanSkill->Gettime_1()).count();
 
 	// 스킬 비활성화
-	if (skilldestroytime > TFIREMANSKILLDESTROY)
+	if (skilldestroytime > 0.8)
 	{
 		firemanSkill->Setisactivate(false);
 		OBJECTIDARR[firemanSkill->GetID()] = false;
