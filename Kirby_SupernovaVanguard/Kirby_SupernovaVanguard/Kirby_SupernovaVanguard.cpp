@@ -633,8 +633,6 @@ void DrawEXP(HDC& hdc, int& cameraTop, int& cameraLeft)
 	DeleteObject(brush);
 }
 
-<<<<<<< HEAD
-=======
 void DrawTime(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 	int minutes = static_cast<int>(uData.publicdata.currentTime) / 60;
 	int seconds = static_cast<int>(uData.publicdata.currentTime) % 60;
@@ -696,7 +694,6 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 	//########################################
 }
 
->>>>>>> parent of c10b91f (feat: 레벨업 유아이 구현중)
 void DrawCollider(HDC& hdc)
 {
 	for (int i = 0; i < OBJECTNUM; i++)
