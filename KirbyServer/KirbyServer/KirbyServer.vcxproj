@@ -132,6 +132,7 @@
     <ClInclude Include="Collider2D.h" />
     <ClInclude Include="DededeSkill.h" />
     <ClInclude Include="EletricfieldSkill.h" />
+    <ClInclude Include="FireballSkill.h" />
     <ClInclude Include="FireManMonster.h" />
     <ClInclude Include="FiremanSkill.h" />
     <ClInclude Include="framework.h" />

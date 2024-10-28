@@ -104,7 +104,11 @@ static std::chrono::high_resolution_clock::time_point t2_UI;
 static std::chrono::duration<double> timeSpan_UI;
 
 int levelExp[51];
+// <<
 
+// >> : Boss
+void GenerateLaserSkill(int&);
+void GenerateFireballSkill(int&);
 // <<
 
 #define MAX_LOADSTRING 100
@@ -295,7 +299,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					if (totalData.udata[pIdx].dataType == 0)
 						break;
 
-					GenerateMonster(pIdx);
+					//GenerateMonster(pIdx);
 				}
 				if(!isGameStart)
 				{
@@ -1075,41 +1079,12 @@ void GenerateMonsterSkill()
 							break;
 							case MONSTERSKILLTYPE::LASERSKILL:
 							{
-								int count = 0;
-								static bool vertical = false;
-
-								for (int ns = MONSTERSKILLINDEX; ns < FINALINDEX; ns++)
-								{
-									if (count == 6)
-										break;
-									if(!OBJECTIDARR[ns])
-									{
-										LaserSkill* laserSkill = new LaserSkill(i, 0);
-
-										// laser 방향 설정 해주기
-										POINT dir;
-										if (count < 3)
-											dir = { vertical,!vertical };
-										else
-											dir = { vertical, -!vertical };
-
-										laserSkill->Setdirection({ dir.x,dir.y });
-										laserSkill->Setangle(0);
-
-										laserSkill->Settime_1();
-										laserSkill->Settime_2();
-										laserSkill->Setisactivate(true);
-										laserSkill->SetID(ns);
-										laserSkill->Setoffset({ (long)((count % 3 - 1) * laserSkill->Getsize()), (long)((count % 3 - 1) * laserSkill->Getsize()) });
-										laserSkill->Setposition({ totalData.mdata[i].pos.x + laserSkill->Getoffset().x, totalData.mdata[i].pos.y + laserSkill->Getoffset().y });
-										laserSkill->Setmasternum(i);
-										vMonsterSkill[ns - MONSTERSKILLINDEX] = laserSkill;
-
-										OBJECTIDARR[ns] = true;
-										count++;
-									}
-								}
-								vertical = !vertical;
+								GenerateLaserSkill(i);
+							}
+							break;
+							case MONSTERSKILLTYPE::FIREBALLSKILL:
+							{
+								GenerateFireballSkill(i);
 							}
 							break;
 							}
@@ -1220,6 +1195,9 @@ void SetMonsterSkillToDatasheet()
 			break;
 		case MONSTERSKILLTYPE::LASERSKILL:
 			SetLaserSkillInDatasheet(monsterSkill, ID);
+			break;
+		case MONSTERSKILLTYPE::FIREBALLSKILL:
+			SetFireballSkillInDatasheet(monsterSkill, ID);
 			break;
 		}
 	}
@@ -1395,7 +1373,7 @@ void InitBoss(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
 	m = new Boss(generatePos, BOSS, CHASE, {totalData.udata[0].pos}, BOSS_BASE_DAMAGE, BOSS_BASE_HEALTH, BOSS_BASE_SPEED, TRUE);
 
-	MonsterSkill* monsterSkill = new LaserSkill(ID, 0);
+	MonsterSkill* monsterSkill = new FireballSkill(ID, 0);
 
 	SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
 
@@ -1661,6 +1639,9 @@ void UpdateMonsterSkill()
 			break;
 		case MONSTERSKILLTYPE::LASERSKILL:
 			UpdateLaserSkill(skill);
+			break;
+		case MONSTERSKILLTYPE::FIREBALLSKILL:
+			UpdateFireballSkill(skill);
 			break;
 		}
 	}
@@ -2019,6 +2000,84 @@ void Rigidbody()
 				monsterArr[i]->SetPosition(newPos);
 				totalData.mdata[i].pos = newPos;
 			}
+		}
+	}
+}
+
+void GenerateLaserSkill(int& monsterID)
+{
+	int count = 0;
+	static bool vertical = false;
+
+	for (int ns = MONSTERSKILLINDEX; ns < FINALINDEX; ns++)
+	{
+		if (count == LASERNUM)
+			break;
+		if (!OBJECTIDARR[ns])
+		{
+			LaserSkill* laserSkill = new LaserSkill(monsterID, 0);
+
+			// laser 방향 설정 해주기
+			POINT dir;
+			if (count < LASERNUM / 2)
+				dir = { vertical,!vertical };
+			else
+				dir = { -vertical, -!vertical };
+
+			laserSkill->Setdirection({ dir.y,dir.x });
+			laserSkill->Setangle(0);
+
+			laserSkill->Settime_1();
+			laserSkill->Settime_2();
+			laserSkill->Setisactivate(true);
+			laserSkill->SetID(ns);
+			laserSkill->Setoffset({ (long)((count % (LASERNUM / 2) - (LASERNUM / 2 / 2)) * laserSkill->Getsize() * dir.x),
+				(long)((count % (LASERNUM / 2) - (LASERNUM / 2 / 2)) * laserSkill->Getsize() * dir.y) });
+			laserSkill->Setposition({ totalData.mdata[monsterID].pos.x + laserSkill->Getoffset().x, totalData.mdata[monsterID].pos.y + laserSkill->Getoffset().y });
+			laserSkill->Setmasternum(monsterID);
+			vMonsterSkill[ns - MONSTERSKILLINDEX] = laserSkill;
+
+			OBJECTIDARR[ns] = true;
+			count++;
+		}
+	}
+	vertical = !vertical;
+}
+
+void GenerateFireballSkill(int& monsterID)
+{
+	int count = 0;
+	int offsetangle = 360 / FIREBALLNUM;
+
+	for (int ns = MONSTERSKILLINDEX; ns < FINALINDEX; ns++)
+	{
+		if (count == FIREBALLNUM)
+			break;
+		if (!OBJECTIDARR[ns])
+		{
+			FireballSkill* fireballSkill = new FireballSkill(monsterID, 0);
+
+			int angle = count * offsetangle;
+			// laser 방향 설정 해주기
+			POINT dir;
+			dir = { (long)floor(cos(angle * 3.14 / 180) * 10), (long)round(sin(angle * 3.14 / 180) * 10) };
+
+			fireballSkill->Setdirection({ dir.x,dir.y });
+			fireballSkill->Setangle(0);
+
+			fireballSkill->Settime_1();
+			fireballSkill->Settime_2();
+			fireballSkill->Setisactivate(true);
+			fireballSkill->SetID(ns);
+			fireballSkill->Setoffset({ (long)(dir.x * fireballSkill->Getsize() / 5),
+				(long)(dir.y * fireballSkill->Getsize() / 5) });
+			fireballSkill->Setposition({ totalData.mdata[monsterID].pos.x + fireballSkill->Getoffset().x,
+				totalData.mdata[monsterID].pos.y + fireballSkill->Getoffset().y });
+			fireballSkill->Setmasternum(monsterID);
+			vMonsterSkill[ns - MONSTERSKILLINDEX] = fireballSkill;
+
+			OBJECTIDARR[ns] = true;
+			count++;
 		}
 	}
 }

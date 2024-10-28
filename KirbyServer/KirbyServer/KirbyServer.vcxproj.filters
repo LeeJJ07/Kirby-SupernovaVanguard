@@ -168,6 +168,9 @@
     <ClInclude Include="LaserSkill.h">
       <Filter>클래스\Object\MonsterSkill</Filter>
     </ClInclude>
+    <ClInclude Include="FireballSkill.h">
+      <Filter>클래스\Object\MonsterSkill</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="KirbyServer.ico">

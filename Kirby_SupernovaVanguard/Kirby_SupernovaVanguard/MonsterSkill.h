@@ -6,7 +6,8 @@
 enum EMONSTERSKILLTYPE {
 	SPEARSKILL = 1,
 	FIREMANSKILL,
-	LASERSKILL
+	LASERSKILL,
+	FIREBALLSKILL
 };
 
 enum EMONSTERSKILLSTATE {
@@ -47,6 +48,12 @@ public:
 		{
 			Rectangle2D* rectangle = new Rectangle2D(true, EMISSILE);
 			SetObject(rectangle);
+		}
+		break;
+		case FIREBALLSKILL:
+		{
+			Circle2D* circle = new Circle2D(true, EMISSILE);
+			SetObject(circle);
 		}
 		break;
 		}
