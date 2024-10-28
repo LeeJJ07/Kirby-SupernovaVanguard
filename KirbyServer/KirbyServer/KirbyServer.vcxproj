@@ -132,6 +132,7 @@
     <ClInclude Include="Collider2D.h" />
     <ClInclude Include="DededeSkill.h" />
     <ClInclude Include="EletricfieldSkill.h" />
+    <ClInclude Include="FireballSkill.h" />
     <ClInclude Include="FireManMonster.h" />
     <ClInclude Include="FiremanSkill.h" />
     <ClInclude Include="framework.h" />
@@ -141,6 +142,7 @@
     <ClInclude Include="KunaiSkill.h" />
     <ClInclude Include="KungFuMan.h" />
     <ClInclude Include="LandMineMonster.h" />
+    <ClInclude Include="LaserSkill.h" />
     <ClInclude Include="MaberoaSkill.h" />
     <ClInclude Include="MagicarrowSkill.h" />
     <ClInclude Include="MetaknightSkill.h" />

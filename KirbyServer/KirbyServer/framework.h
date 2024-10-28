@@ -119,6 +119,8 @@ enum OBJECTINDEX
 // >> MonsterSkill Destroy Time
 #define TSPEARSKILLDESTROY 3
 #define TFIREMANSKILLDESTROY 1
+#define TLASERSKILLDESTROY 4
+#define TFIREBALLSKILLDESTROY 5
 
 // >> Skill offset
 #define OFFSETADJUST 50

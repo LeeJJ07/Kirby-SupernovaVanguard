@@ -53,7 +53,7 @@ static enum ObjectImage
 	landmine_Idle,		KFM_Walk,				KFM_Attack,				KFM_Detect,				gaogao_Attack,			gaogao_Detect,
 	gaogao_Stun,		boss_eye,				boss_mode1,				boss_mode2,				boss_Attack1,			boss_Attack2,		 
 	boss_Attack3,		kirbySkill_Attack,		dededeSkill_Attack,		metaknightSkill_Attack,	maberoaSkill_Attack,	electricfieldSkill_Attack,
-	kunaiSkill_Attack,	magicarrowSkill_Attack, tornadoSkill_Attack,	truckSkill_Attack,		spearSkill_Attack
+	kunaiSkill_Attack,	magicarrowSkill_Attack, tornadoSkill_Attack,	truckSkill_Attack,		spearSkill_Attack,
 };
 
 enum OBJECTINDEX

@@ -36,6 +36,14 @@ void MonsterSkill::SetMonsterSkillAni()
 		tempAni[0] = imageDatas[fireman_Attack];
 		tempAni[1] = nullptr;
 		break;
+	case LASERSKILL:
+		tempAni[0] = imageDatas[boss_Attack1];
+		tempAni[1] = nullptr;
+		break;
+	case FIREBALLSKILL:
+		tempAni[0] = imageDatas[boss_Attack2];
+		tempAni[1] = nullptr;
+		break;
 	}
 
 	for (int i = 0; i < 2; i++)
