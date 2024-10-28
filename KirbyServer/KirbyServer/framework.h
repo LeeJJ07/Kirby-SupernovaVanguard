@@ -35,9 +35,9 @@
 #define DEFAULT_SPAWN_SIZE_X		50
 #define DEFAULT_SPAWN_SIZE_Y		50
 
-#define FIRST_BOSS_INIT_TIME		1000 //300
-#define SECOND_BOSS_INIT_TIME		1000 //600
-#define THIRD_BOSS_INIT_TIME		5 //900
+#define FIRST_BOSS_INIT_TIME		30 //300
+#define SECOND_BOSS_INIT_TIME		60 //600
+#define THIRD_BOSS_INIT_TIME		90 //900
 
 #define PAIR std::pair<double,double>
 #define PLAYERNUM					4
