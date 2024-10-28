@@ -50,7 +50,6 @@
     <ClCompile Include="MonsterSkill.cpp">
       <Filter>클래스파일\Objects\Skill</Filter>
     </ClCompile>
-    <ClCompile Include="SkillSelector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -152,8 +151,7 @@
       <Filter>클래스파일\UI</Filter>
     </ClInclude>
 =======
-    <ClInclude Include="SkillSelector.h" />
->>>>>>> LevelUp
+>>>>>>> parent of c10b91f (feat: 레벨업 유아이 구현중)
   </ItemGroup>
   <ItemGroup>
     <Image Include="Kirby_SupernovaVanguard.ico">
