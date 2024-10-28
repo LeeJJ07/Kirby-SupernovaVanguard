@@ -95,6 +95,10 @@ void MonsterHit(Monster*& , Skill*& );
 void MonsterDie(Monster*& , int& );
 // <<
 
+// >> : physic
+void Rigidbody();
+// <<
+
 // >> : UI
 static std::chrono::high_resolution_clock::time_point t1_UI;
 static std::chrono::high_resolution_clock::time_point t2_UI;
@@ -533,6 +537,7 @@ unsigned __stdcall Update()
 				UpdateTimer();
 				MonsterCollisionUpdate();
 				PlayerCollisionUpdate();
+				Rigidbody();
 				UpdateMonster();
 				GenerateSkill();
 				UpdateSkill();
@@ -616,6 +621,7 @@ void SetUserToData(Player*& player, short& ID)
 {
 	totalData.udata[ID].curHealth = player->GetcurHealth();
 	totalData.udata[ID].maxHealth = player->GetmaxHealth();
+	totalData.udata[ID].pos = player->GetPosition();
 }
 
 void SetUserData(PLAYERDATA& uData, ReceiveData rData)
@@ -1847,4 +1853,83 @@ void MonsterDie(Monster*& monster, int& id)
 	totalData.mdata[id].dataType = 0;
 	delete monster;
 	monster = nullptr;
+}
+
+void Rigidbody()
+{
+	for (int i = 0; i < vClient.size(); i++)
+	{
+		if (vClient[i] == nullptr)
+			continue;
+		for (int j = 0; j < monsterArr.size(); j++)
+		{
+			if (monsterArr[j] == nullptr)
+				continue;
+
+			int distancePToMS = sqrt(pow(vClient[i]->GetPosition().x - monsterArr[j]->GetPosition().x, 2)
+				+ pow(vClient[i]->GetPosition().y - monsterArr[j]->GetPosition().y, 2));
+
+			int radiusSum = 20 + 20;	//vClient[i].size()와 monsterArr[j].size()의 합
+
+			if (distancePToMS < radiusSum)
+			{
+				POINT vector = { vClient[i]->GetPosition().x - monsterArr[j]->GetPosition().x,
+					vClient[i]->GetPosition().y - monsterArr[j]->GetPosition().y };
+
+				if (vector.x == 0)
+					vector.x = 1;
+				if (vector.y == 0)
+					vector.y = 1;
+
+				int dis = sqrt(pow(vector.x, 2) + pow(vector.y, 2));
+
+				vector.x = vector.x * 5 / dis;
+				vector.y = vector.y * 5 / dis;
+
+				POINT newPos = { vClient[i]->GetPosition().x + vector.x,
+					vClient[i]->GetPosition().y + vector.y };
+				vClient[i]->SetPosition(newPos);
+
+				short ID = i;
+				SetUserToData(vClient[i], ID);
+			}
+		}
+	}
+
+	for (int i = 0; i < monsterArr.size(); i++)
+	{
+		if (monsterArr[i] == nullptr)
+			continue;
+		for (int j = 0; j < monsterArr.size(); j++)
+		{
+			if (monsterArr[j] == nullptr || i == j)
+				continue;
+
+			int distancePToMS = sqrt(pow(monsterArr[i]->GetPosition().x - monsterArr[j]->GetPosition().x, 2)
+				+ pow(monsterArr[i]->GetPosition().y - monsterArr[j]->GetPosition().y, 2));
+
+			int radiusSum = 20 + 20;	//monsterArr[i].size()와 monsterArr[j].size()의 합
+
+			if (distancePToMS < radiusSum)
+			{
+				POINT vector = { monsterArr[i]->GetPosition().x - monsterArr[j]->GetPosition().x,
+					monsterArr[i]->GetPosition().y - monsterArr[j]->GetPosition().y };
+
+				if (vector.x == 0)
+					vector.x = 1;
+				if (vector.y == 0)
+					vector.y = 1;
+
+				int dis = sqrt(pow(vector.x, 2) + pow(vector.y, 2));
+
+				vector.x = vector.x * 5 / dis;
+				vector.y = vector.y * 5 / dis;
+
+				POINT newPos = { monsterArr[i]->GetPosition().x + vector.x,
+					monsterArr[i]->GetPosition().y + vector.y };
+				monsterArr[i]->SetPosition(newPos);
+				totalData.mdata[i].pos = newPos;
+			}
+		}
+	}
 }
