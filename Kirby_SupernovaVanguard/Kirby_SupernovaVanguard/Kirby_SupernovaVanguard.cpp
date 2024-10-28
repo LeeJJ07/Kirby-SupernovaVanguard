@@ -44,8 +44,8 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 void DoubleBuffering(HDC, std::vector<Object*>);
-void DrawPlayerHp(HDC&);
-void DrawMonsterHp(HDC&);
+void DrawPlayerHp(HDC&, int&, int&);
+void DrawMonsterHp(HDC&, int&, int&);
 void DrawCamera(HDC hdc, int cLeft, int cTop);
 void DrawEXP(HDC&,int&,int&);
 void DrawTime(HDC& hdc, int& cameraLeft, int& cameraTop);
@@ -472,8 +472,8 @@ void DoubleBuffering(HDC hdc)
 
 	DrawCamera(bufferdc, cLeft, cTop);
 
-	DrawPlayerHp(bufferdc);
-	DrawMonsterHp(bufferdc);
+	DrawPlayerHp(bufferdc, cLeft, cTop);
+	DrawMonsterHp(bufferdc, cLeft, cTop);
 
 	DrawEXP(bufferdc, cTop, cLeft);
 
@@ -556,11 +556,17 @@ void DrawCamera(HDC hdc, int cLeft, int cTop)
 	}
 }
 
-void DrawPlayerHp(HDC& hdc)
+void DrawPlayerHp(HDC& hdc, int& cLeft, int& cTop)
 {
 	for (int i = 0; i < vClient.size(); i++)
 	{
-		if (vClient[i] == nullptr)
+		if (objArr[i] == nullptr)
+			continue;
+
+		if (objArr[i]->GetPosition().x < cLeft
+			|| objArr[i]->GetPosition().x > cLeft + CAMERA_WIDTH
+			|| objArr[i]->GetPosition().y < cTop
+			|| objArr[i]->GetPosition().y > cTop + CAMERA_HEIGHT)
 			continue;
 
 		int offsetY = 20;
@@ -592,11 +598,17 @@ void DrawPlayerHp(HDC& hdc)
 	}
 }
 
-void DrawMonsterHp(HDC& hdc)
+void DrawMonsterHp(HDC& hdc, int& cLeft, int& cTop)
 {
 	for (int i = 0; i < vMonster.size(); i++)
 	{
-		if (vMonster[i] == nullptr)
+		if (objArr[i + MONSTERINDEX] == nullptr)
+			continue;
+
+		if (objArr[i + MONSTERINDEX]->GetPosition().x < cLeft
+			|| objArr[i + MONSTERINDEX]->GetPosition().x > cLeft + CAMERA_WIDTH
+			|| objArr[i + MONSTERINDEX]->GetPosition().y < cTop
+			|| objArr[i + MONSTERINDEX]->GetPosition().y > cTop + CAMERA_HEIGHT)
 			continue;
 
 		int offsetY = 20;

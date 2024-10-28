@@ -76,6 +76,7 @@ void Healing(int&);
 void SetSkillToDatasheet();
 void SetMonsterSkillToDatasheet();
 float UpdateAngle(PAIR&);
+void IncreaseSkillValue();
 // <<
 
 // >> : player
@@ -434,7 +435,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -788,6 +789,9 @@ void UpgradeSkillData(int& playerIndex, int skillnum)
 			continue;
 		vClient[playerIndex]->GetSkillManager()[i]->SetCurLevel(vClient[playerIndex]->GetSkillManager()[i]->GetCurLevel() + 1);
 		vClient[playerIndex]->SetSkillLevel(skillnum, vClient[playerIndex]->GetSkillLevel(skillnum) + 1);
+		
+		IncreaseSkillValue();
+
 		break;
 	}
 }
@@ -1975,6 +1979,7 @@ void PlayerCollisionUpdate()
 
 				if (vectorDistance.x == 0)
 					vectorDistance.x = 1;
+
 				if (vectorDistance.y == 0)
 					vectorDistance.y = 1;
 
@@ -2216,4 +2221,9 @@ void InitFireballSkill(Monster*& monster)
 	std::vector<SkillManager*> sm = monster->GetSkillManager();
 	sm.push_back(skillmanager);
 	monster->SetSkillManager(sm);
+}
+
+void IncreaseSkillValue()
+{
+
 }

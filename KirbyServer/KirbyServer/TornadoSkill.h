@@ -62,11 +62,8 @@ void UpdateTornadoSkill(Skill*& skill)
 
 	POINT myposition = skill->Getposition();
 
-	if (skill->Gettargetnum() == 0)
-	{
-		int monsterIndex = FindCloseMonster(myposition);
-		tornadoskill->Settargetnum(monsterIndex);
-	}
+	int monsterIndex = FindCloseMonster(myposition);
+	tornadoskill->Settargetnum(monsterIndex);
 
 	if (tornadoskill->Gettargetnum() != -1)
 	{
