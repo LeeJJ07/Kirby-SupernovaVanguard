@@ -22,12 +22,7 @@
 #include <iostream>
 #include <cmath>
 #include <time.h>
-<<<<<<< HEAD
 #include <map>
-=======
-#include <random>
-#include <algorithm>
->>>>>>> LevelUp
 
 #define MAX_MAP_SIZE_X				4000
 #define MAX_MAP_SIZE_Y				2000
@@ -49,8 +44,6 @@
 #define MONSTERSKILLNUM				100
 
 #define RETARGETINGTIME				1
-
-#define ALL_SKILL_LAST_INDEX		9
 
 enum OBJECTINDEX
 {

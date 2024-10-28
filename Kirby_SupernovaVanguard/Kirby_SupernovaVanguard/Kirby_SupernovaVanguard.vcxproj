@@ -154,7 +154,6 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SelectScene.h" />
     <ClInclude Include="Skill.h" />
-    <ClInclude Include="SkillSelector.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="StartScene.h" />
     <ClInclude Include="targetver.h" />
@@ -177,7 +176,6 @@
     <ClCompile Include="Rectangle2D.cpp" />
     <ClCompile Include="SelectScene.cpp" />
     <ClCompile Include="Skill.cpp" />
-    <ClCompile Include="SkillSelector.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="StartScene.cpp" />
     <ClCompile Include="PlayerData.cpp" />
