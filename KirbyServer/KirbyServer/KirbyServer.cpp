@@ -501,6 +501,8 @@ void ReadData()
 	for (int i = 0; i < socketList.size(); i++) {
 		ReceiveData temp = {};
 		int dataLen = recv(socketList[i], (char*)&temp, sizeof(ReceiveData), 0);
+			if (!temp.send)
+				continue;
 		if(dataLen > 0)
 		{
 			if (totalData.publicdata.isAllPlayerChoice)
@@ -550,7 +552,7 @@ void ReadData()
 		t2_select = std::chrono::high_resolution_clock::now();
 		timeSpan_select = std::chrono::duration_cast<std::chrono::duration<double>>(t2_select - t1_select);
 
-		if (timeSpan_select.count() > 20.0)
+		if (timeSpan_select.count() > 2.0)
 		{
 			totalData.publicdata.isOK = 1;
 			isTimingStarted = false;

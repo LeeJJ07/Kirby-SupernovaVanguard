@@ -825,7 +825,7 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		if (timeSpan_send.count() >= 0.0025 && cs.DebugInfo != NULL)
+		if (timeSpan_send.count() >= 0.01 && cs.DebugInfo != NULL)
 		{
 			if (threadEnd_Send)
 				return 0;
@@ -842,6 +842,7 @@ unsigned __stdcall Send()
 			aD.playerMove = { x,y };
 			aD.cursorMove = { cursorX, cursorY };
 			aD.charactertype = dynamic_cast<Player*>(vClient[myID])->GetCharacterType();
+			aD.send = true;
 
 			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
 
@@ -872,7 +873,8 @@ unsigned __stdcall Read()
 				return 0;
 			EnterCriticalSection(&cs);
 
-			ReadMessage(cSocket, vClient);
+			if (!ReadMessage(cSocket, vClient))
+				continue;
 
 			if (uData.publicdata.islevelUp && isChoiceSkill)
 			{
