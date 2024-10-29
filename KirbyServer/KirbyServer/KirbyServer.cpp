@@ -79,7 +79,7 @@ void Healing(int&);
 void SetSkillToDatasheet();
 void SetMonsterSkillToDatasheet();
 float UpdateAngle(PAIR&);
-void IncreaseSkillValue();
+void IncreaseSkillValue(int& , int, int);
 // <<
 
 // >> : player
@@ -788,7 +788,7 @@ void UpgradeSkillData(int& playerIndex, int skillnum)
 		vClient[playerIndex]->GetSkillManager()[i]->SetCurLevel(vClient[playerIndex]->GetSkillManager()[i]->GetCurLevel() + 1);
 		vClient[playerIndex]->SetSkillLevel(skillnum, vClient[playerIndex]->GetSkillLevel(skillnum) + 1);
 		
-		IncreaseSkillValue();
+		IncreaseSkillValue(playerIndex, skillnum, i);
 
 		break;
 	}
@@ -2221,7 +2221,13 @@ void InitFireballSkill(Monster*& monster)
 	monster->SetSkillManager(sm);
 }
 
-void IncreaseSkillValue()
+void IncreaseSkillValue(int& playerIndex, int skillnum, int smIndex)
 {
 
+	string data;
+	ifstream file(".txt");
+	switch (vClient[playerIndex]->GetSkillManager()[smIndex]->Gettype())
+	{
+
+	}
 }
