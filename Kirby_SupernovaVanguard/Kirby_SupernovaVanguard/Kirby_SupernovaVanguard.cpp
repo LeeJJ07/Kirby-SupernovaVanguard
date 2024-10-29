@@ -319,7 +319,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			case SELECT:
 				if (!aD.isReady)
+				{
 					aD.isReady = true;
+				}
 				break;
 			}
 			break;
@@ -915,7 +917,7 @@ unsigned __stdcall Paint(HWND pParam)
 			{
 			case SELECT:
 			{
-				selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, vClient, { cursorX, cursorY });
+				selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, vClient, { cursorX, cursorY }, uData);
 
 				t1_render = std::chrono::high_resolution_clock::now();
 				timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);

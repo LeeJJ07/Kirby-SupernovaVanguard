@@ -126,6 +126,12 @@ void GenerateFireballSkill(int&);
 static int readyclientnum = 0;
 static bool isAllclientReady = false;
 static bool isGameStart = false;
+
+static bool isTimingStarted = false;
+static std::chrono::high_resolution_clock::time_point t1_select;
+static std::chrono::high_resolution_clock::time_point t2_select;
+static std::chrono::duration<double> timeSpan_select;
+
 static int skillnum;
 
 int InitServer(HWND hWnd);
@@ -522,9 +528,27 @@ void ReadData()
 		choiceClientNum = 0;
 	}
 
+	if (isAllclientReady)
+		return;
+
 	if (socketList.size() == readyclientnum && socketList.size() != 0)
 	{
-		isAllclientReady = true;
+		if (!isTimingStarted)
+		{
+			t1_select = std::chrono::high_resolution_clock::now();
+			isTimingStarted = true;
+		}
+		else
+		{
+			t2_select = std::chrono::high_resolution_clock::now();
+			timeSpan_select = std::chrono::duration_cast<std::chrono::duration<double>>(t2_select - t1_select);
+
+			if (timeSpan_select.count() > 10.0)
+			{
+				isAllclientReady = true;
+				isTimingStarted = false;
+			}
+		}
 	}
 }
 
