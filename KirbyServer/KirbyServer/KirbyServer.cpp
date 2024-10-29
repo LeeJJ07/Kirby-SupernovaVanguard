@@ -629,9 +629,32 @@ unsigned __stdcall Send()
 			{
 				if (totalData.udata[i].dataType == NULL)
 					break;
-				/*if (socketList[i] == NULL)
-					continue;*/
-				send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);  // NULL 바이트 제외하고 전송
+
+				// 전송할 데이터의 크기
+				size_t totalDataSize = sizeof(TOTALDATA);
+				size_t totalBytesSent = 0;
+
+				while (totalBytesSent < totalDataSize)
+				{
+					// send 호출 및 전송된 바이트 수 확인
+					int bytesSent = send(socketList[i], (char*)&totalData + totalBytesSent, totalDataSize - totalBytesSent, 0);
+
+					// send 실패 처리
+					if (bytesSent == SOCKET_ERROR)
+					{
+						std::cerr << "Send failed: " << WSAGetLastError() << "\n";
+						break;  // 에러 발생 시 루프 종료
+					}
+
+					// 연결이 닫힌 경우
+					if (bytesSent == 0)
+					{
+						std::cerr << "Connection closed for player " << i << ".\n";
+						break;  // 연결 종료 시 루프 종료
+					}
+
+					totalBytesSent += bytesSent;  // 전송된 바이트 수 누적
+				}
 			}
 
 			t1_send = std::chrono::high_resolution_clock::now();
