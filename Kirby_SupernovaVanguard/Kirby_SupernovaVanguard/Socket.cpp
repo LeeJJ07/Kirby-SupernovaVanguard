@@ -53,6 +53,14 @@ int InitClient(HWND hWnd, SOCKET &s)
 	}
 
 	WSAAsyncSelect(s, hWnd, WM_ASYNC, FD_READ);
+
+    /*u_long mode = 1;
+    if (ioctlsocket(s, FIONBIO, &mode) == SOCKET_ERROR) {
+        std::cerr << "Failed to set non-blocking mode.\n";
+        closesocket(s);
+        WSACleanup();
+        return 1;
+    }*/
 	
 	return 1;
 }
