@@ -26,6 +26,12 @@
 #include <random>
 #include <algorithm>
 
+// >> file library
+#include <fstream>
+#include <sstream>
+#include <cctype>
+// <<
+
 #define MAX_MAP_SIZE_X				4000
 #define MAX_MAP_SIZE_Y				2000
 
@@ -125,4 +131,6 @@ enum OBJECTINDEX
 #define TFIREBALLSKILLDESTROY 3
 
 // >> Skill offset
+#define MAXLEVEL	5
+#define STATNUM	7
 #define OFFSETADJUST 50

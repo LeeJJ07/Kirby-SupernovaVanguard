@@ -27,6 +27,9 @@ private:
 	POINT offset;
 	POINT position;
 	POINT direction;
+
+	std::chrono::high_resolution_clock::time_point t1_coolTime;
+	std::chrono::high_resolution_clock::time_point t2_coolTime;
 public:
 	MonsterSkill() :masternum(0), targetnum(0), skilltype(SPEARSKILL), collidershape(ECOLLIDERSHAPE::RECTANGLE),
 		speed(1), damage(1), size(0), size2(0), coolTime(5.0), offset({ 0,0 }), position({ 0,0 }), direction({ 1,0 }) {}
@@ -52,6 +55,9 @@ public:
 	POINT	Getposition() { return position; }
 	POINT	Getdirection() { return direction; }
 
+	std::chrono::high_resolution_clock::time_point Gett1_coolTime() { return t1_coolTime; }
+	std::chrono::high_resolution_clock::time_point Gett2_coolTime() { return t2_coolTime; }
+
 	void	Setisactivate(bool isactivate) { this->isactivate = isactivate; }
 	void	SetisOneOff(bool isOneOff) { this->isOneOff = isOneOff; }
 	void	Setmasternum(int masternum) { this->masternum = masternum; }
@@ -68,6 +74,9 @@ public:
 	void	Setoffset(POINT offset) { this->offset = offset; }
 	void	Setposition(POINT position) { this->position = { position.x, position.y }; }
 	void	Setdirection(POINT direction) { this->direction = direction; }
+
+	void	Sett1_coolTime() { t1_coolTime = std::chrono::high_resolution_clock::now(); }
+	void	Sett2_coolTime() { t2_coolTime = std::chrono::high_resolution_clock::now(); }
 
 	virtual	void SetCollider(Collider2D* collider) = 0;
 };

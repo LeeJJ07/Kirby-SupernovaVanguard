@@ -80,6 +80,7 @@ void SetSkillToDatasheet();
 void SetMonsterSkillToDatasheet();
 float UpdateAngle(PAIR&);
 void IncreaseSkillValue(int& , int, int);
+void SetSkillState(Skill*&, Skill*&);
 // <<
 
 // >> : player
@@ -114,6 +115,11 @@ int levelExp[51];
 // >> : Boss
 void GenerateLaserSkill(int&);
 void GenerateFireballSkill(int&);
+// <<
+
+// >> : File
+ifstream skillDataFile;
+
 // <<
 
 #define MAX_LOADSTRING 100
@@ -337,7 +343,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_CREATE:
 	{
-		srand(NULL);
+		skillDataFile.open("skillDataSheet.txt");
 
 		InitializeCriticalSection(&criticalsection);
 
@@ -395,6 +401,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			CloseHandle(hThreads[1]);
 		if (hThreads[2])
 			CloseHandle(hThreads[2]);
+
+		if (skillDataFile.is_open())
+			skillDataFile.close();
 
 		threadEnd_Update = true;
 		threadEnd_Send = true;
@@ -513,6 +522,7 @@ void ReadData()
 			}
 		}
 	}
+
 	if (socketList.size() == choiceClientNum && socketList.size() != 0)
 	{
 		totalData.publicdata.isAllPlayerChoice = true;
@@ -738,14 +748,11 @@ void SetBasisSkillData(int& playerIndex)
 		basisSkill = new MaberoaSkill(playerIndex, 0);
 		break;
 	}
-	SkillManager* skillmanager = new SkillManager(basisSkill->Getskilltype(), basisSkill->Getcooltime());
 
-	std::vector<SkillManager*> sm = vClient[playerIndex]->GetSkillManager();
-	sm.push_back(skillmanager);
-	vClient[playerIndex]->SetSkillManager(sm);
+	vClient[playerIndex]->GetSkillManager()->GetskillVector().push_back(basisSkill);
 
 	vClient[playerIndex]->SetSkillLevel(vClient[playerIndex]->GetCharacterType(), 1);
-	for (int i = 1; i <= 4; i++) {
+	for (int i = KIRBY; i <= MABOROA; i++) {
 		if (vClient[playerIndex]->GetSkillLevel(i)) continue;
 		vClient[playerIndex]->SetSkillLevel(i, -1);
 	}
@@ -771,21 +778,18 @@ void SetSkillData(int& playerIndex, int skillnum)
 		basisSkill = new TruckSkill(playerIndex, 0);
 		break;
 	}
-	SkillManager* skillmanager = new SkillManager(basisSkill->Getskilltype(), basisSkill->Getcooltime());
 
-	std::vector<SkillManager*> sm = vClient[playerIndex]->GetSkillManager();
-	sm.push_back(skillmanager);
-	vClient[playerIndex]->SetSkillManager(sm);
+	vClient[playerIndex]->GetSkillManager()->GetskillVector().push_back(basisSkill);
 
 	vClient[playerIndex]->SetSkillLevel(skillnum, 1);
 }
 void UpgradeSkillData(int& playerIndex, int skillnum)
 {
-	for (int i = 0; i < vClient[playerIndex]->GetSkillManager().size(); i++)
+	for (int i = 0; i < vClient[playerIndex]->GetSkillManager()->GetskillVector().size(); i++)
 	{
-		if (vClient[playerIndex]->GetSkillManager()[i]->Gettype() != skillnum)
+		if (vClient[playerIndex]->GetSkillManager()->GetskillVector()[i]->Getskilltype() != skillnum)
 			continue;
-		vClient[playerIndex]->GetSkillManager()[i]->SetCurLevel(vClient[playerIndex]->GetSkillManager()[i]->GetCurLevel() + 1);
+		vClient[playerIndex]->GetSkillManager()->GetskillVector()[i]->SetCurLevel(vClient[playerIndex]->GetSkillManager()->GetskillVector()[i]->GetCurLevel() + 1);
 		vClient[playerIndex]->SetSkillLevel(skillnum, vClient[playerIndex]->GetSkillLevel(skillnum) + 1);
 		
 		IncreaseSkillValue(playerIndex, skillnum, i);
@@ -804,19 +808,20 @@ void GenerateSkill()
 {
 	for (int i = 0; i < socketList.size(); i++)
 	{
-		std::vector<SkillManager*> temp = vClient[i]->GetSkillManager();
+		SkillManager* temp = vClient[i]->GetSkillManager();
 		static bool electricCreate[4];
 
 		if (!vClient[i]->GetisAlive())
 			continue;
 
-		for (int j = 0; j < temp.size(); j++)
+		for (int j = 0; j < temp->GetskillVector().size(); j++)
 		{
-			temp[j]->Settime_2();
+			Skill* tempSkill = temp->GetskillVector()[j];
+			tempSkill->Sett2_coolTime();
 
-			double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(temp[j]->Gettime_2() - temp[j]->Gettime_1()).count();
+			double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(tempSkill->Gett2_coolTime() - tempSkill->Gett1_coolTime()).count();
 
-			if (skillcooltime > temp[j]->Getcooltime())
+			if (skillcooltime > tempSkill->Getcooltime())
 			{
 				int s;
 				bool isGenerateSkill = false;
@@ -824,7 +829,7 @@ void GenerateSkill()
 				{
 					if (!OBJECTIDARR[s])
 					{
-						switch (temp[j]->Gettype())
+						switch (tempSkill->Getskilltype())
 						{
 						case SKILLTYPE::KIRBYSKILL:
 						{
@@ -1062,7 +1067,9 @@ void GenerateSkill()
 						break;
 						}
 
-						temp[j]->Settime_1();
+						SetSkillState(vSkill[s - SKILLINDEX], tempSkill);
+
+						tempSkill->Sett1_coolTime();
 
 						OBJECTIDARR[s] = true;
 						isGenerateSkill = true;
@@ -1079,6 +1086,17 @@ void GenerateSkill()
 	}
 }
 
+void SetSkillState(Skill*& sub, Skill*& copy)
+{
+	sub->Setspeed(copy->Getspeed());
+	sub->Setdamage(copy->Getdamage());
+	sub->Setsize(copy->Getsize());
+	sub->Setsize2(copy->Getsize2());
+	sub->Setcooltime(copy->Getcooltime());
+	sub->SetpierceCount(copy->GetpierceCount());
+	sub->SetAmount(copy->GetAmount());
+}
+
 void GenerateMonsterSkill()
 {
 	for (int i = 0; i < MONSTERNUM; i++)
@@ -1089,14 +1107,15 @@ void GenerateMonsterSkill()
 			if (type != SPEAR && type != FIREMAN && type != BOSS)
 				continue;
 
-			std::vector<SkillManager*> skillmanager = monsterArr[i]->GetSkillManager();
-			for (int j = 0; j < skillmanager.size(); j++)
+			MonsterSkillManager* monsterSkillManager = monsterArr[i]->GetMonsterSkillManager();
+			for (int j = 0; j < monsterSkillManager->GetskillVector().size(); j++)
 			{
-				skillmanager[j]->Settime_2();
+				MonsterSkill* tempMonsterSkill = monsterSkillManager->GetskillVector()[j];
+				tempMonsterSkill->Sett2_coolTime();
 
-				double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(skillmanager[j]->Gettime_2() - skillmanager[j]->Gettime_1()).count();
+				double skillcooltime = std::chrono::duration_cast<std::chrono::duration<double>>(tempMonsterSkill->Gett2_coolTime() - tempMonsterSkill->Gett1_coolTime()).count();
 
-				if (skillcooltime > skillmanager[j]->Getcooltime())
+				if (skillcooltime > tempMonsterSkill->Getcooltime())
 				{
 					int s;
 					bool isGenerateSkill = false;
@@ -1104,7 +1123,7 @@ void GenerateMonsterSkill()
 					{
 						if (!OBJECTIDARR[s])
 						{
-							switch (skillmanager[j]->Gettype())
+							switch (tempMonsterSkill->Getskilltype())
 							{
 							case MONSTERSKILLTYPE::SPEARSKILL:
 							{
@@ -1169,7 +1188,7 @@ void GenerateMonsterSkill()
 							break;
 							}
 
-							skillmanager[j]->Settime_1();
+							tempMonsterSkill->Sett1_coolTime();
 
 							OBJECTIDARR[s] = true;
 							isGenerateSkill = true;
@@ -1411,11 +1430,7 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 
 	if (monsterSkill != nullptr)
 	{
-		SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
-
-		std::vector<SkillManager*> sm = monsterArr[ID - MONSTERINDEX]->GetSkillManager();
-		sm.push_back(skillmanager);
-		monsterArr[ID - MONSTERINDEX]->SetSkillManager(sm);
+		monsterArr[ID - MONSTERINDEX]->GetMonsterSkillManager()->GetskillVector().push_back(monsterSkill);
 	}
 
 	monsterCount++;
@@ -1457,11 +1472,7 @@ void InitBoss(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 
 	MonsterSkill* monsterSkill = new FireballSkill(ID, 0);
 
-	SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
-
-	std::vector<SkillManager*> sm = monsterArr[ID - MONSTERINDEX]->GetSkillManager();
-	sm.push_back(skillmanager);
-	monsterArr[ID - MONSTERINDEX]->SetSkillManager(sm);
+	monsterArr[ID - MONSTERINDEX]->GetMonsterSkillManager()->GetskillVector().push_back(monsterSkill);
 	monsterArr[ID - MONSTERINDEX]->SetMonsterState(ATTACK);
 
 	monsterCount++;
@@ -1915,7 +1926,7 @@ void SetRandomChoiceSkill() {
 			break;
 		std::vector<int> randIdx;
 		for (int j = 1; j <= ALL_SKILL_LAST_INDEX; j++) {
-			if (vClient[i]->GetSkillLevel(j) >= 5 || vClient[i]->GetSkillLevel(j) == -1)
+			if (vClient[i]->GetSkillLevel(j) >= MAXLEVEL || vClient[i]->GetSkillLevel(j) == -1)
 				continue;
 			randIdx.push_back(j);
 		}
@@ -2203,31 +2214,51 @@ void InitLasorSkill(Monster*& monster)
 {
 	MonsterSkill* monsterSkill = new LaserSkill(BossID, 0);
 
-	SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
-
-	std::vector<SkillManager*> sm = monster->GetSkillManager();
-	sm.push_back(skillmanager);
-	monster->SetSkillManager(sm);
+	monster->GetMonsterSkillManager()->GetskillVector().push_back(monsterSkill);
 }
 
 void InitFireballSkill(Monster*& monster)
 {
 	MonsterSkill* monsterSkill = new FireballSkill(BossID, 0);
 
-	SkillManager* skillmanager = new SkillManager(monsterSkill->Getskilltype(), monsterSkill->Getcooltime());
-
-	std::vector<SkillManager*> sm = monster->GetSkillManager();
-	sm.push_back(skillmanager);
-	monster->SetSkillManager(sm);
+	monster->GetMonsterSkillManager()->GetskillVector().push_back(monsterSkill);
 }
 
 void IncreaseSkillValue(int& playerIndex, int skillnum, int smIndex)
 {
+	std::string line;
+	std::vector<double> values;
 
-	string data;
-	ifstream file(".txt");
-	switch (vClient[playerIndex]->GetSkillManager()[smIndex]->Gettype())
+	int txtRow = (vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->Getskilltype() - 1) * MAXLEVEL
+		+ vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->GetCurLevel();
+
+	int curRow = 0;
+
+	skillDataFile.clear();
+	skillDataFile.seekg(0, std::ios::beg);
+
+	while (std::getline(skillDataFile, line))
 	{
+		if (curRow == txtRow)
+		{
+			std::istringstream ss(line);
+			std::string token;
 
+			while (ss >> token)
+			{
+				if (std::all_of(token.begin(), token.end(), [](char c) { return ::isdigit(c) || c == '.'; })) {
+					values.push_back(std::stod(token));  // double로 변환
+				}
+			}
+			break;
+		}
+		curRow++;
 	}
+	vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->Setspeed(values[0]);
+	vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->Setdamage(values[1]);
+	vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->Setsize(values[2]);
+	vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->Setsize2(values[3]);
+	vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->Setcooltime(values[4]);
+	vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->SetpierceCount(values[5]);
+	vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->SetAmount(values[6]);
 }
