@@ -130,7 +130,6 @@ ifstream skillDataFile;
 #define TIMER_GENERATESKILL 4
 
 static int readyclientnum = 0;
-static bool isAllclientReady = false;
 static bool isGameStart = false;
 
 static bool isTimingStarted = false;
@@ -280,7 +279,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case TIMER_GENERATEMONSTER:
 		{
-			if (isAllclientReady)
+			if (totalData.publicdata.isOK)
 			{
 				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
 				{
@@ -529,7 +528,7 @@ void ReadData()
 		}
 	}
 
-	if (socketList.size() == choiceClientNum && socketList.size() != 0)
+	if (totalData.publicdata.isOK && socketList.size() == choiceClientNum && socketList.size() != 0)
 	{
 		totalData.publicdata.isAllPlayerChoice = true;
 		totalData.publicdata.islevelUp = false;
@@ -538,7 +537,7 @@ void ReadData()
 		choiceClientNum = 0;
 	}
 
-	if (isAllclientReady)
+	if (totalData.publicdata.isOK)
 		return;
 
 	if (socketList.size() == readyclientnum && socketList.size() != 0)
@@ -548,16 +547,13 @@ void ReadData()
 			t1_select = std::chrono::high_resolution_clock::now();
 			isTimingStarted = true;
 		}
-		else
-		{
-			t2_select = std::chrono::high_resolution_clock::now();
-			timeSpan_select = std::chrono::duration_cast<std::chrono::duration<double>>(t2_select - t1_select);
+		t2_select = std::chrono::high_resolution_clock::now();
+		timeSpan_select = std::chrono::duration_cast<std::chrono::duration<double>>(t2_select - t1_select);
 
-			if (timeSpan_select.count() > 10.0)
-			{
-				isAllclientReady = true;
-				isTimingStarted = false;
-			}
+		if (timeSpan_select.count() > 2.0)
+		{
+			totalData.publicdata.isOK = true;
+			isTimingStarted = false;
 		}
 	}
 }

@@ -87,6 +87,7 @@ struct MONSTERSKILLDATA
 
 struct PUBLICDATA
 {
+	bool	isOK;
 	bool	isAllPlayerChoice;
 	float	currentTime;
 	int		level;

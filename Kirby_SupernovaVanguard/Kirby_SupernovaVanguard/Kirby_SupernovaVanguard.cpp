@@ -393,13 +393,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 			{
-				int i;
-				for (i = 0; i < vClient.size(); i++)
-				{
-					if (vClient[i] != NULL && !vClient[i]->GetIsInGame())
-						break;
-				}
-				if (i == vClient.size())
+				if (uData.publicdata.isOK)
 				{
 					curScene = GAME;
 					for (int j = 0; j < PLAYERNUM; j++)
