@@ -429,7 +429,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 int InitServer(HWND hWnd)
 {
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
-	s = socket(AF_INET, SOCK_STREAM, 0);
+	s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	
 	int sendBufSize = sizeof(TOTALDATA) + 1;
 	int recvBufSize = sizeof(TOTALDATA) + 1;
@@ -625,37 +625,23 @@ unsigned __stdcall Send()
 		{
 			EnterCriticalSection(&criticalsection);
 
-			// TOTALDATA 크기 + NULL (1바이트)만큼의 버퍼를 생성
-			int totalSize = sizeof(TOTALDATA) + 1;
-			char* sendBuffer = new char[totalSize];
-
-			// TOTALDATA 데이터를 버퍼에 복사
-			memcpy(sendBuffer, &totalData, sizeof(TOTALDATA));
-			sendBuffer[sizeof(TOTALDATA)] = '\0'; // 끝에 NULL 추가
-
 			for (int i = 0; i < PLAYERNUM; i++)
 			{
 				if (totalData.udata[i].dataType == NULL)
 					break;
 				if (socketList[i] == NULL)
 					continue;
-
-				// NULL 값이 포함된 버퍼 전송
-				send(socketList[i], sendBuffer, totalSize, 0);
+				send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);  // NULL 바이트 제외하고 전송
 			}
 
 			t1_send = std::chrono::high_resolution_clock::now();
 			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 
 			LeaveCriticalSection(&criticalsection);
-
-			// 버퍼 해제
-			delete[] sendBuffer;
 		}
 		Sleep(0);
 	}
 }
-
 //unsigned __stdcall Send()
 //{
 //	while (TRUE)
