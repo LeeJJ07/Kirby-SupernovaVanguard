@@ -414,7 +414,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 			{
-				if (uData.publicdata.isOK)
+				if (uData.publicdata.isOK == 1)
 				{
 					SetCursor(hCursorAttack);
 					curScene = GAME;

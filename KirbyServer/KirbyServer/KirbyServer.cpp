@@ -552,7 +552,7 @@ void ReadData()
 
 		if (timeSpan_select.count() > 2.0)
 		{
-			totalData.publicdata.isOK = true;
+			totalData.publicdata.isOK = 1;
 			isTimingStarted = false;
 		}
 	}
@@ -629,8 +629,8 @@ unsigned __stdcall Send()
 			{
 				if (totalData.udata[i].dataType == NULL)
 					break;
-				if (socketList[i] == NULL)
-					continue;
+				/*if (socketList[i] == NULL)
+					continue;*/
 				send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);  // NULL 바이트 제외하고 전송
 			}
 

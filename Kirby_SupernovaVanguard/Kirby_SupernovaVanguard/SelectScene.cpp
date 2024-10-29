@@ -59,7 +59,7 @@ SelectScene::~SelectScene()
 
 void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Object*>& clients, POINT curMousePos, TOTALDATA& tData)
 {
-	if ((int)(tData.publicdata.isOK) != 0 && (int)(tData.publicdata.isOK) != 1)
+	if (tData.publicdata.isOK != 0 && tData.publicdata.isOK != 1)
 		return;
 
 	HDC hDoubleBufferDC;
