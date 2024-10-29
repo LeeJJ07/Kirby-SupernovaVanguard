@@ -67,10 +67,7 @@ void Player::DrawPlayer(HDC& hdc, ActionData& aD)
     HDC hMemDC = CreateCompatibleDC(hdc);
     HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, ani[characterState]->GetBitmap());
 
-    if (ani[characterState]->IncreaseIdx() && characterState == ATTACK)
-    {
-        aD.curState = IDLE;
-    }
+    ani[characterState]->IncreaseIdx();
 
     int width = ani[characterState]->GetCurWidth();
     int height = ani[characterState]->GetHeight() - 1;
