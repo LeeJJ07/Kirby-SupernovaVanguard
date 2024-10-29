@@ -1,5 +1,6 @@
 #pragma once
 
+
 typedef struct receiveData
 {
 	ECharacterState curState;

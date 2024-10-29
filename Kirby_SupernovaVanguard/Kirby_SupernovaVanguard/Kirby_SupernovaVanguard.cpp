@@ -313,12 +313,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case START:
 				if (InitClient(hWnd, cSocket))
 				{
-					if (!ReadInitMessage(cSocket, uData))
+					if (!ReadInitMessage(cSocket))
 						break;
 
 					vClient[myID] = new Player();
 
-					vClient[myID]->ObjectUpdate(uData, myID);
+					vClient[myID]->ObjectUpdate(myID);
 					vClient[myID]->GetCollider()->MovePosition(vClient[myID]->GetPosition());
 
 					CreateObject((Player*)vClient[myID], myID);
@@ -870,7 +870,7 @@ unsigned __stdcall Read()
 				return 0;
 			EnterCriticalSection(&cs);
 
-			ReadMessage(cSocket, vClient, uData);
+			ReadMessage(cSocket, vClient);
 
 			if (uData.publicdata.islevelUp && isChoiceSkill)
 			{
@@ -918,7 +918,7 @@ unsigned __stdcall Paint(HWND pParam)
 			{
 			case SELECT:
 			{
-				selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, vClient, { cursorX, cursorY }, uData);
+				selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, vClient, { cursorX, cursorY });
 
 				t1_render = std::chrono::high_resolution_clock::now();
 				timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);

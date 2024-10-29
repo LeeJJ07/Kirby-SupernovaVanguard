@@ -44,7 +44,7 @@ int InitClient(HWND hWnd, SOCKET &s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
@@ -56,43 +56,38 @@ int InitClient(HWND hWnd, SOCKET &s)
 	
 	return 1;
 }
-void ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
+void ReadMessage(SOCKET& s, std::vector<Object*>& p)
 {
-    // TOTALDATA 초기화
-    memset(&pD, 0, sizeof(TOTALDATA));
-
     int totalBytesReceived = 0;
+    TOTALDATA temp = {};
     while (totalBytesReceived < sizeof(TOTALDATA))
     {
-        // recv로 데이터를 받음
-        int bytesReceived = recv(s, ((char*)&pD) + totalBytesReceived, sizeof(TOTALDATA) - totalBytesReceived, 0);
+        int bytesReceived = recv(s, ((char*)&uData) + totalBytesReceived, sizeof(TOTALDATA) - totalBytesReceived, 0);
 
-        // recv 실패 처리
         if (bytesReceived == SOCKET_ERROR)
         {
             std::cerr << "Receive failed: " << WSAGetLastError() << "\n";
-            return;  // 에러 발생 시 함수 종료
+            return; // 에러 발생 시 함수 종료
         }
 
-        // 연결이 닫힌 경우
         if (bytesReceived == 0)
         {
             std::cerr << "Connection closed.\n";
-            return;  // 연결 종료 시 함수 종료
+            return; // 연결 종료 시 함수 종료
         }
 
-        totalBytesReceived += bytesReceived;  // 수신한 바이트 수 누적
+        totalBytesReceived += bytesReceived; // 수신한 바이트 수 누적
     }
 
     // 받은 데이터 크기가 TOTALDATA와 정확히 일치할 때만 처리
-    if (totalBytesReceived >= sizeof(TOTALDATA))
+    if (totalBytesReceived == sizeof(TOTALDATA))
     {
         readCount++;
 
         // >> : playerdata
         for (int i = 0; i < PLAYERNUM; i++)
         {
-            if (pD.udata[i].dataType != PLAYERTYPE)
+            if (uData.udata[i].dataType != PLAYERTYPE)
             {
                 if (i == 0)
                 {
@@ -108,7 +103,7 @@ void ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
                 CreateObject(p[i], i + PLAYERINDEX);
                 p[i]->Setid(i + PLAYERINDEX);
             }
-            p[i]->ObjectUpdate(pD, i);
+            p[i]->ObjectUpdate(i);
             p[i]->GetCollider()->MovePosition(p[i]->GetPosition());
 
             camera.PositionUpdate();
@@ -118,7 +113,7 @@ void ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
         // >> : monsterdata
         for (int i = 0; i < MONSTERNUM; i++)
         {
-            if (pD.mdata[i].dataType != MONSTERTYPE)
+            if (uData.mdata[i].dataType != MONSTERTYPE)
             {
                 objArr[i + MONSTERINDEX] = nullptr;
                 vMonster[i] = nullptr;
@@ -127,12 +122,12 @@ void ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
 
             if (vMonster[i] == nullptr)
             {
-                vMonster[i] = new Monster(pD.mdata[i].monsterType);
+                vMonster[i] = new Monster(uData.mdata[i].monsterType);
                 CreateObject((Monster*)vMonster[i], i + MONSTERINDEX);
                 vMonster[i]->Setid(i);
             }
 
-            vMonster[i]->ObjectUpdate(pD, i);
+            vMonster[i]->ObjectUpdate(i);
             vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
         }
         // <<
@@ -140,21 +135,21 @@ void ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
         // >> : skilldata
         for (int i = 0; i < SKILLNUM; i++)
         {
-            if (pD.sdata[i].dataType != SKILLTYPE || !pD.sdata[i].isActivate)
+            if (uData.sdata[i].dataType != SKILLTYPE || !uData.sdata[i].isActivate)
             {
                 objArr[i + SKILLINDEX] = nullptr;
                 vSkill[i] = nullptr;
                 continue;
             }
 
-            if (vSkill[i] == nullptr || vSkill[i]->GetCollider()->GetColliderShape() != pD.sdata[i].colliderShape)
+            if (vSkill[i] == nullptr || vSkill[i]->GetCollider()->GetColliderShape() != uData.sdata[i].colliderShape)
             {
-                vSkill[i] = new Skill((ESKILLTYPE)pD.sdata[i].skillType);
+                vSkill[i] = new Skill((ESKILLTYPE)uData.sdata[i].skillType);
                 CreateObject((Skill*)vSkill[i], i + SKILLINDEX);
-                vSkill[i]->Setid(pD.sdata[i].targetNum);
+                vSkill[i]->Setid(uData.sdata[i].targetNum);
             }
 
-            vSkill[i]->ObjectUpdate(pD, i);
+            vSkill[i]->ObjectUpdate(i);
             vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());
         }
         // <<
@@ -162,21 +157,21 @@ void ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
         // >> : monsterskilldata
         for (int i = 0; i < MONSTERSKILLNUM; i++)
         {
-            if (pD.msdata[i].dataType != SKILLTYPE || !pD.msdata[i].isActivate)
+            if (uData.msdata[i].dataType != SKILLTYPE || !uData.msdata[i].isActivate)
             {
                 objArr[i + MONSTERSKILLINDEX] = nullptr;
                 vMonsterSkill[i] = nullptr;
                 continue;
             }
 
-            if (vMonsterSkill[i] == nullptr || vMonsterSkill[i]->GetCollider()->GetColliderShape() != pD.msdata[i].colliderShape)
+            if (vMonsterSkill[i] == nullptr || vMonsterSkill[i]->GetCollider()->GetColliderShape() != uData.msdata[i].colliderShape)
             {
-                vMonsterSkill[i] = new MonsterSkill((EMONSTERSKILLTYPE)pD.msdata[i].skillType);
+                vMonsterSkill[i] = new MonsterSkill((EMONSTERSKILLTYPE)uData.msdata[i].skillType);
                 CreateObject((MonsterSkill*)vMonsterSkill[i], i + MONSTERSKILLINDEX);
-                vMonsterSkill[i]->Setid(pD.msdata[i].targetNum);
+                vMonsterSkill[i]->Setid(uData.msdata[i].targetNum);
             }
 
-            vMonsterSkill[i]->ObjectUpdate(pD, i);
+            vMonsterSkill[i]->ObjectUpdate(i);
             vMonsterSkill[i]->GetCollider()->MovePosition(vMonsterSkill[i]->GetPosition());
         }
         // <<
@@ -311,7 +306,7 @@ void ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
 //	}
 //}
 
-bool ReadInitMessage(SOCKET& s, TOTALDATA& uD)
+bool ReadInitMessage(SOCKET& s)
 {
 	int totalBytesReceived = 0;
 	int bytesToReceive = sizeof(TOTALDATA);
@@ -321,7 +316,7 @@ bool ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 
 	while (totalBytesReceived < bytesToReceive)
 	{
-		bytesReceived = recv(s, (char*)&uD + totalBytesReceived, bytesToReceive - totalBytesReceived, 0);
+		bytesReceived = recv(s, (char*)&uData + totalBytesReceived, bytesToReceive - totalBytesReceived, 0);
 		if (bytesReceived == SOCKET_ERROR)
 		{
 			continue;
@@ -336,7 +331,7 @@ bool ReadInitMessage(SOCKET& s, TOTALDATA& uD)
 	short num = -1;
 	for (int i = 0; i < PLAYERNUM; i++)
 	{
-		if (uD.udata[i].dataType == 0)
+		if (uData.udata[i].dataType == 0)
 			break;
 		num++;
 	}

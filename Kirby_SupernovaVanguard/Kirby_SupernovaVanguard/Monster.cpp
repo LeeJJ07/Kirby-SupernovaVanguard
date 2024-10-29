@@ -181,18 +181,18 @@ void Monster::BossDraw(HDC& hdc)
     DeleteDC(hMemDC);
 }
 
-void Monster::ObjectUpdate(TOTALDATA& totalData, int i)
+void Monster::ObjectUpdate(int i)
 {
-	SetPosition(totalData.mdata[i].pos);
-    SetLookingDir(totalData.mdata[i].lookingDir);
-	GetCollider()->SetOffset(totalData.mdata[i].offset);
-    SetmaxHealth(totalData.mdata[i].maxHealth);
-    SetcurHealth(totalData.mdata[i].curHealth);
+	SetPosition(uData.mdata[i].pos);
+    SetLookingDir(uData.mdata[i].lookingDir);
+	GetCollider()->SetOffset(uData.mdata[i].offset);
+    SetmaxHealth(uData.mdata[i].maxHealth);
+    SetcurHealth(uData.mdata[i].curHealth);
     
-    SetMonsterType(totalData.mdata[i].monsterType);
+    SetMonsterType(uData.mdata[i].monsterType);
     
-    if (curState != totalData.mdata[i].curState)
+    if (curState != uData.mdata[i].curState)
     {
-        SetMonsterState(totalData.mdata[i].curState);
+        SetMonsterState(uData.mdata[i].curState);
     }
 }

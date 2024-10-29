@@ -1,26 +1,26 @@
 #include "Skill.h"
 
-void Skill::ObjectUpdate(TOTALDATA& totalData, int i)
+void Skill::ObjectUpdate(int i)
 {
-	switch (totalData.sdata[i].colliderShape)
+	switch (uData.sdata[i].colliderShape)
 	{
 	case CIRCLE:
 		Circle2D* skillcirclecollider;
 		skillcirclecollider = dynamic_cast<Circle2D*>(this->GetCollider());
-		skillcirclecollider->SetRadius(totalData.sdata[i].colliderSize);
+		skillcirclecollider->SetRadius(uData.sdata[i].colliderSize);
 		break;
 	case RECTANGLE:
 		Rectangle2D* skillrectanglecollider;
 		skillrectanglecollider = dynamic_cast<Rectangle2D*>(this->GetCollider());
-		skillrectanglecollider->SetWidth(totalData.sdata[i].colliderSize);
-		skillrectanglecollider->SetHeight(totalData.sdata[i].colliderSize2);
-		skillrectanglecollider->Setangle(totalData.sdata[i].angle);
+		skillrectanglecollider->SetWidth(uData.sdata[i].colliderSize);
+		skillrectanglecollider->SetHeight(uData.sdata[i].colliderSize2);
+		skillrectanglecollider->Setangle(uData.sdata[i].angle);
 		break;
 	}
-	SetPosition(totalData.sdata[i].position);
-	GetCollider()->MovePosition(totalData.sdata[i].colliderPosition);
-	Setsize(totalData.sdata[i].size);
-	Setsize2(totalData.sdata[i].size2);
+	SetPosition(uData.sdata[i].position);
+	GetCollider()->MovePosition(uData.sdata[i].colliderPosition);
+	Setsize(uData.sdata[i].size);
+	Setsize2(uData.sdata[i].size2);
 }
 
 void Skill::SetSkillAni()

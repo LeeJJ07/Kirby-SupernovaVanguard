@@ -102,5 +102,5 @@ public:
 
 	void BossDraw(HDC&);
 	void Draw(HDC&);
-	void ObjectUpdate(TOTALDATA&, int i);
+	void ObjectUpdate(int i);
 };

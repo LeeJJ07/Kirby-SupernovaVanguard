@@ -57,9 +57,9 @@ SelectScene::~SelectScene()
 	DeleteBitmap();
 }
 
-void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Object*>& clients, POINT curMousePos, TOTALDATA& tData)
+void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Object*>& clients, POINT curMousePos)
 {
-	if (tData.publicdata.isOK != 0 && tData.publicdata.isOK != 1)
+	if (uData.publicdata.isOK != 0 && uData.publicdata.isOK != 1)
 		return;
 
 	HDC hDoubleBufferDC;
@@ -101,7 +101,7 @@ void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, 
 		// 반투명 원 그리기
 		graphics.FillEllipse(&semiTransparentBrush, centerX - radius, centerY - radius, radius * 2, radius * 2);
 		{
-			if(!tData.udata[i].inGameStart)
+			if(!uData.udata[i].inGameStart)
 				charIndex[i] = SelectCharacter((Player*)(clients[i]), rectView);
 			Rect destRect(centerX - 150 / 2, centerY - 150 / 2, 150, 150);
 			Rect srcRect(0, 0, w[charIndex[i]], h[charIndex[i]]);
@@ -109,7 +109,7 @@ void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, 
 				destRect, srcRect.X, srcRect.Y, srcRect.Width, srcRect.Height, UnitPixel);
 		}
 
-		if(!tData.udata[i].inGameStart)
+		if(!uData.udata[i].inGameStart)
 		{
 			Rect destRect(centerX - w[i + 9] * 1.5f, centerY - 160, w[i + 9] * 3, h[i + 9] * 3);
 			Rect srcRect(0, 0, w[i + 9], h[i + 9]);

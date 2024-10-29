@@ -1,22 +1,29 @@
 #include "Player.h"
 #include "Camera.h"
 
-void Player::ObjectUpdate(TOTALDATA& pData, int i)
+static int a;
+static int b;
+
+void Player::ObjectUpdate(int i)
 {
-	SetPosition(pData.udata[i].pos);
-	GetCollider()->SetOffset(pData.udata[i].offset);
-	SetLookingDir(pData.udata[i].lookingDir);
-	SetIsInGame(pData.udata[i].inGameStart);
-	SetMousePosition(pData.udata[i].mousePos);
-    SetmaxHealth(pData.udata[i].maxHealth);
-    SetcurHealth(pData.udata[i].curHealth);
-    SetplayerSize(pData.udata[i].radius);
-    SetCharacterState(pData.udata[i].curState);
+	SetPosition(uData.udata[i].pos);
+	GetCollider()->SetOffset(uData.udata[i].offset);
+	SetLookingDir(uData.udata[i].lookingDir);
+	SetIsInGame(uData.udata[i].inGameStart);
+    if (uData.udata[i].inGameStart)
+        a++;
+    if (!uData.udata[i].inGameStart)
+        b++;
+	SetMousePosition(uData.udata[i].mousePos);
+    SetmaxHealth(uData.udata[i].maxHealth);
+    SetcurHealth(uData.udata[i].curHealth);
+    SetplayerSize(uData.udata[i].radius);
+    SetCharacterState(uData.udata[i].curState);
     
     switch (GetCollider()->GetColliderShape())
     {
     case CIRCLE:
-        ((Circle2D*)GetCollider())->SetRadius(pData.udata[i].radius);
+        ((Circle2D*)GetCollider())->SetRadius(uData.udata[i].radius);
         break;
     case RECTANGLE:
 

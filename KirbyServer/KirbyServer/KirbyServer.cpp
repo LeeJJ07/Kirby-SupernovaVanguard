@@ -550,7 +550,7 @@ void ReadData()
 		t2_select = std::chrono::high_resolution_clock::now();
 		timeSpan_select = std::chrono::duration_cast<std::chrono::duration<double>>(t2_select - t1_select);
 
-		if (timeSpan_select.count() > 2.0)
+		if (timeSpan_select.count() > 20.0)
 		{
 			totalData.publicdata.isOK = 1;
 			isTimingStarted = false;
@@ -629,45 +629,36 @@ unsigned __stdcall Send()
 			for (int i = 0; i < PLAYERNUM; i++)
 			{
 				if (totalData.udata[i].dataType == NULL)
-					break;
+					break; // 데이터가 없으면 종료
 
-				// 전송할 데이터의 크기
 				size_t totalDataSize = sizeof(TOTALDATA);
 				size_t totalBytesSent = 0;
 
 				while (totalBytesSent < totalDataSize)
 				{
-					// send 호출 및 전송된 바이트 수 확인
 					int bytesSent = send(socketList[i], (char*)&totalData + totalBytesSent, totalDataSize - totalBytesSent, 0);
 
-					// send 실패 처리
 					if (bytesSent == SOCKET_ERROR)
 					{
 						std::cerr << "Send failed for player " << i << ": " << WSAGetLastError() << "\n";
-						break;  // 현재 플레이어에 대한 전송을 중단
+						break; // 현재 플레이어에 대한 전송 중단
 					}
 
-					// 연결이 닫힌 경우
 					if (bytesSent == 0)
 					{
 						std::cerr << "Connection closed for player " << i << ".\n";
-						break;  // 현재 플레이어에 대한 전송을 중단
+						break; // 연결 종료
 					}
 
-					totalBytesSent += bytesSent;  // 전송된 바이트 수 누적
+					totalBytesSent += bytesSent; // 전송된 바이트 수 누적
 				}
 			}
 
-			// 시간 업데이트
-			auto t2_send = std::chrono::high_resolution_clock::now();
-			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
-			t1_send = t2_send;  // 현재 시간으로 업데이트
-
+			t1_send = std::chrono::high_resolution_clock::now();
 			LeaveCriticalSection(&criticalsection);
 		}
 
-		// 약간의 지연 추가
-		Sleep(0);  // CPU 사용량을 줄이기 위한 지연
+		Sleep(0); // CPU 사용량을 줄이기 위한 지연
 	}
 }
 //unsigned __stdcall Send()
