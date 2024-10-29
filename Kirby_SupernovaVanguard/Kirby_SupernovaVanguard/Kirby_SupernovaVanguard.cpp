@@ -359,6 +359,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	}
 	break;
+	case WM_MOUSEMOVE:
+		if (curScene == SELECT)
+		{
+			cursorX = LOWORD(lParam);
+			cursorY = HIWORD(lParam);
+		}
+		break;
 	case WM_PAINT:
 		if (curScene == START)
 		{
@@ -908,12 +915,10 @@ unsigned __stdcall Paint(HWND pParam)
 			{
 			case SELECT:
 			{
-				{
-					selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, vClient);
+				selectScene.DrawBitmapDoubleBuffering(pParam, hdc, rectView, vClient, { cursorX, cursorY });
 
-					t1_render = std::chrono::high_resolution_clock::now();
-					timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
-				}
+				t1_render = std::chrono::high_resolution_clock::now();
+				timeSpan_render = std::chrono::duration_cast<std::chrono::duration<double>>(t2_render - t1_render);
 			}
 			break;
 			case GAME:
