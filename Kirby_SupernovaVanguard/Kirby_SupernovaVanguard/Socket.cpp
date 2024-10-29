@@ -44,7 +44,7 @@ int InitClient(HWND hWnd, SOCKET &s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
@@ -58,6 +58,9 @@ int InitClient(HWND hWnd, SOCKET &s)
 }
 void ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
 {
+    // TOTALDATA 초기화
+    memset(&pD, 0, sizeof(TOTALDATA));
+
     int totalBytesReceived = 0;
     while (totalBytesReceived < sizeof(TOTALDATA))
     {
@@ -82,7 +85,7 @@ void ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
     }
 
     // 받은 데이터 크기가 TOTALDATA와 정확히 일치할 때만 처리
-    if (totalBytesReceived == sizeof(TOTALDATA))
+    if (totalBytesReceived >= sizeof(TOTALDATA))
     {
         readCount++;
 
@@ -188,6 +191,10 @@ void ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
         {
             CountReadNum();
         }
+    }
+    else
+    {
+        std::cerr << "Received data size mismatch: expected " << sizeof(TOTALDATA) << ", got " << totalBytesReceived << "\n";
     }
 }
 

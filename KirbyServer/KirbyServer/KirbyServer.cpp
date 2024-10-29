@@ -452,7 +452,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -616,11 +616,12 @@ unsigned __stdcall Update()
 }
 unsigned __stdcall Send()
 {
-	while (TRUE)
+	while (true)
 	{
 		if (threadEnd_Send)
 			return 0;
 
+		// 시간 간격 체크
 		if (timeSpan_send.count() >= 0.01)
 		{
 			EnterCriticalSection(&criticalsection);
@@ -642,27 +643,31 @@ unsigned __stdcall Send()
 					// send 실패 처리
 					if (bytesSent == SOCKET_ERROR)
 					{
-						std::cerr << "Send failed: " << WSAGetLastError() << "\n";
-						break;  // 에러 발생 시 루프 종료
+						std::cerr << "Send failed for player " << i << ": " << WSAGetLastError() << "\n";
+						break;  // 현재 플레이어에 대한 전송을 중단
 					}
 
 					// 연결이 닫힌 경우
 					if (bytesSent == 0)
 					{
 						std::cerr << "Connection closed for player " << i << ".\n";
-						break;  // 연결 종료 시 루프 종료
+						break;  // 현재 플레이어에 대한 전송을 중단
 					}
 
 					totalBytesSent += bytesSent;  // 전송된 바이트 수 누적
 				}
 			}
 
-			t1_send = std::chrono::high_resolution_clock::now();
+			// 시간 업데이트
+			auto t2_send = std::chrono::high_resolution_clock::now();
 			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+			t1_send = t2_send;  // 현재 시간으로 업데이트
 
 			LeaveCriticalSection(&criticalsection);
 		}
-		Sleep(0);
+
+		// 약간의 지연 추가
+		Sleep(0);  // CPU 사용량을 줄이기 위한 지연
 	}
 }
 //unsigned __stdcall Send()

@@ -65,7 +65,7 @@ std::vector<Object*> vClient(PLAYERNUM);
 std::vector<Object*> vMonster(MONSTERNUM);
 std::vector<Object*> vSkill(SKILLNUM);
 std::vector<Object*> vMonsterSkill(MONSTERSKILLNUM);
-TOTALDATA uData;
+
 Object** objArr;
 static SOCKET cSocket;
 
