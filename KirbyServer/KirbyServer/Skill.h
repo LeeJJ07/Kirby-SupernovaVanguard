@@ -33,6 +33,8 @@ private:
 	int damage;
 	int ID = -1;
 	int pierceCount;
+	int amount;
+	int curLevel;
 	float coolTime;
 	float speed;
 	float angle;
@@ -46,13 +48,16 @@ private:
 	bool canhit = true;
 	std::chrono::high_resolution_clock::time_point t1_attacktick;
 	std::chrono::high_resolution_clock::time_point t2_attacktick;
+
+	std::chrono::high_resolution_clock::time_point t1_coolTime;
+	std::chrono::high_resolution_clock::time_point t2_coolTime;
 public:
 	Skill() :masternum(0), targetnum(0), skilltype(KIRBYSKILL), collidershape(ECOLLIDERSHAPE::CIRCLE),
-		speed(1), damage(1), size(0), size2(0), coolTime(5.0), offset({0,0}), position({0,0}), direction({1,0}), pierceCount(1){}
+		speed(1), damage(1), size(0), size2(0), amount(1), curLevel(1), coolTime(5.0), offset({0,0}), position({0,0}), direction({1,0}), pierceCount(1) {}
 	Skill(int masternum, int targetnum, int skilltype, ECOLLIDERSHAPE collidershape, float speed, int damage,int pierceCount,
 		int size, int size2, float coolTime, POINT offset, POINT position, POINT direction)
 		:masternum(masternum), targetnum(targetnum), skilltype(skilltype), collidershape(collidershape), pierceCount(pierceCount),
-		speed(speed), damage(damage), size(size), size2(size2), coolTime(coolTime), offset(offset), position(position), direction(direction) {}
+		speed(speed), damage(damage), size(size), size2(size2), amount(1), curLevel(1), coolTime(coolTime), offset(offset), position(position), direction(direction) {}
 	~Skill() {}
 
 	bool	Getisactivate()	{ return isactivate; }
@@ -62,6 +67,8 @@ public:
 	int Getdamage()	{ return damage; }
 	int GetID()		{ return ID; }
 	int GetpierceCount()		{ return pierceCount; }
+	int GetAmount() { return amount; }
+	int GetCurLevel() { return curLevel; }
 	float	Getcooltime() { return coolTime; }
 	float	Getspeed() { return speed; }
 	float	Getangle() { return angle; }
@@ -75,6 +82,8 @@ public:
 	POINT	Getdirection()	{ return direction; }
 	std::chrono::high_resolution_clock::time_point Gett1_attacktick() { return t1_attacktick; }
 	std::chrono::high_resolution_clock::time_point Gett2_attacktick() { return t2_attacktick; }
+	std::chrono::high_resolution_clock::time_point Gett1_coolTime() { return t1_coolTime; }
+	std::chrono::high_resolution_clock::time_point Gett2_coolTime() { return t2_coolTime; }
 
 	void	Setisactivate(bool isactivate)	{ this->isactivate = isactivate; }
 	void	Setmasternum(int masternum) { this->masternum = masternum; }
@@ -83,6 +92,8 @@ public:
 	void	Setdamage(int damage)	{ this->damage = damage; }
 	void	SetID(int ID)	{ this->ID = ID; }
 	void	SetpierceCount(int pierceCount)	{ this->pierceCount = pierceCount; }
+	void	SetAmount(int amount) { this->amount = amount; }
+	void	SetCurLevel(int curLevel) { this->curLevel = curLevel; }
 	void	Setcooltime(float coolTime)	{ this->coolTime = coolTime; }
 	void	Setspeed(float speed)	{ this->speed = speed; }
 	void	Setangle(float angle)	{ this->angle = angle; }
@@ -96,6 +107,8 @@ public:
 	void	Setcanhit(bool canhit) { this->canhit = canhit; }
 	void	Sett1_attacktick() { t1_attacktick = std::chrono::high_resolution_clock::now(); }
 	void	Sett2_attacktick() { t2_attacktick = std::chrono::high_resolution_clock::now(); }
+	void	Sett1_coolTime() { t1_coolTime = std::chrono::high_resolution_clock::now(); }
+	void	Sett2_coolTime() { t2_coolTime = std::chrono::high_resolution_clock::now(); }
 
 	virtual	void SetCollider(Collider2D* collider) = 0;
 };

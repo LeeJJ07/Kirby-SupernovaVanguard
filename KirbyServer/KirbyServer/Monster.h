@@ -1,7 +1,7 @@
 #pragma once
 #include "Object.h"
 #include "MonsterSkill.h"
-#include "SkillManager.h"
+#include "MonsterSkillManager.h"
 
 enum EMonsterType { RUNNER, SPEAR, WINGBUG, FIREMAN, LANDMINE, KUNGFUMAN, GAOGAO, BOSS};
 enum EMonsterState { CHASE, ATTACK, DEATH, IDLE, DETECT, STUN };
@@ -32,7 +32,7 @@ protected:
 	std::chrono::high_resolution_clock::time_point t1_targeting;
 	std::chrono::high_resolution_clock::time_point t2_targeting;
 
-	std::vector<SkillManager*> vSkillManager;
+	MonsterSkillManager* vMonsterSkillManager;
 public:
 	Monster() : monsterType(RUNNER), curState(CHASE), Object()
 	{
@@ -46,6 +46,8 @@ public:
 		this->speed = BASE_SPEED;
 
 		isEnabled = false;
+
+		vMonsterSkillManager = new MonsterSkillManager;
 	}
 	Monster(POINT p) : monsterType(RUNNER), curState(CHASE), Object(p)
 	{
@@ -59,6 +61,8 @@ public:
 		this->speed = BASE_SPEED;
 
 		isEnabled = false;
+
+		vMonsterSkillManager = new MonsterSkillManager;
 	}
 	Monster(POINT p, EMonsterType mType, EMonsterState cs, POINT targetPos, int damage, int maxHealth, float speed, bool isEnabled)
 		: monsterType(mType), curState(cs), Object(p)
@@ -73,12 +77,13 @@ public:
 		this->speed = speed;
 		
 		this->isEnabled = isEnabled;
+
+		vMonsterSkillManager = new MonsterSkillManager;
 	}
 
 	virtual ~Monster()
 	{
-		for (auto vsm : vSkillManager)
-			delete vsm;
+		delete vMonsterSkillManager;
 	}
 
 	EMonsterType	GetMonsterType() { return monsterType; }
@@ -95,7 +100,7 @@ public:
 	bool	GetEnabled() { return isEnabled; }
 	std::chrono::high_resolution_clock::time_point Gett1_targeting() { return t1_targeting; }
 	std::chrono::high_resolution_clock::time_point Gett2_targeting() { return t2_targeting; }
-	std::vector<SkillManager*> GetSkillManager() { return vSkillManager; }
+	MonsterSkillManager*& GetMonsterSkillManager() { return vMonsterSkillManager; }
 
 	void	SetTargetPos(POINT targetPos) { this->targetPos = targetPos; }
 	void	SetDamage(int damage) { this->damage = damage; }
@@ -106,7 +111,7 @@ public:
 	void	SetEnabled(bool isEnabled) { this->isEnabled = isEnabled; }
 	void	Sett1_targeting() { t1_targeting = std::chrono::high_resolution_clock::now(); }
 	void	Sett2_targeting() { t2_targeting = std::chrono::high_resolution_clock::now(); }
-	void	SetSkillManager(std::vector<SkillManager*> vSkillManager) { this->vSkillManager = vSkillManager; }
+	void	SetMonsterSkillManager(MonsterSkillManager* vMonsterSkillManager) { this->vMonsterSkillManager = vMonsterSkillManager; }
 
 	virtual void StateUpdate() = 0;
 	virtual void Update() = 0;

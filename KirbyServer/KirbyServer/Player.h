@@ -32,7 +32,7 @@ private:
 	bool	isLockOn;
 	bool	isAlive = true;
 
-	std::vector<SkillManager*> vSkillManager;
+	SkillManager* vSkillManager;
 	int allSkillLevel[10];
 public:
 	Player(int ID, int playerSize)
@@ -43,11 +43,11 @@ public:
 		SetObject(c);
 		for (int i = 0; i < 10; i++)
 			allSkillLevel[i] = 0;
+		this->vSkillManager = new SkillManager();
 	}
 	~Player()
 	{
-		for (auto vsm : vSkillManager)
-			delete vsm;
+			delete vSkillManager;
 	}
 
 	ECharacterType	GetCharacterType() { return characterType; }
@@ -60,7 +60,7 @@ public:
 	int GetplayerSize() { return playerSize; }
 	bool	GetisLockOn()	{ return isLockOn; }
 	bool	GetisAlive()	{ return isAlive; }
-	std::vector<SkillManager*> GetSkillManager() { return vSkillManager; }
+	SkillManager*& GetSkillManager() { return vSkillManager; }
 
 	void	SetmaxHealth(int maxHealth)	{ this->maxHealth = maxHealth; }
 	void	SetcurHealth(int curHealth)	{ this->curHealth = curHealth; }
@@ -69,7 +69,7 @@ public:
 	void	Setspeed(float speed)	{ this->speed = speed; }
 	void	SetisLockOn(bool isLockOn)	{ this->isLockOn = isLockOn; }
 	void	SetisAlive(bool isAlive)	{ this->isAlive = isAlive; }
-	void	SetSkillManager(std::vector<SkillManager*> vSkillManager)	{ this->vSkillManager = vSkillManager; }
+	void	SetSkillManager(SkillManager* vSkillManager)	{ this->vSkillManager = vSkillManager; }
 	void	SetSkillLevel(int idx, int level)	{ allSkillLevel[idx] = level; }
 	void	SetCharacterType(int characterType)
 	{

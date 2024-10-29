@@ -32,9 +32,11 @@ void Boss::Update()
 	{
 		phase++;
 		phase %= PHASENUM;
-		std::vector<SkillManager*> sm = this->GetSkillManager();
+		/*std::vector<SkillManager*> sm = this->GetSkillManager();
 		sm.clear();
-		this->SetSkillManager(sm);
+		this->SetSkillManager(sm);*/
+
+		this->GetMonsterSkillManager()->GetskillVector().clear();
 
 		Monster* monster = this;
 

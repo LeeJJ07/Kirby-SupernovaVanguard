@@ -178,6 +178,7 @@
     <ClCompile Include="KungFuMan.cpp" />
     <ClCompile Include="LandMineMonster.cpp" />
     <ClCompile Include="Monster.cpp" />
+    <ClCompile Include="MonsterSkillManager.h" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Rectangle2D.cpp" />
     <ClCompile Include="RunnerMonster.cpp" />

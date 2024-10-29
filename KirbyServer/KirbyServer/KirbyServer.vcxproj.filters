@@ -49,6 +49,9 @@
     <ClCompile Include="Rectangle2D.cpp">
       <Filter>클래스\Collider\Rectangle</Filter>
     </ClCompile>
+    <ClCompile Include="MonsterSkillManager.h">
+      <Filter>클래스\Object\Monster</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Boss.h">
