@@ -452,7 +452,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -501,6 +501,8 @@ void ReadData()
 	for (int i = 0; i < socketList.size(); i++) {
 		ReceiveData temp = {};
 		int dataLen = recv(socketList[i], (char*)&temp, sizeof(ReceiveData), 0);
+		if (!temp.send)
+			continue;
 		if(dataLen > 0)
 		{
 			if (totalData.publicdata.isAllPlayerChoice)
@@ -638,8 +640,9 @@ unsigned __stdcall Send()
 				while (totalBytesSent < totalDataSize)
 				{
 					// send 호출 및 전송된 바이트 수 확인
+					totalData.send = true;
 					int bytesSent = send(socketList[i], (char*)&totalData + totalBytesSent, totalDataSize - totalBytesSent, 0);
-
+					totalData.send = false;
 					// send 실패 처리
 					if (bytesSent == SOCKET_ERROR)
 					{
@@ -669,7 +672,7 @@ unsigned __stdcall Send()
 		// 약간의 지연 추가
 		Sleep(0);  // CPU 사용량을 줄이기 위한 지연
 	}
-}
+} 
 //unsigned __stdcall Send()
 //{
 //	while (TRUE)

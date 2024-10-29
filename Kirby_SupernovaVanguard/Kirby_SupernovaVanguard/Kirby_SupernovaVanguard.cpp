@@ -825,6 +825,7 @@ unsigned __stdcall Send()
 	{
 		if (timeSpan_send.count() >= 0.0025 && cs.DebugInfo != NULL)
 		{
+			EnterCriticalSection(&cs);
 			if (threadEnd_Send)
 				return 0;
 			if (curScene == GAME)
@@ -841,7 +842,10 @@ unsigned __stdcall Send()
 			aD.cursorMove = { cursorX, cursorY };
 			aD.charactertype = dynamic_cast<Player*>(vClient[myID])->GetCharacterType();
 
+			aD.send = true;
 			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
+
+			aD.send = false;
 
 			sendCount++;
 
@@ -855,6 +859,8 @@ unsigned __stdcall Send()
 
 			t1_send = std::chrono::high_resolution_clock::now();
 			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+
+			LeaveCriticalSection(&cs);
 		}
 		Sleep(0);
 	}
@@ -870,7 +876,12 @@ unsigned __stdcall Read()
 				return 0;
 			EnterCriticalSection(&cs);
 
-			ReadMessage(cSocket, vClient, uData);
+			if (ReadMessage(cSocket, vClient, uData))
+			{
+				LeaveCriticalSection(&cs);
+				Sleep(0);
+				continue;
+			}
 
 			if (uData.publicdata.islevelUp && isChoiceSkill)
 			{
@@ -895,6 +906,7 @@ unsigned __stdcall Read()
 		Sleep(0);
 	}
 }
+
 
 unsigned __stdcall Paint(HWND pParam)
 {

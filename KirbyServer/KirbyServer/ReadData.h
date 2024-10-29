@@ -11,4 +11,5 @@ typedef struct receiveData
 	bool	isReady;
 	bool	isChoice;
 	bool	isLockOn;
+	bool	send;
 }ReceiveData;

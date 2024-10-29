@@ -21,7 +21,7 @@ static WSADATA wsadata;
 static SOCKADDR_IN addr = { 0 };
 
 int InitClient(HWND hWnd, SOCKET&);
-void ReadMessage(SOCKET&, std::vector<Object*>&, TOTALDATA& );
+bool ReadMessage(SOCKET&, std::vector<Object*>&, TOTALDATA& );
 void CloseClient(SOCKET&, std::vector<Object*>&, int);
 bool ReadInitMessage(SOCKET&, TOTALDATA&);
 extern std::vector<Object*> vMonster;
