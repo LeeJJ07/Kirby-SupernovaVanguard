@@ -72,7 +72,7 @@ static SOCKET cSocket;
 // >> : Thread
 DWORD dwThID1, dwThID2, dwThID3;
 HANDLE hThreads[3];
-CRITICAL_SECTION cs;
+//CRITICAL_SECTION cs;
 
 bool threadEnd_Read;
 bool threadEnd_Send;
@@ -268,7 +268,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 	{
 
-		InitializeCriticalSection(&cs);
+		//InitializeCriticalSection(&cs);
 		GetClientRect(hWnd, &rectView);
 
 		LoadCustomCursor();
@@ -443,7 +443,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		Sleep(0);
 
-		DeleteCriticalSection(&cs);
+		//DeleteCriticalSection(&cs);
 
 		KillTimer(hWnd, TIMER_START);
 		KillTimer(hWnd, TIMER_SELECT);
@@ -823,8 +823,9 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		if (timeSpan_send.count() >= 0.0025 && cs.DebugInfo != NULL)
+		if (timeSpan_send.count() >= 0.0025 /*&& cs.DebugInfo != NULL*/)
 		{
+			//EnterCriticalSection(&cs);
 			if (threadEnd_Send)
 				return 0;
 			if (curScene == GAME)
@@ -841,6 +842,7 @@ unsigned __stdcall Send()
 			aD.cursorMove = { cursorX, cursorY };
 			aD.charactertype = dynamic_cast<Player*>(vClient[myID])->GetCharacterType();
 
+			aD.send = true;
 			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
 
 			sendCount++;
@@ -855,6 +857,7 @@ unsigned __stdcall Send()
 
 			t1_send = std::chrono::high_resolution_clock::now();
 			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+			//LeaveCriticalSection(&cs);
 		}
 		Sleep(0);
 	}
@@ -868,9 +871,14 @@ unsigned __stdcall Read()
 		{
 			if (threadEnd_Read)
 				return 0;
-			EnterCriticalSection(&cs);
+			//EnterCriticalSection(&cs);
 
-			ReadMessage(cSocket, vClient, uData);
+			if (ReadMessage(cSocket, vClient, uData))
+			{
+				//LeaveCriticalSection(&cs);
+				Sleep(0);
+				continue;
+			}
 
 			if (uData.publicdata.islevelUp && isChoiceSkill)
 			{
@@ -890,7 +898,7 @@ unsigned __stdcall Read()
 			}
 			t1_read = std::chrono::high_resolution_clock::now();
 
-			LeaveCriticalSection(&cs);
+			//LeaveCriticalSection(&cs);
 		}
 		Sleep(0);
 	}
@@ -908,9 +916,9 @@ unsigned __stdcall Paint(HWND pParam)
 			Sleep(0);
 			continue;
 		}
-		if (timeSpan_render.count() >= 0.0075 && cs.DebugInfo != NULL)
+		if (timeSpan_render.count() >= 0.0075 /*&& cs.DebugInfo != NULL*/)
 		{
-			EnterCriticalSection(&cs);
+			//EnterCriticalSection(&cs);
 
 			HDC hdc = BeginPaint(pParam, &ps);
 
@@ -948,7 +956,7 @@ unsigned __stdcall Paint(HWND pParam)
 
 			EndPaint(pParam, &ps);
 
-			LeaveCriticalSection(&cs);
+			//LeaveCriticalSection(&cs);
 		}
 		Sleep(0);
 	}

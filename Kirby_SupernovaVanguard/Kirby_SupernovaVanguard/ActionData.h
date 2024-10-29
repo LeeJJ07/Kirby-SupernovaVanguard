@@ -11,4 +11,5 @@ struct ActionData
 	bool	isReady;
 	bool	isChoice;
 	bool	isLockOn;
+	bool	send;
 };
