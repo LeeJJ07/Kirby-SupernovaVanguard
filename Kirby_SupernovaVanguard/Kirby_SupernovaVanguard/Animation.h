@@ -30,12 +30,16 @@ public:
 	int GetCnt() { return cnt; }
 	int GetIndex() { return curIdx; }
 	void SetIndex(int idx) { curIdx = idx; }
-	void IncreaseIdx() 
-	{ 
+	bool IncreaseIdx() 
+	{
 		increaseIdx++;
 		if (increaseIdx >= (cnt * 10))
+		{
 			increaseIdx = 0;
+			return true;
+		}
 		curIdx = increaseIdx /  10;
+		return false;
 	}
 
 	POINT GetCurCog() { return m[curIdx]; }

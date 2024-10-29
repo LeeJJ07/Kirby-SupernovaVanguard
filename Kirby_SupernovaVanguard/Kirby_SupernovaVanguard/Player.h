@@ -2,7 +2,7 @@
 #include "Object.h"
 #include "PlayerData.h"
 #include "Animation.h"
-
+#include "ActionData.h"
 
 extern std::map<ObjectImage, Animation*> imageDatas;
 
@@ -33,12 +33,14 @@ public:
 	}
 
 	ECharacterType	GetCharacterType()	{ return characterType; }
+	ECharacterState	GetCharacterState()	{ return characterState; }
 	POINT	GetMousePosition()	{ return mousePosition; }
 	int		GetmaxHealth()	{ return maxHealth; }
 	int		GetcurHealth()	{ return curHealth; }
 	int		GetplayerSize()	{ return playerSize; }
 
 	void	SetCharacterType(ECharacterType characterType)	{ this->characterType = characterType; }
+	void	SetCharacterState(ECharacterState characterState)	{ this->characterState = characterState; }
 	void	SetMousePosition(POINT mousePos)	{ mousePosition = mousePos; }
 	void	SetmaxHealth(int maxHealth)	{ this->maxHealth = maxHealth; }
 	void	SetcurHealth(int curHealth) { this->curHealth = curHealth; }
@@ -46,7 +48,7 @@ public:
 
 	void	ObjectUpdate(TOTALDATA&, int i);
 	void	SetPlayerAni();
-	void	DrawPlayer(HDC&);
+	void	DrawPlayer(HDC&, ActionData&);
 };
 
 extern std::vector<Object*> vClient;

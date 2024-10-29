@@ -2,6 +2,7 @@
 
 typedef struct receiveData
 {
+	ECharacterState curState;
 	POINT	playerMove;
 	POINT	cursorMove;
 	short	id;

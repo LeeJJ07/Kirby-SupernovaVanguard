@@ -513,11 +513,6 @@ void DrawCamera(HDC hdc, int cLeft, int cTop)
 
 		switch (objArr[i]->GetCollider()->GetColliderType())
 		{
-		case TERRAIN:
-			break;
-		case PLAYER:
-			((Player*)objArr[i])->DrawPlayer(hdc);
-			break;
 		case MONSTER:
 			((Monster*)objArr[i])->Draw(hdc);
 			break;
@@ -545,19 +540,8 @@ void DrawCamera(HDC hdc, int cLeft, int cTop)
 
 		switch (objArr[i]->GetCollider()->GetColliderType())
 		{
-		case TERRAIN:
-			break;
 		case PLAYER:
-			((Player*)objArr[i])->DrawPlayer(hdc);
-			break;
-		case MONSTER:
-			((Monster*)objArr[i])->Draw(hdc);
-			break;
-		case PMISSILE:
-			((Skill*)objArr[i])->DrawSkill(hdc);
-			break;
-		case EMISSILE:
-			((MonsterSkill*)objArr[i])->DrawMonsterSkill(hdc);
+			((Player*)objArr[i])->DrawPlayer(hdc, aD);
 			break;
 		default:
 			continue;

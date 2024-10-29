@@ -11,6 +11,7 @@ void Player::ObjectUpdate(TOTALDATA& pData, int i)
     SetmaxHealth(pData.udata[i].maxHealth);
     SetcurHealth(pData.udata[i].curHealth);
     SetplayerSize(pData.udata[i].radius);
+    SetCharacterState(pData.udata[i].curState);
     
     switch (GetCollider()->GetColliderShape())
     {
@@ -61,12 +62,15 @@ void Player::SetPlayerAni()
     }
 }
 
-void Player::DrawPlayer(HDC& hdc)
+void Player::DrawPlayer(HDC& hdc, ActionData& aD)
 {
     HDC hMemDC = CreateCompatibleDC(hdc);
     HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, ani[characterState]->GetBitmap());
 
-    ani[characterState]->IncreaseIdx();
+    if (ani[characterState]->IncreaseIdx() && characterState == ATTACK)
+    {
+        aD.curState = IDLE;
+    }
 
     int width = ani[characterState]->GetCurWidth();
     int height = ani[characterState]->GetHeight() - 1;

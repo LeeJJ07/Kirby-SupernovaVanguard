@@ -3,6 +3,8 @@
 #include "Skill.h"
 #include "SkillManager.h"
 
+enum ECharacterState { PIDLE, PWALK, PATTACK, PDEATH };
+
 enum ECharacterType
 {
 	KIRBY = 1,
