@@ -452,7 +452,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -636,6 +636,7 @@ unsigned __stdcall Send()
 
 				while (totalBytesSent < totalDataSize)
 				{
+					totalData.send = true;
 					int bytesSent = send(socketList[i], (char*)&totalData + totalBytesSent, totalDataSize - totalBytesSent, 0);
 
 					if (bytesSent == SOCKET_ERROR)

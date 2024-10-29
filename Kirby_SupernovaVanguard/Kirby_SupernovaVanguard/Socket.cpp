@@ -60,9 +60,10 @@ void ReadMessage(SOCKET& s, std::vector<Object*>& p)
 {
     int totalBytesReceived = 0;
     TOTALDATA temp = {};
+    
     while (totalBytesReceived < sizeof(TOTALDATA))
     {
-        int bytesReceived = recv(s, ((char*)&uData) + totalBytesReceived, sizeof(TOTALDATA) - totalBytesReceived, 0);
+        int bytesReceived = recv(s, ((char*)&temp) + totalBytesReceived, sizeof(TOTALDATA) - totalBytesReceived, 0);
 
         if (bytesReceived == SOCKET_ERROR)
         {
@@ -78,6 +79,9 @@ void ReadMessage(SOCKET& s, std::vector<Object*>& p)
 
         totalBytesReceived += bytesReceived; // 수신한 바이트 수 누적
     }
+    if (temp.send == false)
+        return;
+    memcpy((char*)&uData, (char*)&temp, sizeof(TOTALDATA));
 
     // 받은 데이터 크기가 TOTALDATA와 정확히 일치할 때만 처리
     if (totalBytesReceived == sizeof(TOTALDATA))

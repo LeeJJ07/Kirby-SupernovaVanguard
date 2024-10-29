@@ -18,6 +18,8 @@
 #define TIMER_START 1
 #define TIMER_SELECT 2
 
+TOTALDATA uData;
+
 HCURSOR hCursorSelect;
 HCURSOR hCursorAttack;
 void LoadCustomCursor();

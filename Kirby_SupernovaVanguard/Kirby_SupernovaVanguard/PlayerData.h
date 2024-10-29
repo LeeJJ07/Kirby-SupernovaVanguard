@@ -93,6 +93,7 @@ struct TOTALDATA
 	MONSTERDATA		mdata[MONSTERNUM];
 	SKILLDATA		sdata[SKILLNUM];
 	MONSTERSKILLDATA		msdata[MONSTERSKILLNUM];
+	bool	send;
 };
 
-static TOTALDATA uData;
+extern TOTALDATA uData;
