@@ -566,6 +566,7 @@ void SendToAll()
 			break;
 		send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
 	}
+
 }
 
 void CloseClient(SOCKET socket)
@@ -573,7 +574,6 @@ void CloseClient(SOCKET socket)
 	for (int i = 0; i < socketList.size(); i++) {
 		if (socketList[i] == socket) {
 			closesocket(socketList[i]);
-			//totalData.udata.erase(totalData.udata.begin() + i);
 			socketList.erase(socketList.begin() + i);
 			break;
 		}
@@ -614,7 +614,6 @@ unsigned __stdcall Update()
 		Sleep(0);
 	}
 }
-
 unsigned __stdcall Send()
 {
 	while (TRUE)
@@ -626,23 +625,65 @@ unsigned __stdcall Send()
 		{
 			EnterCriticalSection(&criticalsection);
 
+			// TOTALDATA 크기 + NULL (1바이트)만큼의 버퍼를 생성
+			int totalSize = sizeof(TOTALDATA) + 1;
+			char* sendBuffer = new char[totalSize];
+
+			// TOTALDATA 데이터를 버퍼에 복사
+			memcpy(sendBuffer, &totalData, sizeof(TOTALDATA));
+			sendBuffer[sizeof(TOTALDATA)] = '\0'; // 끝에 NULL 추가
+
 			for (int i = 0; i < PLAYERNUM; i++)
 			{
 				if (totalData.udata[i].dataType == NULL)
 					break;
 				if (socketList[i] == NULL)
 					continue;
-				send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
+
+				// NULL 값이 포함된 버퍼 전송
+				send(socketList[i], sendBuffer, totalSize, 0);
 			}
 
 			t1_send = std::chrono::high_resolution_clock::now();
 			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 
 			LeaveCriticalSection(&criticalsection);
+
+			// 버퍼 해제
+			delete[] sendBuffer;
 		}
 		Sleep(0);
 	}
 }
+
+//unsigned __stdcall Send()
+//{
+//	while (TRUE)
+//	{
+//		if (threadEnd_Send)
+//			return 0;
+//
+//		if (timeSpan_send.count() >= 0.01)
+//		{
+//			EnterCriticalSection(&criticalsection);
+//
+//			for (int i = 0; i < PLAYERNUM; i++)
+//			{
+//				if (totalData.udata[i].dataType == NULL)
+//					break;
+//				if (socketList[i] == NULL)
+//					continue;
+//				send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
+//			}
+//
+//			t1_send = std::chrono::high_resolution_clock::now();
+//			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+//
+//			LeaveCriticalSection(&criticalsection);
+//		}
+//		Sleep(0);
+//	}
+//}
 
 unsigned __stdcall Read()
 {

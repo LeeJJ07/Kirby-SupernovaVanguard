@@ -18,6 +18,10 @@
 #define TIMER_START 1
 #define TIMER_SELECT 2
 
+HCURSOR hCursorSelect;
+HCURSOR hCursorAttack;
+void LoadCustomCursor();
+
 // >> : animation
 std::map<ObjectImage, Animation*> imageDatas;
 std::map<ESKILLTYPE, std::pair< HBITMAP, BITMAP>> imDatas;
@@ -262,9 +266,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_CREATE:
 	{
+
 		InitializeCriticalSection(&cs);
 		GetClientRect(hWnd, &rectView);
 
+		LoadCustomCursor();
 		LoadImages(); // 이미지 로드
 		LoadSkillImage();
 
@@ -283,6 +289,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			ResumeThread(hThreads[2]);
 	}
 	break;
+
+	case WM_SETCURSOR:
+	{
+		if (curScene == GAME)
+		{
+			SetCursor(hCursorAttack);
+			return TRUE;
+		}
+		else
+		{
+			SetCursor(hCursorSelect);
+			return TRUE;
+		}
+	}
+		break;
 	case WM_CHAR:
 		if (wParam == VK_RETURN/* && canGoToNext*/)
 		{
@@ -395,6 +416,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				if (uData.publicdata.isOK)
 				{
+					SetCursor(hCursorAttack);
 					curScene = GAME;
 					for (int j = 0; j < PLAYERNUM; j++)
 					{
@@ -1182,4 +1204,35 @@ void LoadSkillImage()
 
 	imDatas[TRUCKSKILL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/trkSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 	GetObject(imDatas[TRUCKSKILL].first, sizeof(BITMAP), &imDatas[TRUCKSKILL].second);
+}
+
+void LoadCustomCursor()
+{
+	hCursorSelect = (HCURSOR)LoadImage(
+		NULL,                 // hInstance (NULL이면 외부 파일 경로로 지정)
+		L"Images/Backgrounds/cursorSelect.cur",   // 커서 파일 경로
+		IMAGE_CURSOR,         // 이미지 유형
+		0,                    // 가로 크기 (0으로 두면 기본 크기)
+		0,                    // 세로 크기
+		LR_LOADFROMFILE | LR_SHARED  // 외부 파일에서 로드 및 공유 가능 설정
+	);
+
+	hCursorAttack = (HCURSOR)LoadImage(
+		NULL,                 // hInstance (NULL이면 외부 파일 경로로 지정)
+		L"Images/Backgrounds/cursorAttack.cur",   // 커서 파일 경로
+		IMAGE_CURSOR,         // 이미지 유형
+		0,                    // 가로 크기 (0으로 두면 기본 크기)
+		0,                    // 세로 크기
+		LR_LOADFROMFILE | LR_SHARED  // 외부 파일에서 로드 및 공유 가능 설정
+	);
+
+	if (hCursorSelect == NULL)
+	{
+		MessageBox(NULL, L"Failed to load cursorSelect.cur", L"Error", MB_OK);
+	}
+
+	if (hCursorAttack == NULL)
+	{
+		MessageBox(NULL, L"Failed to load cursorAttack.cur", L"Error", MB_OK);
+	}
 }
