@@ -23,6 +23,7 @@ std::map<ObjectImage, Animation*> imageDatas;
 std::map<ESKILLTYPE, std::pair< HBITMAP, BITMAP>> imDatas;
 void LoadImages();
 void LoadSkillImage();
+void ChangeState(ColliderType, int, int);
 void CleanUpImageDatas();
 // <<
 
@@ -1010,7 +1011,7 @@ void Update()
 	timeSpan_sendCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_sendCount - t1_sendCount);
 	timeSpan_readCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_readCount - t1_readCount);
 
-	if (timeSpan_move.count() >= 0.005)
+	if (timeSpan_move.count() >= 0.005 && curScene == GAME)
 	{
 		if (GetAsyncKeyState('A') & 0x8000)
 		{
@@ -1032,6 +1033,10 @@ void Update()
 		{
 		}
 		t1_move = std::chrono::high_resolution_clock::now();
+		if (!y && !x)
+			ChangeState(PLAYER, myID, IDLE);
+		else
+			ChangeState(PLAYER, myID, WALK);
 	}
 }
 
@@ -1172,4 +1177,20 @@ void LoadSkillImage()
 
 	imDatas[TRUCKSKILL].first = (HBITMAP)LoadImage(nullptr, L"Images/Backgrounds/trkSk.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 	GetObject(imDatas[TRUCKSKILL].first, sizeof(BITMAP), &imDatas[TRUCKSKILL].second);
+}
+
+void ChangeState(ColliderType colliderType, int id, int state)
+{
+	switch (colliderType)
+	{
+	case PLAYER:
+		if (((Player*)objArr[id])->GetCharacterState() == (ECharacterState)state)
+			break;
+		((Player*)objArr[id])->Getani()[((Player*)objArr[id])->GetCharacterState()]->SetincreaseIdx(0);
+		((Player*)objArr[id])->SetCharacterState((ECharacterState)state);
+		break;
+	case MONSTER:
+
+		break;
+	}
 }

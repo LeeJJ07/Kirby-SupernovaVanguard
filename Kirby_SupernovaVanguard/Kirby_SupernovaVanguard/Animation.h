@@ -61,6 +61,8 @@ public:
 	std::vector<int> GetLengths() { return lengths; }
 	std::string GetFilePath() { return filePath; }
 
+	void SetincreaseIdx(int increaseIdx) { this->increaseIdx = increaseIdx; }
+
 public: 
 	Animation(int cnt, int spacingX, int R, int G, int B, std::vector<POINT> m, std::vector<int> lengths, int height, std::string filePath);
 	~Animation();

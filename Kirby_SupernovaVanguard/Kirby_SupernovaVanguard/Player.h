@@ -20,7 +20,7 @@ private:
 	POINT mousePosition;
 	std::map<ECharacterState, Animation* > ani;
 public:
-	Player() : characterType(KIRBY),characterState(IDLE), mousePosition({ 0,0 }), Object()
+	Player() : characterType(KIRBY), characterState(IDLE), mousePosition({ 0,0 }), Object()
 	{
 		Circle2D* c = new Circle2D(true, PLAYER);
 		SetObject(c);
@@ -32,12 +32,13 @@ public:
 		ani.clear();
 	}
 
-	ECharacterType	GetCharacterType()	{ return characterType; }
-	ECharacterState	GetCharacterState()	{ return characterState; }
-	POINT	GetMousePosition()	{ return mousePosition; }
-	int		GetmaxHealth()	{ return maxHealth; }
-	int		GetcurHealth()	{ return curHealth; }
-	int		GetplayerSize()	{ return playerSize; }
+	ECharacterType	GetCharacterType() { return characterType; }
+	ECharacterState	GetCharacterState() { return characterState; }
+	POINT	GetMousePosition() { return mousePosition; }
+	int		GetmaxHealth() { return maxHealth; }
+	int		GetcurHealth() { return curHealth; }
+	int		GetplayerSize() { return playerSize; }
+	std::map<ECharacterState, Animation* > Getani() { return ani; }
 
 	void	SetCharacterType(ECharacterType characterType)	{ this->characterType = characterType; }
 	void	SetCharacterState(ECharacterState characterState)	{ this->characterState = characterState; }
