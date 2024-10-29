@@ -64,31 +64,7 @@ void SkillSelector::Draw(HDC& hdc, int& cameraLeft, int& cameraTop, HFONT& hLarg
     SelectObject(hMemDC, hOldBitmap);
     DeleteDC(hMemDC);
 
-	int starCount = 5; // 별 개수
-	int startX = pos.x + cameraLeft - (starCount * 20) / 2; // 별 시작 x 좌표 중앙 정렬
-	int startY = pos.y + cameraTop + height / 2 - 150; // 기본 위치에서 아래로 약간 내려 배치
-
-	for (int i = 0; i < starCount; i++)
-	{
-		HDC hStarDC = CreateCompatibleDC(hdc);
-		HBITMAP hStarOldBitmap;
-
-		// m_hBit_blank 이미지 그리기
-		hStarOldBitmap = (HBITMAP)SelectObject(hStarDC, m_hBit_blank);
-		TransparentBlt(hdc, startX + i * 20, startY, 20, 20,
-			hStarDC, 0, 0, m_bitInfo_blank.bmWidth, m_bitInfo_blank.bmHeight, RGB(255, 0, 255));
-
-		// 스킬 레벨에 따라 m_hBit_full 이미지 덮어쓰기
-		if (i < curSkillLevel)
-		{ 
-			SelectObject(hStarDC, m_hBit_full);
-			TransparentBlt(hdc, startX + i * 20, startY, 20, 20,
-				hStarDC, 0, 0, m_bitInfo_full.bmWidth, m_bitInfo_full.bmHeight, RGB(255, 0, 255));
-		}
-
-		SelectObject(hStarDC, hStarOldBitmap);
-		DeleteDC(hStarDC);
-	}
+	DrawLevelStar(hdc, cameraLeft, cameraTop);
 
 	HDC hSkillDC = CreateCompatibleDC(hdc);
 	HBITMAP hOldSkillBitmap = (HBITMAP)SelectObject(hSkillDC, imDatas[(ESKILLTYPE)skillIdx].first);
@@ -118,6 +94,36 @@ void SkillSelector::Draw(HDC& hdc, int& cameraLeft, int& cameraTop, HFONT& hLarg
 	SetTextColor(hdc, RGB(255, 255, 255)); // 흰색
 	TextOut(hdc, pos.x + cameraLeft, pos.y + cameraTop + height / 2 - 10, skillDescript.c_str(), skillDescript.length());
 	SelectObject(hdc, hOldFont);
+}
+
+void SkillSelector::DrawLevelStar(HDC& hdc, int& cameraLeft, int& cameraTop)
+{
+	if (skillIdx == -1)
+		return;
+
+	int starCount = 5; // 별 개수
+	int startX = pos.x + cameraLeft - (starCount * 20) / 2; // 별 시작 x 좌표 중앙 정렬
+	int startY = pos.y + cameraTop + height / 2 - 150; // 기본 위치에서 아래로 약간 내려 배치
+
+	for (int i = 0; i < starCount; i++)
+	{
+		HDC hStarDC = CreateCompatibleDC(hdc);
+		HBITMAP hStarOldBitmap;
+
+		hStarOldBitmap = (HBITMAP)SelectObject(hStarDC, m_hBit_blank);
+		TransparentBlt(hdc, startX + i * 20, startY, 20, 20,
+			hStarDC, 0, 0, m_bitInfo_blank.bmWidth, m_bitInfo_blank.bmHeight, RGB(255, 0, 255));
+
+		if (i < curSkillLevel)
+		{
+			SelectObject(hStarDC, m_hBit_full);
+			TransparentBlt(hdc, startX + i * 20, startY, 20, 20,
+				hStarDC, 0, 0, m_bitInfo_full.bmWidth, m_bitInfo_full.bmHeight, RGB(255, 0, 255));
+		}
+
+		SelectObject(hStarDC, hStarOldBitmap);
+		DeleteDC(hStarDC);
+	}
 }
 
 void SkillSelector::SetInfo(std::pair<short, int>& skillInfo)

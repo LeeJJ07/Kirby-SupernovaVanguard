@@ -30,7 +30,7 @@ public:
 	HBITMAP GetBitmap() { return m_hBit; }
 
 	void Draw(HDC& hdc, int& cameraLeft, int& cameraTop, HFONT& hLargeFont, HFONT& hSmallFont, std::map<ESKILLTYPE, std::pair< HBITMAP, BITMAP>>& imDatas);
-
+	void DrawLevelStar(HDC& hdc, int& cameraLeft, int& cameraTop);
 public:
 	SkillSelector(POINT pos);
 	~SkillSelector();
