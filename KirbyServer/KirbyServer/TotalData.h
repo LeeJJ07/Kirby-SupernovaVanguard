@@ -36,6 +36,7 @@ struct PLAYERDATA :public OBJECTDATA
 	char	charactertype;
 	int	maxHealth;
 	int	curHealth;
+	ECharacterState	curState;
 
 	std::pair<short, int> levelUpSkillIndex[3]; //스킬 타입, 현재 레벨 담아서 전송
 };

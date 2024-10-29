@@ -45,7 +45,7 @@
 #define SKILLARR 6
 
 static enum ECharacterType { KIRBY = 1, DDD, METANIHGT, MABOROA };
-static enum ECharacterState { IDLE, WALK, ATTACK };
+static enum ECharacterState { IDLE, WALK, ATTACK, DEAD };
 
 //ObjectImage enum 데이터와 txt 파일의 데이터 순서가 일치해야함.
 static enum ObjectImage

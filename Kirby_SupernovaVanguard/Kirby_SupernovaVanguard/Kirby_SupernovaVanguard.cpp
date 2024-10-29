@@ -27,6 +27,7 @@ std::map<ObjectImage, Animation*> imageDatas;
 std::map<ESKILLTYPE, std::pair< HBITMAP, BITMAP>> imDatas;
 void LoadImages();
 void LoadSkillImage();
+void ChangeState(ColliderType, int, int);
 void CleanUpImageDatas();
 // <<
 
@@ -529,11 +530,6 @@ void DrawCamera(HDC hdc, int cLeft, int cTop)
 
 		switch (objArr[i]->GetCollider()->GetColliderType())
 		{
-		case TERRAIN:
-			break;
-		case PLAYER:
-			((Player*)objArr[i])->DrawPlayer(hdc);
-			break;
 		case MONSTER:
 			((Monster*)objArr[i])->Draw(hdc);
 			break;
@@ -561,19 +557,8 @@ void DrawCamera(HDC hdc, int cLeft, int cTop)
 
 		switch (objArr[i]->GetCollider()->GetColliderType())
 		{
-		case TERRAIN:
-			break;
 		case PLAYER:
-			((Player*)objArr[i])->DrawPlayer(hdc);
-			break;
-		case MONSTER:
-			((Monster*)objArr[i])->Draw(hdc);
-			break;
-		case PMISSILE:
-			((Skill*)objArr[i])->DrawSkill(hdc);
-			break;
-		case EMISSILE:
-			((MonsterSkill*)objArr[i])->DrawMonsterSkill(hdc);
+			((Player*)objArr[i])->DrawPlayer(hdc, aD);
 			break;
 		default:
 			continue;
@@ -1042,7 +1027,7 @@ void Update()
 	timeSpan_sendCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_sendCount - t1_sendCount);
 	timeSpan_readCount = std::chrono::duration_cast<std::chrono::duration<double>>(t2_readCount - t1_readCount);
 
-	if (timeSpan_move.count() >= 0.005)
+	if (timeSpan_move.count() >= 0.005 && curScene == GAME)
 	{
 		if (GetAsyncKeyState('A') & 0x8000)
 		{
@@ -1064,6 +1049,10 @@ void Update()
 		{
 		}
 		t1_move = std::chrono::high_resolution_clock::now();
+		if (!y && !x)
+			ChangeState(PLAYER, myID, IDLE);
+		else
+			ChangeState(PLAYER, myID, WALK);
 	}
 }
 
@@ -1234,5 +1223,20 @@ void LoadCustomCursor()
 	if (hCursorAttack == NULL)
 	{
 		MessageBox(NULL, L"Failed to load cursorAttack.cur", L"Error", MB_OK);
+	}
+}
+void ChangeState(ColliderType colliderType, int id, int state)
+{
+	switch (colliderType)
+	{
+	case PLAYER:
+		if (((Player*)objArr[id])->GetCharacterState() == (ECharacterState)state)
+			break;
+		((Player*)objArr[id])->Getani()[((Player*)objArr[id])->GetCharacterState()]->SetincreaseIdx(0);
+		((Player*)objArr[id])->SetCharacterState((ECharacterState)state);
+		break;
+	case MONSTER:
+
+		break;
 	}
 }

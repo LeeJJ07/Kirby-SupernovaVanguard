@@ -30,12 +30,16 @@ public:
 	int GetCnt() { return cnt; }
 	int GetIndex() { return curIdx; }
 	void SetIndex(int idx) { curIdx = idx; }
-	void IncreaseIdx() 
-	{ 
+	bool IncreaseIdx() 
+	{
 		increaseIdx++;
 		if (increaseIdx >= (cnt * 10))
+		{
 			increaseIdx = 0;
+			return true;
+		}
 		curIdx = increaseIdx /  10;
+		return false;
 	}
 
 	POINT GetCurCog() { return m[curIdx]; }
@@ -56,6 +60,8 @@ public:
 	std::vector<POINT> GetCog() { return m; }
 	std::vector<int> GetLengths() { return lengths; }
 	std::string GetFilePath() { return filePath; }
+
+	void SetincreaseIdx(int increaseIdx) { this->increaseIdx = increaseIdx; }
 
 public: 
 	Animation(int cnt, int spacingX, int R, int G, int B, std::vector<POINT> m, std::vector<int> lengths, int height, std::string filePath);
