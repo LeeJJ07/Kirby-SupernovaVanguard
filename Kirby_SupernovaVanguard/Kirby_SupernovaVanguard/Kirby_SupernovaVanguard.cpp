@@ -911,7 +911,7 @@ unsigned __stdcall Read()
 				return 0;
 			//EnterCriticalSection(&cs);
 
-			if (!ReadMessage(cSocket, vClient))
+			if (!ReadMessage(cSocket, vClient, uData))
 			{
 				//LeaveCriticalSection(&cs);
 				Sleep(1);

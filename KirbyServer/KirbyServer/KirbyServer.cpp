@@ -138,10 +138,6 @@ void RestartGame();
 static int readyclientnum = 0;
 static bool isGameStart = false;
 
-static bool isTimingStarted = false;
-static std::chrono::high_resolution_clock::time_point t1_select;
-static std::chrono::high_resolution_clock::time_point t2_select;
-static std::chrono::duration<double> timeSpan_select;
 
 static int skillnum;
 
@@ -419,7 +415,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		threadEnd_Send = true;
 		threadEnd_Read = true;
 
-		Sleep(0);
+		Sleep(1);
 
 		//DeleteCriticalSection(&criticalsection);
 		CloseClient(wParam);
@@ -582,21 +578,7 @@ void ReadData()
 
 	if (socketList.size() == readyclientnum && socketList.size() != 0)
 	{
-		if (!isTimingStarted)
-		{
-			t1_select = std::chrono::high_resolution_clock::now();
-			isTimingStarted = true;
-
-			InitLevel();
-		}
-		t2_select = std::chrono::high_resolution_clock::now();
-		timeSpan_select = std::chrono::duration_cast<std::chrono::duration<double>>(t2_select - t1_select);
-
-		if (timeSpan_select.count() > 2.0)
-		{
-			totalData.publicdata.isOK = 1;
-			isTimingStarted = false;
-		}
+		totalData.publicdata.isOK = 1;
 	}
 }
 
@@ -653,7 +635,7 @@ unsigned __stdcall Update()
 
 			//LeaveCriticalSection(&criticalsection);
 		}
-		Sleep(0);
+		Sleep(1);
 	}
 }
 unsigned __stdcall Send()
@@ -686,7 +668,7 @@ unsigned __stdcall Send()
 			//LeaveCriticalSection(&criticalsection);
 		}
 
-		Sleep(0); // CPU 사용량을 줄이기 위한 지연
+		Sleep(1); // CPU 사용량을 줄이기 위한 지연
 	}
 } 
 //unsigned __stdcall Send()
@@ -740,7 +722,7 @@ unsigned __stdcall Read()
 			t1_read = std::chrono::high_resolution_clock::now();
 		}
 
-		Sleep(0);  // 짧은 대기 시간을 추가해 CPU 부하를 줄임
+		Sleep(1);  // 짧은 대기 시간을 추가해 CPU 부하를 줄임
 	}
 }
 
