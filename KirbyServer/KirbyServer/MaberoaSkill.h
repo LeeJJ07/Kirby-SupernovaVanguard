@@ -23,6 +23,7 @@ public:
 		Circle2D* circle2D = new Circle2D(true, PMISSILE);
 		circle2D->SetPosition(this->Getposition());
 		SetCollider(circle2D);
+
 	}
 	~MaberoaSkill()
 	{
@@ -43,9 +44,11 @@ public:
 	void MaberoaSkillBigger();
 };
 
+static MaberoaSkill* maberoaskill = nullptr;
+
 bool SetMaberoaSkillInDatasheet(Skill*& skill, int& ID)
 {
-	MaberoaSkill* maberoaskill = dynamic_cast<MaberoaSkill*>(skill);
+	maberoaskill = dynamic_cast<MaberoaSkill*>(skill);
 	Circle2D* maberoacollider = dynamic_cast<Circle2D*>(maberoaskill->GetCollider());
 
 	totalData.sdata[ID].isActivate = maberoaskill->Getisactivate();
@@ -61,8 +64,6 @@ bool SetMaberoaSkillInDatasheet(Skill*& skill, int& ID)
 
 	return true;
 }
-
-MaberoaSkill* maberoaskill = nullptr;
 
 void UpdateMaberoaSkill(Skill*& skill)
 {

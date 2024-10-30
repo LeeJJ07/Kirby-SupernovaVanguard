@@ -18,6 +18,8 @@ public:
 		Rectangle2D* rectangle2D = new Rectangle2D(true, PMISSILE);
 		rectangle2D->SetPosition(this->Getposition());
 		SetCollider(rectangle2D);
+
+		totalData.udata[Getmasternum()].curState = (ECharacterState)PATTACK;
 	}
 	~MetaknightSkill()
 	{
@@ -34,7 +36,7 @@ public:
 	void Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
 };
 
-MetaknightSkill* metaknightskill = nullptr;
+static MetaknightSkill* metaknightskill = nullptr;
 
 bool SetMetaknightSkillInDatasheet(Skill*& skill, int& ID)
 {
@@ -88,6 +90,12 @@ void UpdateMetaknightSkill(Skill*& skill)
 	else
 	{
 		metaknightskill->Setcanhit(false);
+	}
+
+	if (totalData.udata[metaknightskill->Getmasternum()].curState == (ECharacterState)PATTACK
+		&& skilldestroytime > METAKNIGHT_SKILL_END_TIME)
+	{
+		totalData.udata[metaknightskill->Getmasternum()].curState = (ECharacterState)PIDLE;
 	}
 
 	if (skilldestroytime > 0.5)

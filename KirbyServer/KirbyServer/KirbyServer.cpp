@@ -452,7 +452,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -755,10 +755,11 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 	{
 		uData.pos.x += rData.playerMove.x;
 		uData.pos.y += rData.playerMove.y;
-
-		if (rData.curState != PATTACK)
+		if(uData.curState != PATTACK)
+			uData.curState = rData.curState;
+		else
 		{
-			uData.curState = PWALK;
+			int a = 0;
 		}
 	}
 
@@ -941,7 +942,6 @@ void GenerateSkill()
 							kirbySkill->Setposition({ totalData.udata[i].pos.x + kirbySkill->Getoffset().x, totalData.udata[i].pos.y + kirbySkill->Getoffset().y });
 							kirbySkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = kirbySkill;
-							totalData.udata[i].curState = ECharacterState::PATTACK;
 						}
 						break;
 						case SKILLTYPE::DEDEDESKILL:
@@ -967,7 +967,6 @@ void GenerateSkill()
 							dededeSkill->Setposition({ totalData.udata[i].pos.x + dededeSkill->Getoffset().x, totalData.udata[i].pos.y + dededeSkill->Getoffset().y });
 							dededeSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = dededeSkill;
-							totalData.udata[i].curState = ECharacterState::PATTACK;
 						}
 						break;
 						case SKILLTYPE::METAKNIGHTSKILL:
@@ -1005,7 +1004,6 @@ void GenerateSkill()
 							metaknightSkill->Setposition({ totalData.udata[i].pos.x + metaknightSkill->Getoffset().x, totalData.udata[i].pos.y + metaknightSkill->Getoffset().y });
 							metaknightSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = metaknightSkill;
-							totalData.udata[i].curState = ECharacterState::PATTACK;
 						}
 						break;
 						case SKILLTYPE::MABEROASKILL:
@@ -1031,7 +1029,6 @@ void GenerateSkill()
 							maberoaSkill->Setposition({ totalData.udata[i].pos.x + maberoaSkill->Getoffset().x, totalData.udata[i].pos.y + maberoaSkill->Getoffset().y });
 							maberoaSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = maberoaSkill;
-							totalData.udata[i].curState = ECharacterState::PATTACK;
 						}
 						break;
 						case SKILLTYPE::ELECTRICFIELDSKILL:

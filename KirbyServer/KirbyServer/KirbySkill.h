@@ -26,6 +26,8 @@ public:
 		Circle2D* circle2D = new Circle2D(true, PMISSILE);
 		circle2D->SetPosition(this->Getposition());
 		SetCollider(circle2D);
+
+		totalData.udata[Getmasternum()].curState = (ECharacterState)PATTACK;
 	}
 	~KirbySkill()
 	{
@@ -106,6 +108,12 @@ void UpdateKirbySkill(Skill* &skill)
 	else
 	{
 		kirbyskill->Setcanhit(false);
+	}
+
+	if (totalData.udata[kirbyskill->Getmasternum()].curState == (ECharacterState)PATTACK
+		&& skilldestroytime > KIRBY_SKILL_END_TIME)
+	{
+		totalData.udata[kirbyskill->Getmasternum()].curState = (ECharacterState)PIDLE;
 	}
 
 	if (skilldestroytime > TKIRBYSKILLDESTROY)

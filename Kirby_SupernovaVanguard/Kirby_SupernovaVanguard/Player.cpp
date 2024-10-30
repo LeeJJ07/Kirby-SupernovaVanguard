@@ -64,6 +64,9 @@ void Player::SetPlayerAni()
 
 void Player::DrawPlayer(HDC& hdc, ActionData& aD)
 {
+    if (characterState != ATTACK && ani[ATTACK]->GetIndex() != 0)
+        ani[ATTACK]->SetIndex(0);
+
     HDC hMemDC = CreateCompatibleDC(hdc);
     HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, ani[characterState]->GetBitmap());
 
