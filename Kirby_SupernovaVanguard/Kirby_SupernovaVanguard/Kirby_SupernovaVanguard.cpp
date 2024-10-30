@@ -881,6 +881,7 @@ unsigned __stdcall Send()
 			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
 
 			aD.send = false;
+			aD.isPressRestart = false;
 
 			sendCount++;
 

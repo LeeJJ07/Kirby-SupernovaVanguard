@@ -285,7 +285,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case TIMER_GENERATEMONSTER:
 		{
-			if (totalData.publicdata.isOK || !isGameStop)
+			if (totalData.publicdata.isOK && !isGameStop)
 			{
 				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
 				{
@@ -326,6 +326,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					{
 						SetPlayerSize(i);
 					}
+
 					for (int i = 0; i < socketList.size(); i++)
 					{
 						SetBasisSkillData(i);
@@ -458,7 +459,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -575,6 +576,8 @@ void ReadData()
 			restartplayer[i] = 0;
 		}
 	}
+	else
+		GameOver();
 
 	if (totalData.publicdata.isOK)
 		return;
@@ -605,7 +608,6 @@ void SendToAll()
 			break;
 		send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
 	}
-
 }
 
 void CloseClient(SOCKET socket)
@@ -643,7 +645,7 @@ unsigned __stdcall Update()
 				UpdateUi();
 				SetSkillToDatasheet();
 				SetMonsterSkillToDatasheet();
-				GameOver();
+				//GameOver();
 			}
 
 			t1_update = std::chrono::high_resolution_clock::now();
@@ -2407,6 +2409,10 @@ void IncreaseSkillValue(int& playerIndex, int skillnum, int smIndex)
 
 void RestartGame()
 {
+	totalData.publicdata.currentTime = 0.0f;
+	totalData.publicdata.level = 1;
+	totalData.publicdata.exp = 0;
+	totalData.publicdata.maxExp = levelExp[totalData.publicdata.level];
 	// 플레이어 초기화
 	for (int i = 0; i < socketList.size(); i++)
 	{
@@ -2416,9 +2422,25 @@ void RestartGame()
 		vClient[i]->SetisAlive(true);
 
 		vClient[i]->GetSkillManager()->GetskillVector().clear();
+		for (int j = 0; j < 10; j++) {
+			vClient[i]->SetSkillLevel(j, 0);
+		}
+		vClient[i]->SetSkillLevel(i + 1, 1);
 		SetBasisSkillData(i);
 	}
-	vMonster.clear();
-	vSkill.clear();
-	vMonsterSkill.clear();
+	for (int i = 0; i < MONSTERNUM; i++)
+	{
+		totalData.mdata[i].dataType = 0;
+		monsterArr[i] = nullptr;
+	}
+	for (int i = 0; i < SKILLNUM; i++)
+	{
+		totalData.sdata[i].dataType = 0;
+		vSkill[i] = nullptr;
+	}
+	for (int i = 0; i < MONSTERSKILLNUM; i++)
+	{
+		totalData.msdata[i].dataType = 0;
+		vMonsterSkill[i] = nullptr;
+	}
 }

@@ -94,9 +94,13 @@ bool ReadMessage(SOCKET& s, std::vector<Object*>& p)
 	if (!temp.send)
 		return false;
 
-
-
 	memcpy((char*)&uData, (char*)&temp, sizeof(TOTALDATA));
+
+	if (uData.publicdata.isGameOver && !temp.publicdata.isGameOver)
+	{
+		int i = 0;
+		i++;
+	}
 
 	readCount++;
 
