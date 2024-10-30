@@ -462,7 +462,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		threadEnd_Send = true;
 		threadEnd_Paint = true;
 
-		Sleep(0);
+		Sleep(1);
 
 		//DeleteCriticalSection(&cs);
 
@@ -897,7 +897,7 @@ unsigned __stdcall Send()
 			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 			//LeaveCriticalSection(&cs);
 		}
-		Sleep(0);
+		Sleep(1);
 	}
 }
 
@@ -911,8 +911,12 @@ unsigned __stdcall Read()
 				return 0;
 			//EnterCriticalSection(&cs);
 
-			if (!ReadMessage(cSocket, vClient, uData))
+			if (!ReadMessage(cSocket, vClient))
+			{
+				//LeaveCriticalSection(&cs);
+				Sleep(1);
 				continue;
+			}
 
 			if (uData.publicdata.islevelUp && isChoiceSkill)
 			{
@@ -934,7 +938,7 @@ unsigned __stdcall Read()
 
 			//LeaveCriticalSection(&cs);
 		}
-		Sleep(0);
+		Sleep(1);
 	}
 }
 
@@ -948,7 +952,7 @@ unsigned __stdcall Paint(HWND pParam)
 		PAINTSTRUCT ps;
 		if (curScene == START)
 		{
-			Sleep(0);
+			Sleep(1);
 			continue;
 		}
 		if (timeSpan_render.count() >= 0.0075 /*&& cs.DebugInfo != NULL*/)
@@ -993,7 +997,7 @@ unsigned __stdcall Paint(HWND pParam)
 
 			//LeaveCriticalSection(&cs);
 		}
-		Sleep(0);
+		Sleep(1);
 	}
 }
 
