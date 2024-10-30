@@ -113,6 +113,12 @@ enum OBJECTINDEX
 #define BOSS_BASE_HEALTH				150
 #define BOSS_BASE_SPEED					1
 
+// >> Skill Animation End Time
+#define KIRBY_SKILL_END_TIME			0.9
+#define DEDEDE_SKILL_END_TIME			0.8
+#define METAKNIGHT_SKILL_END_TIME		0.5
+#define MABOROA_SKILL_END_TIME			0.4
+
 // >> Skill Destroy Time
 #define TKIRBYSKILLDESTROY 2
 #define TDEDEDESKILLDESTROY 2

@@ -64,15 +64,20 @@ void Player::SetPlayerAni()
 
 void Player::DrawPlayer(HDC& hdc, ActionData& aD)
 {
+    if (characterState != ATTACK && ani[ATTACK]->GetIndex() != 0)
+        ani[ATTACK]->SetIndex(0);
+
     HDC hMemDC = CreateCompatibleDC(hdc);
     HBITMAP hOldBitmap = (HBITMAP)SelectObject(hMemDC, ani[characterState]->GetBitmap());
 
     ani[characterState]->IncreaseIdx();
 
-    int width = ani[characterState]->GetCurWidth();
+    int width = ani[characterState]->GetCurWidth() - 2;
     int height = ani[characterState]->GetHeight() - 1;
-    int left = GetPosition().x - ani[characterState]->GetCurCog().x + ani[characterState]->GetPrevWidth();
+    int left = GetPosition().x - ani[characterState]->GetCurCog().x + 1 + ani[characterState]->GetPrevWidth();
     int top = GetPosition().y - ani[characterState]->GetCurCog().y;
+
+    if (characterState == IDLE) width--;
 
     HDC hTempDC = CreateCompatibleDC(hdc);
     HBITMAP hTempBitmap = CreateCompatibleBitmap(hdc, width, height);
@@ -82,14 +87,14 @@ void Player::DrawPlayer(HDC& hdc, ActionData& aD)
     {
         StretchBlt(
             hTempDC, 0, 0, width, height,
-            hMemDC, ani[characterState]->GetPrevWidth(), 0, width, height,
+            hMemDC, ani[characterState]->GetPrevWidth() + 1, 0, width, height,
             SRCCOPY
         );
     }
     else
     {
         StretchBlt(
-            hTempDC, width, 0, -width, height,
+            hTempDC, width, 0, -width - 1, height,
             hMemDC, ani[characterState]->GetPrevWidth(), 0, width, height,
             SRCCOPY
         );

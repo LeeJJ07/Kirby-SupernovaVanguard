@@ -21,6 +21,8 @@ public:
 		Circle2D* circle2D = new Circle2D(true, PMISSILE);
 		circle2D->SetPosition(this->Getposition());
 		SetCollider(circle2D);
+
+		totalData.udata[Getmasternum()].curState = (ECharacterState)PATTACK;
 	}
 	~DededeSkill()
 	{
@@ -41,9 +43,11 @@ public:
 	void Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
 };
 
+static DededeSkill* dededeskill = nullptr;
+
 bool SetDededeSkillInDatasheet(Skill*& skill, int& ID)
 {
-	DededeSkill* dededeskill = dynamic_cast<DededeSkill*>(skill);
+	dededeskill = dynamic_cast<DededeSkill*>(skill);
 	Circle2D* dededecollider = dynamic_cast<Circle2D*>(dededeskill->GetCollider());
 
 	totalData.sdata[ID].isActivate = dededeskill->Getisactivate();
@@ -60,7 +64,6 @@ bool SetDededeSkillInDatasheet(Skill*& skill, int& ID)
 	return true;
 }
 
-DededeSkill* dededeskill = nullptr;
 
 void UpdateDededeSkill(Skill*& skill)
 {
@@ -93,6 +96,12 @@ void UpdateDededeSkill(Skill*& skill)
 	else
 	{
 		dededeskill->Setcanhit(false);
+	}
+
+	if (totalData.udata[dededeskill->Getmasternum()].curState == (ECharacterState)PATTACK
+		&& skilldestroytime > DEDEDE_SKILL_END_TIME)
+	{
+		totalData.udata[dededeskill->Getmasternum()].curState = (ECharacterState)PIDLE;
 	}
 
 	if (skilldestroytime > TDEDEDESKILLDESTROY)

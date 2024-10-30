@@ -30,7 +30,7 @@ std::map<ObjectImage, Animation*> imageDatas;
 std::map<ESKILLTYPE, std::pair< HBITMAP, BITMAP>> imDatas;
 void LoadImages();
 void LoadSkillImage();
-void ChangeState(ColliderType, int, int);
+void ChangeState(ColliderType, int);
 void CleanUpImageDatas();
 // <<
 
@@ -1071,30 +1071,33 @@ void Update()
 
 	if (timeSpan_move.count() >= 0.005 && curScene == GAME)
 	{
+		int tempX = 0, tempY = 0;
 		if (GetAsyncKeyState('A') & 0x8000)
 		{
-			x -= 1;
+			tempX -= 1;
 		}
 		if (GetAsyncKeyState('D') & 0x8000)
 		{
-			x += 1;
+			tempX += 1;
 		}
 		if (GetAsyncKeyState('S') & 0x8000)
 		{
-			y += 1;
+			tempY += 1;
 		}
 		if (GetAsyncKeyState('W') & 0x8000)
 		{
-			y -= 1;
+			tempY -= 1;
 		}
 		if (GetAsyncKeyState(VK_SPACE) & 0x8000)
 		{
 		}
 		t1_move = std::chrono::high_resolution_clock::now();
-		if (!y && !x)
-			ChangeState(PLAYER, myID, IDLE);
+		if (!tempY && !tempX)
+			ChangeState(PLAYER, IDLE);
 		else
-			ChangeState(PLAYER, myID, WALK);
+			ChangeState(PLAYER, WALK);
+		x += tempX;
+		y += tempY;
 	}
 }
 
@@ -1267,15 +1270,12 @@ void LoadCustomCursor()
 		MessageBox(NULL, L"Failed to load cursorAttack.cur", L"Error", MB_OK);
 	}
 }
-void ChangeState(ColliderType colliderType, int id, int state)
+void ChangeState(ColliderType colliderType,int state)
 {
 	switch (colliderType)
 	{
 	case PLAYER:
-		if (((Player*)objArr[id])->GetCharacterState() == (ECharacterState)state)
-			break;
-		((Player*)objArr[id])->Getani()[((Player*)objArr[id])->GetCharacterState()]->SetincreaseIdx(0);
-		((Player*)objArr[id])->SetCharacterState((ECharacterState)state);
+		aD.curState = (ECharacterState)state;
 		break;
 	case MONSTER:
 
