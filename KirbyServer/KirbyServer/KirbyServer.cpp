@@ -415,8 +415,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		threadEnd_Send = true;
 		threadEnd_Read = true;
 
-		Sleep(1);
-
 		//DeleteCriticalSection(&criticalsection);
 		CloseClient(wParam);
 		PostQuitMessage(0);
@@ -578,6 +576,7 @@ void ReadData()
 
 	if (socketList.size() == readyclientnum && socketList.size() != 0)
 	{
+		InitLevel();
 		totalData.publicdata.isOK = 1;
 	}
 }
@@ -607,7 +606,7 @@ unsigned __stdcall Update()
 {
 	while (TRUE)
 	{
-		if (timeSpan_update.count() >= 0.02)
+		if (timeSpan_update.count() >= 0.001)
 		{
 			if (threadEnd_Update)
 				return 0;
@@ -635,7 +634,7 @@ unsigned __stdcall Update()
 
 			//LeaveCriticalSection(&criticalsection);
 		}
-		Sleep(1);
+		Sleep(0);
 	}
 }
 unsigned __stdcall Send()
@@ -646,7 +645,7 @@ unsigned __stdcall Send()
 			return 0;
 
 		// 시간 간격 체크
-		if (timeSpan_send.count() >= 0.01)
+		if (timeSpan_send.count() >= 0.0005)
 		{
 			//EnterCriticalSection(&criticalsection);
 
@@ -667,8 +666,8 @@ unsigned __stdcall Send()
 
 			//LeaveCriticalSection(&criticalsection);
 		}
+		Sleep(0); // CPU 사용량을 줄이기 위한 지연
 
-		Sleep(1); // CPU 사용량을 줄이기 위한 지연
 	}
 } 
 //unsigned __stdcall Send()
@@ -710,7 +709,7 @@ unsigned __stdcall Read()
 		t2_read = std::chrono::high_resolution_clock::now();  // t2_read 초기화
 		timeSpan_read = std::chrono::duration_cast<std::chrono::duration<double>>(t2_read - t1_read);
 
-		if (timeSpan_read.count() >= 0.001)  // 시간을 10ms로 늘림
+		if (timeSpan_read.count() >= 0.0005)  // 시간을 10ms로 늘림
 		{
 			//EnterCriticalSection(&criticalsection);
 
@@ -721,8 +720,8 @@ unsigned __stdcall Read()
 			// 타이머 초기화
 			t1_read = std::chrono::high_resolution_clock::now();
 		}
+		//Sleep(0);  // 짧은 대기 시간을 추가해 CPU 부하를 줄임
 
-		Sleep(1);  // 짧은 대기 시간을 추가해 CPU 부하를 줄임
 	}
 }
 
@@ -777,10 +776,6 @@ void SetUserData(PLAYERDATA& uData, ReceiveData rData)
 		uData.pos.y += rData.playerMove.y;
 		if(uData.curState != PATTACK)
 			uData.curState = rData.curState;
-		else
-		{
-			int a = 0;
-		}
 	}
 
 	uData.mousePos.x = rData.cursorMove.x;

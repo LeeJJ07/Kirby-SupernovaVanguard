@@ -462,8 +462,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		threadEnd_Send = true;
 		threadEnd_Paint = true;
 
-		Sleep(1);
-
 		//DeleteCriticalSection(&cs);
 
 		KillTimer(hWnd, TIMER_START);
@@ -857,7 +855,7 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		if (timeSpan_send.count() >= 0.0025 /*&& cs.DebugInfo != NULL*/)
+		if (timeSpan_send.count() >= 0.005 /*&& cs.DebugInfo != NULL*/)
 		{
 			//EnterCriticalSection(&cs);
 			if (threadEnd_Send)
@@ -905,7 +903,7 @@ unsigned __stdcall Read()
 {
 	while (TRUE)
 	{
-		if (timeSpan_read.count() >= 0.01)
+		if (timeSpan_read.count() >= 0.0005)
 		{
 			if (threadEnd_Read)
 				return 0;
@@ -938,7 +936,7 @@ unsigned __stdcall Read()
 
 			//LeaveCriticalSection(&cs);
 		}
-		Sleep(1);
+		//Sleep(1);
 	}
 }
 
@@ -955,7 +953,7 @@ unsigned __stdcall Paint(HWND pParam)
 			Sleep(1);
 			continue;
 		}
-		if (timeSpan_render.count() >= 0.0075 /*&& cs.DebugInfo != NULL*/)
+		if (timeSpan_render.count() >= 0.005 /*&& cs.DebugInfo != NULL*/)
 		{
 			//EnterCriticalSection(&cs);
 
@@ -997,7 +995,7 @@ unsigned __stdcall Paint(HWND pParam)
 
 			//LeaveCriticalSection(&cs);
 		}
-		Sleep(1);
+		//Sleep(0);
 	}
 }
 

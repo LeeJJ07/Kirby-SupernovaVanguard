@@ -330,7 +330,7 @@ bool ReadInitMessage(SOCKET& s, TOTALDATA& uData)
 	int bytesToReceive = sizeof(TOTALDATA);
 	int bytesReceived;
 
-	Sleep(1);
+	Sleep(3);
 
 	while (totalBytesReceived < bytesToReceive)
 	{
