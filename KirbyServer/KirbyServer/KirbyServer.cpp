@@ -363,8 +363,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (hThreads[2])
 			ResumeThread(hThreads[2]);
 
-		InitLevel();
-
 		totalData.publicdata.isAllPlayerChoice = true;
 
 		return InitServer(hWnd);
@@ -550,6 +548,8 @@ void ReadData()
 		{
 			t1_select = std::chrono::high_resolution_clock::now();
 			isTimingStarted = true;
+
+			InitLevel();
 		}
 		t2_select = std::chrono::high_resolution_clock::now();
 		timeSpan_select = std::chrono::duration_cast<std::chrono::duration<double>>(t2_select - t1_select);
@@ -1933,7 +1933,7 @@ void InitLevel()
 	levelExp[0] = 0;
 	for (int i = 1; i <= 50; i++)
 	{
-		levelExp[i] = levelExp[i-1] + ((i - 1) / 10 + 1) * 10;
+		levelExp[i] = levelExp[i-1] + ((i - 1) / 2 + 1) * 20 * vClient.size() / 0.75f;
 	}
 
 	totalData.publicdata.level = 1;
