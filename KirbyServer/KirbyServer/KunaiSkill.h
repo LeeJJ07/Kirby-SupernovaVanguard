@@ -80,7 +80,7 @@ void UpdateKunaiSkill(Skill*& skill)
 	kunaiskill->Sett2_attacktick();
 	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(kunaiskill->Gett2_attacktick() - kunaiskill->Gett1_attacktick()).count();
 
-	if (hittime >KUNAITICK)
+	if (hittime > KUNAITICK)
 	{
 		kunaiskill->Setcanhit(true);
 		kunaiskill->Sett1_attacktick();

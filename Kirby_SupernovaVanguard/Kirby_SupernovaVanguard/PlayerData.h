@@ -84,6 +84,7 @@ struct PUBLICDATA
 	int		exp;
 	int		maxExp;
 	bool	islevelUp;
+	bool	isGameOver;
 };
 
 struct TOTALDATA

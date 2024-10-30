@@ -93,6 +93,7 @@ void SetUserToData(Player*&, short&);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 void PlayerHit(Player*& , MonsterSkill*&, int&);
 void PlayerDie(Player*&);
+void GameOver();
 // <<
 
 // >> : monster
@@ -110,6 +111,8 @@ static std::chrono::high_resolution_clock::time_point t2_UI;
 static std::chrono::duration<double> timeSpan_UI;
 
 int levelExp[51];
+bool isGameStop = false;
+bool isGameOver = false;
 // <<
 
 // >> : Boss
@@ -119,8 +122,11 @@ void GenerateFireballSkill(int&);
 
 // >> : File
 ifstream skillDataFile;
-
 // <<
+
+// >> : Restart
+void RestartGame();
+// << 
 
 #define MAX_LOADSTRING 100
 #define WM_ASYNC WM_USER + 1
@@ -279,7 +285,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case TIMER_GENERATEMONSTER:
 		{
-			if (totalData.publicdata.isOK)
+			if (totalData.publicdata.isOK && !isGameStop)
 			{
 				if (!init_boss && totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
 				{
@@ -320,6 +326,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					{
 						SetPlayerSize(i);
 					}
+
 					for (int i = 0; i < socketList.size(); i++)
 					{
 						SetBasisSkillData(i);
@@ -450,7 +457,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -496,6 +503,7 @@ void ReadData()
 	readyclientnum = 0;
 	static int choiceClientNum = 0;
 	static int a[4];
+	static int restartplayer[4];
 	for (int i = 0; i < socketList.size(); i++) {
 		ReceiveData temp = {};
 		int dataLen = recv(socketList[i], (char*)&temp, sizeof(ReceiveData), 0);
@@ -505,6 +513,13 @@ void ReadData()
 
 		if(dataLen > 0)
 		{
+			if(totalData.publicdata.isGameOver)
+			{
+				if (temp.isPressRestart)
+				{
+					restartplayer[i] = temp.isPressRestart;
+				}
+			}
 			if (totalData.publicdata.isAllPlayerChoice)
 			{
 				SetUserData(totalData.udata[temp.id], temp);
@@ -532,12 +547,35 @@ void ReadData()
 
 	if (totalData.publicdata.isOK && socketList.size() == choiceClientNum && socketList.size() != 0)
 	{
+		isGameStop = false;
 		totalData.publicdata.isAllPlayerChoice = true;
 		totalData.publicdata.islevelUp = false;
 		for (int i = 0; i < 4; i++)
 			a[i] = 0;
 		choiceClientNum = 0;
 	}
+
+	int restartplayernum = 0;
+	for (restartplayernum = 0; restartplayernum < socketList.size(); restartplayernum++)
+	{
+		if (!restartplayer[restartplayernum])
+			break;
+	}
+	if (restartplayernum == socketList.size() && socketList.size())
+	{
+		totalData.publicdata.isGameOver = false;
+		isGameStop = false;
+		// 게임 재시작 코드 추가
+
+		RestartGame();
+
+		for (int i = 0; i < socketList.size(); i++)
+		{
+			restartplayer[i] = 0;
+		}
+	}
+	else
+		GameOver();
 
 	if (totalData.publicdata.isOK)
 		return;
@@ -570,7 +608,6 @@ void SendToAll()
 			break;
 		send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
 	}
-
 }
 
 void CloseClient(SOCKET socket)
@@ -594,7 +631,7 @@ unsigned __stdcall Update()
 				return 0;
 			//EnterCriticalSection(&criticalsection);
 
-			if (totalData.publicdata.isAllPlayerChoice)
+			if (totalData.publicdata.isAllPlayerChoice && !isGameStop)
 			{
 				UpdateTimer();
 				MonsterCollisionUpdate();
@@ -608,6 +645,7 @@ unsigned __stdcall Update()
 				UpdateUi();
 				SetSkillToDatasheet();
 				SetMonsterSkillToDatasheet();
+				//GameOver();
 			}
 
 			t1_update = std::chrono::high_resolution_clock::now();
@@ -2123,6 +2161,22 @@ void PlayerDie(Player*& player)
 	player->SetisAlive(false);
 }
 
+void GameOver()
+{
+	int deadPlayer = 0;
+	for (int i = 0; i < socketList.size(); i++)
+	{
+		if (!vClient[i]->GetisAlive())
+			deadPlayer++;
+	}
+	if (deadPlayer == socketList.size() && socketList.size())
+	{
+		// Game종료 이벤트
+		isGameStop = true;
+		totalData.publicdata.isGameOver = true;
+	}
+}
+
 void MonsterHit(Monster*& monster,Skill*& skill)
 {
 	monster->SetcurHealth(monster->GetcurHealth() - skill->Getdamage());
@@ -2351,4 +2405,42 @@ void IncreaseSkillValue(int& playerIndex, int skillnum, int smIndex)
 	vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->Setcooltime(values[4]);
 	vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->SetpierceCount(values[5]);
 	vClient[playerIndex]->GetSkillManager()->GetskillVector()[smIndex]->SetAmount(values[6]);
+}
+
+void RestartGame()
+{
+	totalData.publicdata.currentTime = 0.0f;
+	totalData.publicdata.level = 1;
+	totalData.publicdata.exp = 0;
+	totalData.publicdata.maxExp = levelExp[totalData.publicdata.level];
+	// 플레이어 초기화
+	for (int i = 0; i < socketList.size(); i++)
+	{
+		vClient[i]->SetPosition({ MAX_MAP_SIZE_X / 2, MAX_MAP_SIZE_Y / 2 });
+		vClient[i]->SetmaxHealth(100);
+		vClient[i]->SetcurHealth(100);
+		vClient[i]->SetisAlive(true);
+
+		vClient[i]->GetSkillManager()->GetskillVector().clear();
+		for (int j = 0; j < 10; j++) {
+			vClient[i]->SetSkillLevel(j, 0);
+		}
+		vClient[i]->SetSkillLevel(i + 1, 1);
+		SetBasisSkillData(i);
+	}
+	for (int i = 0; i < MONSTERNUM; i++)
+	{
+		totalData.mdata[i].dataType = 0;
+		monsterArr[i] = nullptr;
+	}
+	for (int i = 0; i < SKILLNUM; i++)
+	{
+		totalData.sdata[i].dataType = 0;
+		vSkill[i] = nullptr;
+	}
+	for (int i = 0; i < MONSTERSKILLNUM; i++)
+	{
+		totalData.msdata[i].dataType = 0;
+		vMonsterSkill[i] = nullptr;
+	}
 }

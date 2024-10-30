@@ -13,6 +13,7 @@
 #include "Hp.h"
 #include "Animation.h"
 #include "SkillSelector.h"
+#include "UI.h"
 
 #define MAX_LOADSTRING 100
 #define TIMER_START 1
@@ -170,6 +171,13 @@ static HBITMAP hSkillSelectTitleImage;
 static BITMAP m_skillSelectTitleBitInfo;
 // <<
 
+// >> : GameOver 
+UI* gameOver;
+UI* restart;
+
+bool canPressRestart;
+// <<
+
 unsigned long ulStackSize = 0;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -284,6 +292,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		InitObjArr();
 
+		gameOver = new UI(GAMEOVER);
+		gameOver->SetUIAni();
+		restart = new UI(RESTART);
+		restart->SetUIAni();
+
 		if (hThreads[0])
 			ResumeThread(hThreads[0]);
 		if (hThreads[1])
@@ -345,6 +358,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				if (!aD.isReady)
 				{
 					aD.isReady = true;
+				}
+				break;
+			case GAME:
+				if (canPressRestart)
+				{
+					aD.isPressRestart = true;
 				}
 				break;
 			}
@@ -507,6 +526,19 @@ void DoubleBuffering(HDC hdc)
 
 	if (isDrawCollider)
 		DrawCollider(bufferdc);
+
+	if (uData.publicdata.isGameOver)
+	{
+		static std::chrono::high_resolution_clock::time_point t1_restart = std::chrono::high_resolution_clock::now();
+		static std::chrono::high_resolution_clock::time_point t2_restart = std::chrono::high_resolution_clock::now();
+		gameOver->DrawUI(bufferdc, camera);
+		if ((std::chrono::duration_cast<std::chrono::duration<double>>(t2_restart - t1_restart)).count() >= 3.0f)
+		{
+			restart->DrawUI(bufferdc, camera);
+			canPressRestart = true;
+		}
+		t2_restart = std::chrono::high_resolution_clock::now();
+	}
 
 	DrawTime(bufferdc, cLeft, cTop);
 	// <<
@@ -849,6 +881,7 @@ unsigned __stdcall Send()
 			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
 
 			aD.send = false;
+			aD.isPressRestart = false;
 
 			sendCount++;
 

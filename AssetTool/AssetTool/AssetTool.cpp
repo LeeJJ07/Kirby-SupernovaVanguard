@@ -232,7 +232,7 @@ void DrawAnimation(HDC hdc)
     // 현재 프레임에 따라 비트맵의 시작 위치 계산
     int xStart = 0;
     for (int i = 0; i < curFrame; i++)
-        xStart += widths[i] + spacingX - 1;
+        xStart += widths[i] + spacingX;
     int yStart = 0;
 
     int diffX = xStart + widths[curFrame] / 2 - pos[curFrame].x;
@@ -348,7 +348,7 @@ void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc)
     // 브러시 설정 후 사각형 그리기
     HBRUSH hBoxBrush = CreateSolidBrush(RGB(R, G, B));
     SelectObject(hDoubleBufferDC, hBoxBrush);
-    Rectangle(hDoubleBufferDC, boxX, boxY, boxX + boxWidth, boxY + boxHeight);
+    Rectangle(hDoubleBufferDC, boxX, boxY + 200, boxX + boxWidth, boxY + boxHeight + 200);
     DeleteObject(hBoxBrush);
 
     // 더블 버퍼의 내용을 실제 화면에 복사
@@ -659,8 +659,9 @@ BOOL CALLBACK Dialog1_Proc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
         case IDC_BUTTON_cut:
         {
             g_TextImgWidth = 0;
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < length - 1; i++)
                 g_TextImgWidth += widths[i] + spacingX;
+                g_TextImgWidth += widths[length - 1];
             g_TextImgHeight = height - 1;
 
             g_StartImgX = rectView.right / 2 - g_CharPos.x - g_TextImgWidth / 2;
