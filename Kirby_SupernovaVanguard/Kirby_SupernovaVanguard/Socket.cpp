@@ -8,6 +8,7 @@
 
 short myID;
 int textreadCount;
+//extern CRITICAL_SECTION cs;
 
 enum DATATYPE
 {
@@ -24,10 +25,10 @@ extern std::chrono::high_resolution_clock::time_point t2_readCount;
 int InitClient(HWND hWnd, SOCKET& s)
 {
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
-	s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	s = socket(AF_INET, SOCK_STREAM, 0);
 
-	int sendBufSize = sizeof(TOTALDATA) + 1;
-	int recvBufSize = sizeof(TOTALDATA) + 1;
+	int sendBufSize = sizeof(TOTALDATA);
+	int recvBufSize = sizeof(TOTALDATA);
 
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR)
 	{
@@ -90,7 +91,7 @@ bool ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
 			return false;  // ���� ���� �� �Լ� ����
 		}
 
-		totalBytesReceived += bytesReceived;  // ������ ����Ʈ �� ����
+		totalBytesReceived += bytesReceived;
 	}
 
 	if (!temp.send)

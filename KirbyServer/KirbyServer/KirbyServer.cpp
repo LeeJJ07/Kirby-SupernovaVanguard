@@ -377,9 +377,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			AcceptSocket(hWnd, s, c_addr, userID++);
 			break;
 		case FD_READ:
-			//EnterCriticalSection(&criticalsection);
+			/*EnterCriticalSection(&criticalsection);
 			ReadData();
-			//LeaveCriticalSection(&criticalsection);
+			//LeaveCriticalSection(&criticalsection);*/
 			break;
 		case FD_CLOSE:
 			CloseClient(wParam);
@@ -417,7 +417,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		Sleep(0);
 
 		//DeleteCriticalSection(&criticalsection);
-
+		CloseClient(wParam);
 		PostQuitMessage(0);
 		break;
 	default:
@@ -429,10 +429,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 int InitServer(HWND hWnd)
 {
 	WSAStartup(MAKEWORD(2, 2), &wsaData);
-	s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	s = socket(AF_INET, SOCK_STREAM, 0);
 	
-	int sendBufSize = sizeof(TOTALDATA) + 1;
-	int recvBufSize = sizeof(TOTALDATA) + 1;
+	int sendBufSize = sizeof(TOTALDATA);
+	int recvBufSize = sizeof(TOTALDATA);
 
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
 		std::cerr << "Setting send buffer size failed.\n";
@@ -452,7 +452,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -678,7 +678,6 @@ unsigned __stdcall Send()
 //		Sleep(0);
 //	}
 //}
-
 unsigned __stdcall Read()
 {
 	while (TRUE)
@@ -686,20 +685,47 @@ unsigned __stdcall Read()
 		if (threadEnd_Read)
 			return 0;
 
-		if (timeSpan_read.count() >= 0.001)
+		// 주기 체크
+		t2_read = std::chrono::high_resolution_clock::now();  // t2_read 초기화
+		timeSpan_read = std::chrono::duration_cast<std::chrono::duration<double>>(t2_read - t1_read);
+
+		if (timeSpan_read.count() >= 0.001)  // 시간을 10ms로 늘림
 		{
 			//EnterCriticalSection(&criticalsection);
 
 			ReadData();
 
-			t1_read = std::chrono::high_resolution_clock::now();
-			timeSpan_read = std::chrono::duration_cast<std::chrono::duration<double>>(t2_read - t1_read);
-
 			//LeaveCriticalSection(&criticalsection);
+
+			// 타이머 초기화
+			t1_read = std::chrono::high_resolution_clock::now();
 		}
-		Sleep(0);
+
+		Sleep(0);  // 짧은 대기 시간을 추가해 CPU 부하를 줄임
 	}
 }
+
+//unsigned __stdcall Read()
+//{
+//	while (TRUE)
+//	{
+//		if (threadEnd_Read)
+//			return 0;
+//
+//		if (timeSpan_read.count() >= 0.001)
+//		{
+//			//EnterCriticalSection(&criticalsection);
+//
+//			ReadData();
+//
+//			t1_read = std::chrono::high_resolution_clock::now();
+//			timeSpan_read = std::chrono::duration_cast<std::chrono::duration<double>>(t2_read - t1_read);
+//
+//			//LeaveCriticalSection(&criticalsection);
+//		}
+//		Sleep(0);
+//	}
+//}
 
 void InitUserData(PLAYERDATA& userData, int id)
 {
