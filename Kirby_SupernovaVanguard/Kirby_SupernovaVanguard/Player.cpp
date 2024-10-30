@@ -1,19 +1,12 @@
 #include "Player.h"
 #include "Camera.h"
 
-static int a;
-static int b;
-
 void Player::ObjectUpdate(int i)
 {
 	SetPosition(uData.udata[i].pos);
 	GetCollider()->SetOffset(uData.udata[i].offset);
 	SetLookingDir(uData.udata[i].lookingDir);
 	SetIsInGame(uData.udata[i].inGameStart);
-    if (uData.udata[i].inGameStart)
-        a++;
-    if (!uData.udata[i].inGameStart)
-        b++;
 	SetMousePosition(uData.udata[i].mousePos);
     SetmaxHealth(uData.udata[i].maxHealth);
     SetcurHealth(uData.udata[i].curHealth);

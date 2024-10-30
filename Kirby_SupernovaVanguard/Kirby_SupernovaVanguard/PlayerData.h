@@ -93,12 +93,8 @@ struct TOTALDATA
 	MONSTERDATA		mdata[MONSTERNUM];
 	SKILLDATA		sdata[SKILLNUM];
 	MONSTERSKILLDATA		msdata[MONSTERSKILLNUM];
-<<<<<<< HEAD
-	bool	send;
-=======
-	
+
 	bool send;
->>>>>>> Collider
 };
 
 extern TOTALDATA uData;
