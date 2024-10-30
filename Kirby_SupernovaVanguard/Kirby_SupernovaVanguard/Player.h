@@ -4,8 +4,6 @@
 #include "Animation.h"
 #include "ActionData.h"
 
-extern std::map<ObjectImage, Animation*> imageDatas;
-
 class Animation;
 
 class Player : public Object

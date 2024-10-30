@@ -48,7 +48,7 @@ int InitClient(HWND hWnd, SOCKET& s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
@@ -93,8 +93,10 @@ bool ReadMessage(SOCKET& s, std::vector<Object*>& p)
 
 	if (!temp.send)
 		return false;
-	memcpy((char*)&uData, (char*)&temp, sizeof(TOTALDATA));
 
+
+
+	memcpy((char*)&uData, (char*)&temp, sizeof(TOTALDATA));
 
 	readCount++;
 
@@ -192,7 +194,10 @@ bool ReadMessage(SOCKET& s, std::vector<Object*>& p)
 
 	// >> publicdata
 	{
-		// pD.publicdata.Exp;
+		if (uData.publicdata.isGameOver)
+		{
+
+		}
 	}
 	// <<
 

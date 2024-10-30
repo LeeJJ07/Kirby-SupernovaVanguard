@@ -48,7 +48,7 @@ public:
 	{
 		int sumWidth = 0;
 		for (int i = 0; i < curIdx; i++)
-			sumWidth += lengths[i] + spacingX - 1;
+			sumWidth += lengths[i] + spacingX;
 		return sumWidth;
 	}
 	int GetHeight() { return height; }
@@ -68,3 +68,4 @@ public:
 	~Animation();
 };
 
+extern std::map<ObjectImage, Animation*> imageDatas;
