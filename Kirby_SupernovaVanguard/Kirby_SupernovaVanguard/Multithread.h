@@ -4,6 +4,6 @@
 #include <Windows.h>
 #include <process.h>
 
-extern CRITICAL_SECTION cs;
+//extern CRITICAL_SECTION cs;
 
 static bool isChecked;

@@ -27,7 +27,7 @@ std::mt19937 gen(rd()); // 시드를 기반으로 하는 난수 생성 엔진
 // >> : multithread
 DWORD dwThID1, dwThID2, dwThID3;
 HANDLE hThreads[3];
-CRITICAL_SECTION criticalsection;
+//CRITICAL_SECTION criticalsection;
 unsigned long ulStackSize = 0;
 bool threadEnd_Update;
 bool threadEnd_Send;
@@ -350,7 +350,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		skillDataFile.open("skillDataSheet.txt");
 
-		InitializeCriticalSection(&criticalsection);
+		//InitializeCriticalSection(&criticalsection);
 
 		SetTimer(hWnd, TIMER_GENERATEMONSTER, 1000, NULL);
 		hThreads[1] = (HANDLE)_beginthreadex(NULL, ulStackSize, (unsigned(__stdcall*)(void*))Send, NULL, 0, (unsigned*)&dwThID2);
@@ -377,9 +377,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			AcceptSocket(hWnd, s, c_addr, userID++);
 			break;
 		case FD_READ:
-			EnterCriticalSection(&criticalsection);
+			//EnterCriticalSection(&criticalsection);
 			ReadData();
-			LeaveCriticalSection(&criticalsection);
+			//LeaveCriticalSection(&criticalsection);
 			break;
 		case FD_CLOSE:
 			CloseClient(wParam);
@@ -416,7 +416,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		Sleep(0);
 
-		DeleteCriticalSection(&criticalsection);
+		//DeleteCriticalSection(&criticalsection);
 
 		PostQuitMessage(0);
 		break;
@@ -590,7 +590,7 @@ unsigned __stdcall Update()
 		{
 			if (threadEnd_Update)
 				return 0;
-			EnterCriticalSection(&criticalsection);
+			//EnterCriticalSection(&criticalsection);
 
 			if (totalData.publicdata.isAllPlayerChoice)
 			{
@@ -611,7 +611,7 @@ unsigned __stdcall Update()
 			t1_update = std::chrono::high_resolution_clock::now();
 			timeSpan_update = std::chrono::duration_cast<std::chrono::duration<double>>(t2_update - t1_update);
 
-			LeaveCriticalSection(&criticalsection);
+			//LeaveCriticalSection(&criticalsection);
 		}
 		Sleep(0);
 	}
@@ -626,39 +626,16 @@ unsigned __stdcall Send()
 		// 시간 간격 체크
 		if (timeSpan_send.count() >= 0.01)
 		{
-			EnterCriticalSection(&criticalsection);
+			//EnterCriticalSection(&criticalsection);
 
 			for (int i = 0; i < PLAYERNUM; i++)
 			{
 				if (totalData.udata[i].dataType == NULL)
 					break;
 
-				// 전송할 데이터의 크기
-				size_t totalDataSize = sizeof(TOTALDATA);
-				size_t totalBytesSent = 0;
+				totalData.send = true;
+				int bytesSent = send(socketList[i], (char*)&totalData, sizeof(TOTALDATA), 0);
 
-				while (totalBytesSent < totalDataSize)
-				{
-					// send 호출 및 전송된 바이트 수 확인
-					totalData.send = true;
-					int bytesSent = send(socketList[i], (char*)&totalData + totalBytesSent, totalDataSize - totalBytesSent, 0);
-					totalData.send = false;
-					// send 실패 처리
-					if (bytesSent == SOCKET_ERROR)
-					{
-						std::cerr << "Send failed for player " << i << ": " << WSAGetLastError() << "\n";
-						break;  // 현재 플레이어에 대한 전송을 중단
-					}
-
-					// 연결이 닫힌 경우
-					if (bytesSent == 0)
-					{
-						std::cerr << "Connection closed for player " << i << ".\n";
-						break;  // 현재 플레이어에 대한 전송을 중단
-					}
-
-					totalBytesSent += bytesSent;  // 전송된 바이트 수 누적
-				}
 			}
 
 			// 시간 업데이트
@@ -666,7 +643,7 @@ unsigned __stdcall Send()
 			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
 			t1_send = t2_send;  // 현재 시간으로 업데이트
 
-			LeaveCriticalSection(&criticalsection);
+			//LeaveCriticalSection(&criticalsection);
 		}
 
 		// 약간의 지연 추가
@@ -711,14 +688,14 @@ unsigned __stdcall Read()
 
 		if (timeSpan_read.count() >= 0.001)
 		{
-			EnterCriticalSection(&criticalsection);
+			//EnterCriticalSection(&criticalsection);
 
 			ReadData();
 
 			t1_read = std::chrono::high_resolution_clock::now();
 			timeSpan_read = std::chrono::duration_cast<std::chrono::duration<double>>(t2_read - t1_read);
 
-			LeaveCriticalSection(&criticalsection);
+			//LeaveCriticalSection(&criticalsection);
 		}
 		Sleep(0);
 	}

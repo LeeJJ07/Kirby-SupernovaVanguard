@@ -27,7 +27,7 @@ struct PLAYERDATA :public OBJECTDATA
 	int	curHealth;
 	ECharacterState	curState;
 
-	std::pair<short, int> levelUpSkillIndex[3]; //½ºÅ³ Å¸ÀÔ, ÇöÀç ·¹º§ ¹Þ±â
+	std::pair<short, int> levelUpSkillIndex[3]; //ï¿½ï¿½Å³ Å¸ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ±ï¿½
 };
 
 struct MONSTERDATA :public OBJECTDATA
@@ -93,7 +93,8 @@ struct TOTALDATA
 	MONSTERDATA		mdata[MONSTERNUM];
 	SKILLDATA		sdata[SKILLNUM];
 	MONSTERSKILLDATA		msdata[MONSTERSKILLNUM];
-	bool	send;
+	
+	bool send;
 };
 
 static TOTALDATA uData;

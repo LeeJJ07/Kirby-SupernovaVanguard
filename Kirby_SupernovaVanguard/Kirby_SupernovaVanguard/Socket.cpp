@@ -9,7 +9,8 @@
 short myID;
 int textreadCount;
 
-enum DATATYPE {
+enum DATATYPE
+{
 	PLAYERTYPE = 'p',
 	MONSTERTYPE = 'm',
 	SKILLTYPE = 's',
@@ -20,22 +21,24 @@ extern std::chrono::duration<double> timeSpan_readCount;
 extern std::chrono::high_resolution_clock::time_point t1_readCount;
 extern std::chrono::high_resolution_clock::time_point t2_readCount;
 
-int InitClient(HWND hWnd, SOCKET &s)
+int InitClient(HWND hWnd, SOCKET& s)
 {
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	int sendBufSize = sizeof(TOTALDATA) + 1;
 	int recvBufSize = sizeof(TOTALDATA) + 1;
-	
-	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR) {
+
+	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR)
+	{
 		std::cerr << "Setting send buffer size failed.\n";
 		closesocket(s);
 		WSACleanup();
 		return 1;
 	}
 
-	if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (char*)&recvBufSize, sizeof(recvBufSize)) == SOCKET_ERROR) {
+	if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, (char*)&recvBufSize, sizeof(recvBufSize)) == SOCKET_ERROR)
+	{
 		std::cerr << "Setting recv buffer size failed.\n";
 		closesocket(s);
 		WSACleanup();
@@ -54,152 +57,152 @@ int InitClient(HWND hWnd, SOCKET &s)
 
 	WSAAsyncSelect(s, hWnd, WM_ASYNC, FD_READ);
 
-    /*u_long mode = 1;
-    if (ioctlsocket(s, FIONBIO, &mode) == SOCKET_ERROR) {
-        std::cerr << "Failed to set non-blocking mode.\n";
-        closesocket(s);
-        WSACleanup();
-        return 1;
-    }*/
-	
+	/*u_long mode = 1;
+	if (ioctlsocket(s, FIONBIO, &mode) == SOCKET_ERROR) {
+		std::cerr << "Failed to set non-blocking mode.\n";
+		closesocket(s);
+		WSACleanup();
+		return 1;
+	}*/
+
 	return 1;
 }
 bool ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
 {
-    int totalBytesReceived = 0;
-    TOTALDATA temp;
-    while (totalBytesReceived < sizeof(TOTALDATA))
-    {
-        // recv·Î µ¥ÀÌÅÍ¸¦ ¹ÞÀ½
-        int bytesReceived = recv(s, ((char*)&temp) + totalBytesReceived, sizeof(TOTALDATA) - totalBytesReceived, 0);
+	int totalBytesReceived = 0;
+	TOTALDATA temp;
+	while (totalBytesReceived < sizeof(TOTALDATA))
+	{
+		// recvï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ ï¿½ï¿½ï¿½ï¿½
+		int bytesReceived = recv(s, ((char*)&temp) + totalBytesReceived, sizeof(TOTALDATA) - totalBytesReceived, 0);
 
-        // recv ½ÇÆÐ Ã³¸®
-        if (bytesReceived == SOCKET_ERROR)
-        {
-            std::cerr << "Receive failed: " << WSAGetLastError() << "\n";
-            return false;  // ¿¡·¯ ¹ß»ý ½Ã ÇÔ¼ö Á¾·á
-        }
+		// recv ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
+		if (bytesReceived == SOCKET_ERROR)
+		{
+			std::cerr << "Receive failed: " << WSAGetLastError() << "\n";
+			return false;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ß»ï¿½ ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½
+		}
 
-        // ¿¬°áÀÌ ´ÝÈù °æ¿ì
-        if (bytesReceived == 0)
-        {
-            std::cerr << "Connection closed.\n";
-            return false;  // ¿¬°á Á¾·á ½Ã ÇÔ¼ö Á¾·á
-        }
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+		if (bytesReceived == 0)
+		{
+			std::cerr << "Connection closed.\n";
+			return false;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ô¼ï¿½ ï¿½ï¿½ï¿½ï¿½
+		}
 
-        totalBytesReceived += bytesReceived;  // ¼ö½ÅÇÑ ¹ÙÀÌÆ® ¼ö ´©Àû
-    }
+		totalBytesReceived += bytesReceived;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	}
 
-    if (!temp.send)
-        return false;
-    memcpy((char*)&pD, (char*)&temp, sizeof(TOTALDATA));
+	if (!temp.send)
+		return false;
+	memcpy((char*)&pD, (char*)&temp, sizeof(TOTALDATA));
 
 
-    readCount++;
+	readCount++;
 
-    // >> : playerdata
-    for (int i = 0; i < PLAYERNUM; i++)
-    {
-        if (pD.udata[i].dataType != PLAYERTYPE)
-        {
-            if (i == 0)
-            {
-                LeaveCriticalSection(&cs);
-                return false;
-            }
-            break;
-        }
+	// >> : playerdata
+	for (int i = 0; i < PLAYERNUM; i++)
+	{
+		if (pD.udata[i].dataType != PLAYERTYPE)
+		{
+			if (i == 0)
+			{
+				//LeaveCriticalSection(&cs);
+				return false;
+			}
+			break;
+		}
 
-        if (!p[i])
-        {
-            p[i] = new Player();
-            CreateObject(p[i], i + PLAYERINDEX);
-            p[i]->Setid(i + PLAYERINDEX);
-        }
-        p[i]->ObjectUpdate(pD, i);
-        p[i]->GetCollider()->MovePosition(p[i]->GetPosition());
+		if (!p[i])
+		{
+			p[i] = new Player();
+			CreateObject(p[i], i + PLAYERINDEX);
+			p[i]->Setid(i + PLAYERINDEX);
+		}
+		p[i]->ObjectUpdate(pD, i);
+		p[i]->GetCollider()->MovePosition(p[i]->GetPosition());
 
-        camera.PositionUpdate();
-    }
-    // <<
+		camera.PositionUpdate();
+	}
+	// <<
 
-    // >> : monsterdata
-    for (int i = 0; i < MONSTERNUM; i++)
-    {
-        if (pD.mdata[i].dataType != MONSTERTYPE)
-        {
-            objArr[i + MONSTERINDEX] = nullptr;
-            vMonster[i] = nullptr;
-            continue;
-        }
+	// >> : monsterdata
+	for (int i = 0; i < MONSTERNUM; i++)
+	{
+		if (pD.mdata[i].dataType != MONSTERTYPE)
+		{
+			objArr[i + MONSTERINDEX] = nullptr;
+			vMonster[i] = nullptr;
+			continue;
+		}
 
-        if (vMonster[i] == nullptr)
-        {
-            vMonster[i] = new Monster(pD.mdata[i].monsterType);
-            CreateObject((Monster*)vMonster[i], i + MONSTERINDEX);
-            vMonster[i]->Setid(i);
-        }
+		if (vMonster[i] == nullptr)
+		{
+			vMonster[i] = new Monster(pD.mdata[i].monsterType);
+			CreateObject((Monster*)vMonster[i], i + MONSTERINDEX);
+			vMonster[i]->Setid(i);
+		}
 
-        vMonster[i]->ObjectUpdate(pD, i);
-        vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
-    }
-    // <<
+		vMonster[i]->ObjectUpdate(pD, i);
+		vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
+	}
+	// <<
 
-    // >> : skilldata
-    for (int i = 0; i < SKILLNUM; i++)
-    {
-        if (pD.sdata[i].dataType != SKILLTYPE || !pD.sdata[i].isActivate)
-        {
-            objArr[i + SKILLINDEX] = nullptr;
-            vSkill[i] = nullptr;
-            continue;
-        }
+	// >> : skilldata
+	for (int i = 0; i < SKILLNUM; i++)
+	{
+		if (pD.sdata[i].dataType != SKILLTYPE || !pD.sdata[i].isActivate)
+		{
+			objArr[i + SKILLINDEX] = nullptr;
+			vSkill[i] = nullptr;
+			continue;
+		}
 
-        if (vSkill[i] == nullptr || vSkill[i]->GetCollider()->GetColliderShape() != pD.sdata[i].colliderShape)
-        {
-            vSkill[i] = new Skill((ESKILLTYPE)pD.sdata[i].skillType);
-            CreateObject((Skill*)vSkill[i], i + SKILLINDEX);
-            vSkill[i]->Setid(pD.sdata[i].targetNum);
-        }
+		if (vSkill[i] == nullptr || vSkill[i]->GetCollider()->GetColliderShape() != pD.sdata[i].colliderShape)
+		{
+			vSkill[i] = new Skill((ESKILLTYPE)pD.sdata[i].skillType);
+			CreateObject((Skill*)vSkill[i], i + SKILLINDEX);
+			vSkill[i]->Setid(pD.sdata[i].targetNum);
+		}
 
-        vSkill[i]->ObjectUpdate(pD, i);
-        vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());
-    }
-    // <<
+		vSkill[i]->ObjectUpdate(pD, i);
+		vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());
+	}
+	// <<
 
-    // >> : monsterskilldata
-    for (int i = 0; i < MONSTERSKILLNUM; i++)
-    {
-        if (pD.msdata[i].dataType != SKILLTYPE || !pD.msdata[i].isActivate)
-        {
-            objArr[i + MONSTERSKILLINDEX] = nullptr;
-            vMonsterSkill[i] = nullptr;
-            continue;
-        }
+	// >> : monsterskilldata
+	for (int i = 0; i < MONSTERSKILLNUM; i++)
+	{
+		if (pD.msdata[i].dataType != SKILLTYPE || !pD.msdata[i].isActivate)
+		{
+			objArr[i + MONSTERSKILLINDEX] = nullptr;
+			vMonsterSkill[i] = nullptr;
+			continue;
+		}
 
-        if (vMonsterSkill[i] == nullptr || vMonsterSkill[i]->GetCollider()->GetColliderShape() != pD.msdata[i].colliderShape)
-        {
-            vMonsterSkill[i] = new MonsterSkill((EMONSTERSKILLTYPE)pD.msdata[i].skillType);
-            CreateObject((MonsterSkill*)vMonsterSkill[i], i + MONSTERSKILLINDEX);
-            vMonsterSkill[i]->Setid(pD.msdata[i].targetNum);
-        }
+		if (vMonsterSkill[i] == nullptr || vMonsterSkill[i]->GetCollider()->GetColliderShape() != pD.msdata[i].colliderShape)
+		{
+			vMonsterSkill[i] = new MonsterSkill((EMONSTERSKILLTYPE)pD.msdata[i].skillType);
+			CreateObject((MonsterSkill*)vMonsterSkill[i], i + MONSTERSKILLINDEX);
+			vMonsterSkill[i]->Setid(pD.msdata[i].targetNum);
+		}
 
-        vMonsterSkill[i]->ObjectUpdate(pD, i);
-        vMonsterSkill[i]->GetCollider()->MovePosition(vMonsterSkill[i]->GetPosition());
-    }
-    // <<
+		vMonsterSkill[i]->ObjectUpdate(pD, i);
+		vMonsterSkill[i]->GetCollider()->MovePosition(vMonsterSkill[i]->GetPosition());
+	}
+	// <<
 
-    // >> publicdata
-    {
-        // pD.publicdata.Exp;
-    }
-    // <<
+	// >> publicdata
+	{
+		// pD.publicdata.Exp;
+	}
+	// <<
 
-    if (timeSpan_readCount.count() >= 1)
-    {
-        CountReadNum();
-    }
-    return true;
+	if (timeSpan_readCount.count() >= 1)
+	{
+		CountReadNum();
+	}
+	return true;
 }
 
 //void ReadMessage(SOCKET &s, std::vector<Object*>& p, TOTALDATA& pD)

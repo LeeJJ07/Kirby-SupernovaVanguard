@@ -38,7 +38,7 @@ struct PLAYERDATA :public OBJECTDATA
 	int	curHealth;
 	ECharacterState	curState;
 
-	std::pair<short, int> levelUpSkillIndex[3]; //½ºÅ³ Å¸ÀÔ, ÇöÀç ·¹º§ ´ã¾Æ¼­ Àü¼Û
+	std::pair<short, int> levelUpSkillIndex[3]; //ï¿½ï¿½Å³ Å¸ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ¼ï¿½ ï¿½ï¿½ï¿½ï¿½
 };
 
 struct MONSTERDATA :public OBJECTDATA
