@@ -452,7 +452,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -1091,30 +1091,30 @@ void GenerateSkill()
 						{
 							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 
-							MagicArrowSkill* magicarrowSkill = new MagicArrowSkill(i, 0);
+							MagicArrowSkill* magicArrowSkill = new MagicArrowSkill(i, monsterIndex);
+							PAIR lookingdir;
 
-							PAIR lookingdir = { (magicarrowSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (magicarrowSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
-							
+							lookingdir = { (magicArrowSkill->Getposition().x - totalData.mdata[monsterIndex].pos.x), (magicArrowSkill->Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+
 							if (lookingdir.first == 0)
 								lookingdir.first = skilloffsetX;
 							if (lookingdir.second == 0)
 								lookingdir.second = skilloffsetX;
 
 							double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
-							
 							lookingdir.first /= -temp / OFFSETADJUST; lookingdir.second /= -temp / OFFSETADJUST;
 
-							magicarrowSkill->Setdirection({ (long)(lookingdir.first),(long)(lookingdir.second) });
-							magicarrowSkill->Setangle(UpdateAngle(lookingdir));
-							
-							magicarrowSkill->Settime_1();
-							magicarrowSkill->Settime_2();
-							magicarrowSkill->Setisactivate(true);
-							magicarrowSkill->SetID(s);
-							magicarrowSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)magicarrowSkill->Getsize() / OFFSETADJUST / 2, (long)totalData.udata[i].lookingDir.second * (long)magicarrowSkill->Getsize() / OFFSETADJUST / 2 });
-							magicarrowSkill->Setposition({ totalData.udata[i].pos.x + magicarrowSkill->Getoffset().x, totalData.udata[i].pos.y + magicarrowSkill->Getoffset().y });
-							magicarrowSkill->Setmasternum(i);
-							vSkill[s - SKILLINDEX] = magicarrowSkill;
+							magicArrowSkill->Setdirection({ (long)lookingdir.first,(long)lookingdir.second });
+
+							magicArrowSkill->Setangle(UpdateAngle(lookingdir));
+							magicArrowSkill->Settime_1();
+							magicArrowSkill->Settime_2();
+							magicArrowSkill->Setisactivate(true);
+							magicArrowSkill->SetID(s);
+							magicArrowSkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)magicArrowSkill->Getsize() / OFFSETADJUST / 2, (long)totalData.udata[i].lookingDir.second * (long)magicArrowSkill->Getsize() / OFFSETADJUST / 2 });
+							magicArrowSkill->Setposition({ totalData.udata[i].pos.x + magicArrowSkill->Getoffset().x, totalData.udata[i].pos.y + magicArrowSkill->Getoffset().y });
+							magicArrowSkill->Setmasternum(i);
+							vSkill[s - SKILLINDEX] = magicArrowSkill;
 						}
 						break;
 						case SKILLTYPE::TORNADOSKILL:
@@ -1977,8 +1977,8 @@ void MonsterCollisionUpdate()
 			else
 			{
 				int angle = vSkill[j]->Getangle();
-				int value1 = abs(vSkill[j]->Getsize() * cos(angle * 3.14 * 180));
-				int value2 = abs(vSkill[j]->Getsize2() * cos((180 - angle) * 3.14 * 180));
+				float value1 = abs(vSkill[j]->Getsize() * cos(angle * 3.14 * 180));
+				float value2 = abs(vSkill[j]->Getsize2() * cos((180 - angle) * 3.14 * 180));
 				POINT vectorDistance = { monsterArr[i]->GetPosition().x - vSkill[j]->Getposition().x,monsterArr[i]->GetPosition().y - vSkill[j]->Getposition().y };
 
 				if (vectorDistance.x == 0)
@@ -1986,15 +1986,17 @@ void MonsterCollisionUpdate()
 				if (vectorDistance.y == 0)
 					vectorDistance.y = 1;
 
-				int d = round(sqrt((float)pow(vectorDistance.x, 2) + pow(vectorDistance.y, 2)));
-				int angle2 = atan(vectorDistance.y / vectorDistance.x);
-				int angle3 = atan(vectorDistance.x / vectorDistance.y);
-				int distance = abs(d * cos(angle2 * 3.14 * 180));
-				int distance2 = abs(d * cos(angle3 * 3.14 * 180));
-				int distanceMToS = 20 + value1 + value2;
+				float d = round(sqrt((float)pow(vectorDistance.x, 2) + pow(vectorDistance.y, 2)));
+				float angle2 = atan((float)vectorDistance.y / vectorDistance.x);
+				float angle3 = atan((float)vectorDistance.x / vectorDistance.y);
+				float distance = abs(d * cos(angle2 * 3.14 * 180));
+				float distance2 = abs(d * cos(angle3 * 3.14 * 180));
+				float distanceMToS = 20 + value1 + value2;
 
 				if (distanceMToS > distance && distanceMToS > distance2)
 				{
+					if (vSkill[j]->Getskilltype() == MAGICARROWSKILL)
+						int i = 100;
 					MonsterHit(monsterArr[i], vSkill[j]);
 				}
 				if (monsterArr[i]->GetcurHealth() <= 0)
