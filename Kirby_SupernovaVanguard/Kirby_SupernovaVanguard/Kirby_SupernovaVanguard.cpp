@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #include "Kirby_SupernovaVanguard.h"
 #include "PlayerData.h"
 #include "ActionData.h"
@@ -74,7 +74,7 @@ static SOCKET cSocket;
 // >> : Thread
 DWORD dwThID1, dwThID2, dwThID3;
 HANDLE hThreads[3];
-CRITICAL_SECTION cs;
+//CRITICAL_SECTION cs;
 
 bool threadEnd_Read;
 bool threadEnd_Send;
@@ -270,7 +270,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_CREATE:
 	{
 
-		InitializeCriticalSection(&cs);
+		//InitializeCriticalSection(&cs);
 		GetClientRect(hWnd, &rectView);
 
 		LoadCustomCursor();
@@ -445,7 +445,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		Sleep(0);
 
-		DeleteCriticalSection(&cs);
+		//DeleteCriticalSection(&cs);
 
 		KillTimer(hWnd, TIMER_START);
 		KillTimer(hWnd, TIMER_SELECT);
@@ -662,12 +662,12 @@ void DrawEXP(HDC& hdc, int& cameraTop, int& cameraLeft)
 	MaxExpBar.bottom = cameraTop + CAMERA_HEIGHT - MAXEXP_OFFSET_BOTTOM;
 	Rectangle(hdc, MaxExpBar.left, MaxExpBar.top, MaxExpBar.right, MaxExpBar.bottom);
 
-	HBRUSH brush;
-	brush = CreateSolidBrush(RGB(255, 0, 0));
-	HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
 
-	if (uData.publicdata.exp < 0 || uData.publicdata.exp > uData.publicdata.maxExp)
+	if (uData.publicdata.exp < 0 || uData.publicdata.maxExp < 0 
+		|| uData.publicdata.exp > 5000||uData.publicdata.maxExp>5000 || uData.publicdata.exp > uData.publicdata.maxExp)
 		return;
+	HBRUSH brush = CreateSolidBrush(RGB(255, 0, 0));
+	HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
 
 	// 경험치 비율을 0에서 1 사이로 제한
 	double expPer = (double)uData.publicdata.exp / uData.publicdata.maxExp;
@@ -720,7 +720,8 @@ void DrawTime(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 }
 
 void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
-	if (uData.publicdata.isAllPlayerChoice)
+	
+	if (!isSetSkill && uData.publicdata.isAllPlayerChoice)
 		return;
 
 	BLENDFUNCTION blend = { AC_SRC_OVER, 0, 220, 0 };
@@ -776,7 +777,7 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 
 	// 아래쪽에 "배울 스킬을 선택하시오" 추가
 	int subTextY = textY + 650; // 추가된 텍스트의 Y 위치 (조정 가능)
-	TextOut(bufferdc, textX, subTextY, L"배울 스킬을 선택하시오", lstrlen(L"배울 스킬을 선택하시오"));
+	TextOut(bufferdc, textX, subTextY, L"배울 스킬을 선택하십시오", lstrlen(L"배울 스킬을 선택하십시오"));
 
 	// 폰트 해제 및 정리
 	SelectObject(bufferdc, hOldFont1);
@@ -797,7 +798,6 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 	// 폰트 삭제 및 정리
 	DeleteObject(hFontLarge);
 	DeleteObject(hFontSmall);
-
 }
 
 void DrawCollider(HDC& hdc)
@@ -825,8 +825,9 @@ unsigned __stdcall Send()
 {
 	while (TRUE)
 	{
-		if (timeSpan_send.count() >= 0.01 && cs.DebugInfo != NULL)
+		if (timeSpan_send.count() >= 0.0025 /*&& cs.DebugInfo != NULL*/)
 		{
+			//EnterCriticalSection(&cs);
 			if (threadEnd_Send)
 				return 0;
 			if (curScene == GAME)
@@ -844,7 +845,10 @@ unsigned __stdcall Send()
 			aD.charactertype = dynamic_cast<Player*>(vClient[myID])->GetCharacterType();
 			aD.send = true;
 
+			aD.send = true;
 			send(cSocket, (char*)&aD, sizeof(ActionData), NULL);
+
+			aD.send = false;
 
 			sendCount++;
 
@@ -858,6 +862,7 @@ unsigned __stdcall Send()
 
 			t1_send = std::chrono::high_resolution_clock::now();
 			timeSpan_send = std::chrono::duration_cast<std::chrono::duration<double>>(t2_send - t1_send);
+			//LeaveCriticalSection(&cs);
 		}
 		Sleep(0);
 	}
@@ -871,7 +876,7 @@ unsigned __stdcall Read()
 		{
 			if (threadEnd_Read)
 				return 0;
-			EnterCriticalSection(&cs);
+			//EnterCriticalSection(&cs);
 
 			if (!ReadMessage(cSocket, vClient))
 				continue;
@@ -894,11 +899,12 @@ unsigned __stdcall Read()
 			}
 			t1_read = std::chrono::high_resolution_clock::now();
 
-			LeaveCriticalSection(&cs);
+			//LeaveCriticalSection(&cs);
 		}
 		Sleep(0);
 	}
 }
+
 
 unsigned __stdcall Paint(HWND pParam)
 {
@@ -912,9 +918,9 @@ unsigned __stdcall Paint(HWND pParam)
 			Sleep(0);
 			continue;
 		}
-		if (timeSpan_render.count() >= 0.0075 && cs.DebugInfo != NULL)
+		if (timeSpan_render.count() >= 0.0075 /*&& cs.DebugInfo != NULL*/)
 		{
-			EnterCriticalSection(&cs);
+			//EnterCriticalSection(&cs);
 
 			HDC hdc = BeginPaint(pParam, &ps);
 
@@ -952,7 +958,7 @@ unsigned __stdcall Paint(HWND pParam)
 
 			EndPaint(pParam, &ps);
 
-			LeaveCriticalSection(&cs);
+			//LeaveCriticalSection(&cs);
 		}
 		Sleep(0);
 	}
