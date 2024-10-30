@@ -48,7 +48,7 @@ int InitClient(HWND hWnd, SOCKET& s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
@@ -58,13 +58,13 @@ int InitClient(HWND hWnd, SOCKET& s)
 
 	WSAAsyncSelect(s, hWnd, WM_ASYNC, FD_READ);
 
-	/*u_long mode = 1;
+	u_long mode = 1;
 	if (ioctlsocket(s, FIONBIO, &mode) == SOCKET_ERROR) {
 		std::cerr << "Failed to set non-blocking mode.\n";
 		closesocket(s);
 		WSACleanup();
 		return 1;
-	}*/
+	}
 
 	return 1;
 }
@@ -74,21 +74,18 @@ bool ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& pD)
 	TOTALDATA temp;
 	while (totalBytesReceived < sizeof(TOTALDATA))
 	{
-		// recv�� �����͸� ����
 		int bytesReceived = recv(s, ((char*)&temp) + totalBytesReceived, sizeof(TOTALDATA) - totalBytesReceived, 0);
 
-		// recv ���� ó��
 		if (bytesReceived == SOCKET_ERROR)
 		{
 			std::cerr << "Receive failed: " << WSAGetLastError() << "\n";
-			return false;  // ���� �߻� �� �Լ� ����
+			return false;
 		}
 
-		// ������ ���� ���
 		if (bytesReceived == 0)
 		{
 			std::cerr << "Connection closed.\n";
-			return false;  // ���� ���� �� �Լ� ����
+			return false;  
 		}
 
 		totalBytesReceived += bytesReceived;

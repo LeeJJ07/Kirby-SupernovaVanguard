@@ -660,12 +660,12 @@ void DrawEXP(HDC& hdc, int& cameraTop, int& cameraLeft)
 	MaxExpBar.bottom = cameraTop + CAMERA_HEIGHT - MAXEXP_OFFSET_BOTTOM;
 	Rectangle(hdc, MaxExpBar.left, MaxExpBar.top, MaxExpBar.right, MaxExpBar.bottom);
 
-	HBRUSH brush;
-	brush = CreateSolidBrush(RGB(255, 0, 0));
-	HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
 
-	if (uData.publicdata.exp < 0 || uData.publicdata.exp > uData.publicdata.maxExp)
+	if (uData.publicdata.exp < 0 || uData.publicdata.maxExp < 0 
+		|| uData.publicdata.exp > 5000||uData.publicdata.maxExp>5000 || uData.publicdata.exp > uData.publicdata.maxExp)
 		return;
+	HBRUSH brush = CreateSolidBrush(RGB(255, 0, 0));
+	HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
 
 	// 경험치 비율을 0에서 1 사이로 제한
 	double expPer = (double)uData.publicdata.exp / uData.publicdata.maxExp;
@@ -718,7 +718,8 @@ void DrawTime(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 }
 
 void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
-	if (uData.publicdata.isAllPlayerChoice)
+	
+	if (!isSetSkill && uData.publicdata.isAllPlayerChoice)
 		return;
 
 	BLENDFUNCTION blend = { AC_SRC_OVER, 0, 220, 0 };
@@ -795,7 +796,6 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 	// 폰트 삭제 및 정리
 	DeleteObject(hFontLarge);
 	DeleteObject(hFontSmall);
-
 }
 
 void DrawCollider(HDC& hdc)
