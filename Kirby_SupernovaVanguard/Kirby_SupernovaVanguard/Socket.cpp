@@ -27,8 +27,8 @@ int InitClient(HWND hWnd, SOCKET& s)
 	WSAStartup(MAKEWORD(2, 2), &wsadata);
 	s = socket(AF_INET, SOCK_STREAM, 0);
 
-	int sendBufSize = sizeof(TOTALDATA);
-	int recvBufSize = sizeof(TOTALDATA);
+	int sendBufSize = sizeof(TOTALDATA) + 1;
+	int recvBufSize = sizeof(TOTALDATA) + 1;
 
 	if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, (char*)&sendBufSize, sizeof(sendBufSize)) == SOCKET_ERROR)
 	{
@@ -111,7 +111,6 @@ bool ReadMessage(SOCKET& s, std::vector<Object*>& p)
 		{
 			if (i == 0)
 			{
-				//LeaveCriticalSection(&cs);
 				return false;
 			}
 			break;
