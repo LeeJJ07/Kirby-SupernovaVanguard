@@ -27,7 +27,7 @@ public:
 	SelectScene();
 	~SelectScene();
 
-	void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Object*>& clients, POINT curMousePos);
+	void DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Object*>& clients, POINT curMousePos, TOTALDATA& uData);
 	void DeleteBitmap();
 
 	int SelectCharacter(Player* client, RECT& rectView);

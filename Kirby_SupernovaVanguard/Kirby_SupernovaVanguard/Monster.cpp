@@ -181,7 +181,7 @@ void Monster::BossDraw(HDC& hdc)
     DeleteDC(hMemDC);
 }
 
-void Monster::ObjectUpdate(int i)
+void Monster::ObjectUpdate(int i, TOTALDATA& uData)
 {
 	SetPosition(uData.mdata[i].pos);
     SetLookingDir(uData.mdata[i].lookingDir);

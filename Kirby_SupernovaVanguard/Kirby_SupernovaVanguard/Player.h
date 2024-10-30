@@ -45,7 +45,7 @@ public:
 	void	SetcurHealth(int curHealth) { this->curHealth = curHealth; }
 	void	SetplayerSize(int playerSize) { this->playerSize = playerSize; }
 
-	void	ObjectUpdate(int i);
+	void	ObjectUpdate(int i, TOTALDATA& uData);
 	void	SetPlayerAni();
 	void	DrawPlayer(HDC&, ActionData&);
 };

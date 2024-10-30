@@ -1,7 +1,7 @@
 #include "Player.h"
 #include "Camera.h"
 
-void Player::ObjectUpdate(int i)
+void Player::ObjectUpdate(int i, TOTALDATA& uData)
 {
 	SetPosition(uData.udata[i].pos);
 	GetCollider()->SetOffset(uData.udata[i].offset);

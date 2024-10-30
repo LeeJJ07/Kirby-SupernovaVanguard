@@ -1,6 +1,6 @@
 #include "MonsterSkill.h"
 
-void MonsterSkill::ObjectUpdate(int i)
+void MonsterSkill::ObjectUpdate(int i, TOTALDATA& uData)
 {
 	switch (uData.msdata[i].colliderShape)
 	{

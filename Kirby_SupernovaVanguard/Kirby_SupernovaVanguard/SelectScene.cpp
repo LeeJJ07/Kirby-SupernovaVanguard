@@ -57,7 +57,7 @@ SelectScene::~SelectScene()
 	DeleteBitmap();
 }
 
-void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Object*>& clients, POINT curMousePos)
+void SelectScene::DrawBitmapDoubleBuffering(HWND hWnd, HDC hdc, RECT& rectView, vector<Object*>& clients, POINT curMousePos, TOTALDATA& uData)
 {
 	if (uData.publicdata.isOK != 0 && uData.publicdata.isOK != 1)
 		return;

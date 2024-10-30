@@ -97,5 +97,3 @@ struct TOTALDATA
 
 	bool send;
 };
-
-extern TOTALDATA uData;

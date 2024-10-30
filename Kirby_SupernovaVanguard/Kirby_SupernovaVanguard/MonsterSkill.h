@@ -76,5 +76,5 @@ public:
 
 	void	DrawMonsterSkill(HDC&);
 	void	SetMonsterSkillAni();
-	void	ObjectUpdate(int i);
+	void	ObjectUpdate(int i, TOTALDATA& uData);
 };

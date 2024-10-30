@@ -1,6 +1,6 @@
 #include "Skill.h"
 
-void Skill::ObjectUpdate(int i)
+void Skill::ObjectUpdate(int i, TOTALDATA& uData)
 {
 	switch (uData.sdata[i].colliderShape)
 	{

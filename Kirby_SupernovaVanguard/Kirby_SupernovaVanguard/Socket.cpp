@@ -48,7 +48,7 @@ int InitClient(HWND hWnd, SOCKET& s)
 
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	if (connect(s, (LPSOCKADDR)&addr, sizeof(addr)) == SOCKET_ERROR)
 	{
@@ -68,7 +68,7 @@ int InitClient(HWND hWnd, SOCKET& s)
 
 	return 1;
 }
-bool ReadMessage(SOCKET& s, std::vector<Object*>& p)
+bool ReadMessage(SOCKET& s, std::vector<Object*>& p, TOTALDATA& uData)
 {
 	int totalBytesReceived = 0;
 	TOTALDATA temp;
@@ -123,7 +123,7 @@ bool ReadMessage(SOCKET& s, std::vector<Object*>& p)
 			CreateObject(p[i], i + PLAYERINDEX);
 			p[i]->Setid(i + PLAYERINDEX);
 		}
-		p[i]->ObjectUpdate(i);
+		p[i]->ObjectUpdate(i, uData);
 		p[i]->GetCollider()->MovePosition(p[i]->GetPosition());
 
 		camera.PositionUpdate();
@@ -147,7 +147,7 @@ bool ReadMessage(SOCKET& s, std::vector<Object*>& p)
 			vMonster[i]->Setid(i);
 		}
 
-		vMonster[i]->ObjectUpdate(i);
+		vMonster[i]->ObjectUpdate(i, uData);
 		vMonster[i]->GetCollider()->MovePosition(vMonster[i]->GetPosition());
 	}
 	// <<
@@ -169,7 +169,7 @@ bool ReadMessage(SOCKET& s, std::vector<Object*>& p)
 			vSkill[i]->Setid(uData.sdata[i].targetNum);
 		}
 
-		vSkill[i]->ObjectUpdate(i);
+		vSkill[i]->ObjectUpdate(i, uData);
 		vSkill[i]->GetCollider()->MovePosition(vSkill[i]->GetPosition());
 	}
 	// <<
@@ -191,7 +191,7 @@ bool ReadMessage(SOCKET& s, std::vector<Object*>& p)
 			vMonsterSkill[i]->Setid(uData.msdata[i].targetNum);
 		}
 
-		vMonsterSkill[i]->ObjectUpdate(i);
+		vMonsterSkill[i]->ObjectUpdate(i, uData);
 		vMonsterSkill[i]->GetCollider()->MovePosition(vMonsterSkill[i]->GetPosition());
 	}
 	// <<
@@ -325,7 +325,7 @@ bool ReadMessage(SOCKET& s, std::vector<Object*>& p)
 //	}
 //}
 
-bool ReadInitMessage(SOCKET& s)
+bool ReadInitMessage(SOCKET& s, TOTALDATA& uData)
 {
 	int totalBytesReceived = 0;
 	int bytesToReceive = sizeof(TOTALDATA);

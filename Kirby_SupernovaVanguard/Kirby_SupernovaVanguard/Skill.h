@@ -112,5 +112,5 @@ public:
 
 	void	DrawSkill(HDC&);
 	void	SetSkillAni();
-	void	ObjectUpdate(int i);
+	void	ObjectUpdate(int i, TOTALDATA& uData);
 };
