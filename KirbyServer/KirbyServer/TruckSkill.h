@@ -37,28 +37,6 @@ public:
 
 TruckSkill* truckskill = nullptr;
 
-bool SetTruckSkillInDatasheet(Skill*& skill, int& ID)
-{
-	truckskill = dynamic_cast<TruckSkill*>(skill);
-	Rectangle2D* tornadocollider = dynamic_cast<Rectangle2D*>(truckskill->GetCollider());
-
-	totalData.sdata[ID].isActivate = truckskill->Getisactivate();
-	totalData.sdata[ID].id = truckskill->GetID();
-	totalData.sdata[ID].skillType = skill->Getskilltype();
-	totalData.sdata[ID].size = skill->Getsize();
-	totalData.sdata[ID].size2 = skill->Getsize2();
-	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderPosition = truckskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].colliderSize = tornadocollider->GetWidth();
-	totalData.sdata[ID].colliderSize2 = tornadocollider->GetHeight();
-	totalData.sdata[ID].colliderShape = skill->GetcolliderShape();
-	totalData.sdata[ID].targetnum = skill->Gettargetnum();
-	totalData.sdata[ID].angle = skill->Getangle();
-	totalData.sdata[ID].dataType = SKILLTYPE;
-
-	return true;
-}
-
 void UpdateTruckSkill(Skill*& skill)
 {
 	truckskill = dynamic_cast<TruckSkill*>(skill);

@@ -46,25 +46,6 @@ public:
 
 static DededeSkill* dededeskill = nullptr;
 
-bool SetDededeSkillInDatasheet(Skill*& skill, int& ID)
-{
-	dededeskill = dynamic_cast<DededeSkill*>(skill);
-	Circle2D* dededecollider = dynamic_cast<Circle2D*>(dededeskill->GetCollider());
-
-	totalData.sdata[ID].isActivate = dededeskill->Getisactivate();
-	totalData.sdata[ID].id = dededeskill->GetID();
-	totalData.sdata[ID].skillType = skill->Getskilltype();
-	totalData.sdata[ID].size = skill->Getsize();
-	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderPosition = dededeskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].colliderSize = dededecollider->GetRadius();
-	totalData.sdata[ID].colliderShape = skill->GetcolliderShape();
-	totalData.sdata[ID].targetnum = skill->Gettargetnum();
-	totalData.sdata[ID].dataType = SKILLTYPE;
-
-	return true;
-}
-
 
 void UpdateDededeSkill(Skill*& skill)
 {

@@ -14,6 +14,8 @@
 
 using namespace std;
 
+extern TOTALDATA totalData;
+
 enum State { RECEIVE, SEND };
 enum Direction { UP, RIGHT, DOWN, LEFT };
 
@@ -938,6 +940,53 @@ void GenerateSkill()
 				{
 					if (!OBJECTIDARR[s])
 					{
+						int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
+
+						Skill* skill = nullptr;
+
+						switch (tempSkill->Getskilltype())
+						{
+						case SKILLTYPE::KIRBYSKILL:
+							skill = new KirbySkill(i, monsterIndex, 15);
+							break;
+						case SKILLTYPE::DEDEDESKILL:
+
+							break;
+						case SKILLTYPE::METAKNIGHTSKILL:
+
+							break;
+						case SKILLTYPE::MABEROASKILL:
+							skill = new MaberoaSkill(i, monsterIndex, 8);
+							break;
+						case SKILLTYPE::ELECTRICFIELDSKILL:
+
+							break;
+						case SKILLTYPE::KUNAISKILL:
+
+							break;
+						case SKILLTYPE::MAGICARROWSKILL:
+
+							break;
+						case SKILLTYPE::TORNADOSKILL:
+
+							break;
+						case SKILLTYPE::TRUCKSKILL:
+
+							break;
+						default:
+							break;
+						}
+						skill->AssignSkill(monsterIndex, i, totalData.udata[i], totalData.mdata[monsterIndex]);
+						skill->SetID(s);
+						vSkill[s - SKILLINDEX] = skill;
+
+						SetSkillState(vSkill[s - SKILLINDEX], skill);
+
+						tempSkill->Sett1_coolTime();
+
+						OBJECTIDARR[s] = true;
+						isGenerateSkill = true;
+
 						switch (tempSkill->Getskilltype())
 						{
 						case SKILLTYPE::KIRBYSKILL:
@@ -955,8 +1004,6 @@ void GenerateSkill()
 
 								kirbySkill->Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
 							}
-							kirbySkill->Settime_1();
-							kirbySkill->Settime_2();
 							kirbySkill->Setisactivate(true);
 							kirbySkill->SetID(s);
 							kirbySkill->Setoffset({ (long)totalData.udata[i].lookingDir.first * (long)kirbySkill->Getsize() / OFFSETADJUST / 2, (long)totalData.udata[i].lookingDir.second * (long)kirbySkill->Getsize() / OFFSETADJUST / 2 });
@@ -1027,7 +1074,7 @@ void GenerateSkill()
 							vSkill[s - SKILLINDEX] = metaknightSkill;
 						}
 						break;
-						case SKILLTYPE::MABEROASKILL:
+						/*case SKILLTYPE::MABEROASKILL:
 						{
 							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 
@@ -1051,7 +1098,7 @@ void GenerateSkill()
 							maberoaSkill->Setmasternum(i);
 							vSkill[s - SKILLINDEX] = maberoaSkill;
 						}
-						break;
+						break;*/
 						case SKILLTYPE::ELECTRICFIELDSKILL:
 						{
 							if (electricCreate[i])
@@ -1176,12 +1223,12 @@ void GenerateSkill()
 						break;
 						}
 
-						SetSkillState(vSkill[s - SKILLINDEX], tempSkill);
+						/*SetSkillState(vSkill[s - SKILLINDEX], tempSkill);
 
 						tempSkill->Sett1_coolTime();
 
 						OBJECTIDARR[s] = true;
-						isGenerateSkill = true;
+						isGenerateSkill = true;*/
 
 						break;
 					}
@@ -1331,36 +1378,9 @@ void SetSkillToDatasheet()
 		}
 
 		int ID = skill->GetID() - SKILLINDEX;
-		switch (skill->Getskilltype())
-		{
-		case SKILLTYPE::KIRBYSKILL:
-			SetKirbySkillInDatasheet(skill, ID);
-			break;
-		case SKILLTYPE::DEDEDESKILL:
-			SetDededeSkillInDatasheet(skill, ID);
-			break;
-		case SKILLTYPE::METAKNIGHTSKILL:
-			SetMetaknightSkillInDatasheet(skill, ID);
-			break;
-		case SKILLTYPE::MABEROASKILL:
-			SetMaberoaSkillInDatasheet(skill, ID);
-			break;
-		case SKILLTYPE::ELECTRICFIELDSKILL:
-			SetElectricfieldSkillInDatasheet(skill, ID);
-			break;
-		case SKILLTYPE::KUNAISKILL:
-			SetKunaiSkillInDatasheet(skill, ID);
-			break;
-		case SKILLTYPE::MAGICARROWSKILL:
-			SetMagicArrowSkillInDatasheet(skill, ID);
-			break;
-		case SKILLTYPE::TORNADOSKILL:
-			SetTornadoSkillInDatasheet(skill, ID);
-			break;
-		case SKILLTYPE::TRUCKSKILL:
-			SetTruckSkillInDatasheet(skill, ID);
-			break;
-		}
+
+		skill->SetSkillInDataSheet(totalData.sdata[ID]);
+
 		i++;
 	}
 }

@@ -9,11 +9,6 @@ class KirbySkill : public Skill
 private:
 	float biggersize;
 	float decelerationrate;
-
-	Collider2D* collider;
-
-	std::chrono::high_resolution_clock::time_point t1_activate;
-	std::chrono::high_resolution_clock::time_point t2_activate;
 public:
 	KirbySkill(
 		int masternum,
@@ -39,41 +34,17 @@ public:
 	Collider2D* GetCollider()	{ return collider; }
 	float		Getbiggersize()	{ return biggersize; }
 	float		Getdecelerationrate()	{ return decelerationrate; }
-	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }
-	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_activate; }
 
 
 	void SetCollider(Collider2D* collider) override		{ this->collider = collider; }
 	void Setbiggersize(float biggersize)	{ this->biggersize = biggersize; }
 	void Setdecelerationrate(float decelerationrate)	{ this->decelerationrate = decelerationrate; }
-	void Settime_1() { t1_activate = std::chrono::high_resolution_clock::now(); }
-	void Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
 
 	void KirbySkillBigger();
 	void KirbySkillSlower();
 };
 
 static KirbySkill* kirbyskill = nullptr;
-
-bool SetKirbySkillInDatasheet(Skill*& skill, int& ID)
-{
-	kirbyskill = dynamic_cast<KirbySkill*>(skill);
-	Circle2D*	kirbycollider = dynamic_cast<Circle2D*>(kirbyskill->GetCollider());
-
-	totalData.sdata[ID].isActivate = kirbyskill->Getisactivate();
-	totalData.sdata[ID].id = kirbyskill->GetID();
-	totalData.sdata[ID].skillType = skill->Getskilltype();
-	totalData.sdata[ID].size = skill->Getsize();
-	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderPosition = kirbyskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].colliderSize = kirbycollider->GetRadius();
-	totalData.sdata[ID].colliderShape = skill->GetcolliderShape();
-	totalData.sdata[ID].targetnum = skill->Gettargetnum();
-	totalData.sdata[ID].dataType = SKILLTYPE;
-
-	return true;
-}
-
 
 void UpdateKirbySkill(Skill* &skill)
 {
@@ -95,8 +66,8 @@ void UpdateKirbySkill(Skill* &skill)
 	
 	kirbyskill->SetCollider(circle);
 
-	kirbyskill->Settime_2();
-	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(kirbyskill->Gettime_2() - kirbyskill->Gettime_1()).count();
+	kirbyskill->Sett2_destroy();
+	double destroyTime = std::chrono::duration_cast<std::chrono::duration<double>>(kirbyskill->Gett2_destroy() - kirbyskill->Gett1_destroy()).count();
 
 	kirbyskill->Sett2_attacktick();
 	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(kirbyskill->Gett2_attacktick() - kirbyskill->Gett1_attacktick()).count();
@@ -112,12 +83,12 @@ void UpdateKirbySkill(Skill* &skill)
 	}
 
 	if (totalData.udata[kirbyskill->Getmasternum()].curState == (ECharacterState)PATTACK
-		&& skilldestroytime > KIRBY_SKILL_END_TIME)
+		&& destroyTime > KIRBY_SKILL_END_TIME)
 	{
 		totalData.udata[kirbyskill->Getmasternum()].curState = (ECharacterState)PIDLE;
 	}
 
-	if (skilldestroytime > TKIRBYSKILLDESTROY)
+	if (destroyTime > TKIRBYSKILLDESTROY)
 	{
 		OBJECTIDARR[kirbyskill->GetID()] = false;
 		delete skill;

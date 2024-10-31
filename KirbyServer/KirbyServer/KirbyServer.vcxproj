@@ -182,6 +182,7 @@
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Rectangle2D.cpp" />
     <ClCompile Include="RunnerMonster.cpp" />
+    <ClCompile Include="Skill.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="PlayerData.cpp" />
     <ClCompile Include="SpearMonster.cpp" />

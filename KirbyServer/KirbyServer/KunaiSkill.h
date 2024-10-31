@@ -23,11 +23,8 @@ public:
 	{
 		delete collider;
 	}
-
-	Collider2D* GetCollider() { return collider; }
 	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }
 	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_activate; }
-
 
 	void SetCollider(Collider2D* collider) override { this->collider = collider; }
 	void Settime_1() { t1_activate = std::chrono::high_resolution_clock::now(); }
@@ -35,28 +32,6 @@ public:
 };
 
 KunaiSkill* kunaiskill = nullptr;
-
-bool SetKunaiSkillInDatasheet(Skill*& skill, int& ID)
-{
-	kunaiskill = dynamic_cast<KunaiSkill*>(skill);
-	Rectangle2D* kunaicollider = dynamic_cast<Rectangle2D*>(kunaiskill->GetCollider());
-
-	totalData.sdata[ID].isActivate = kunaiskill->Getisactivate();
-	totalData.sdata[ID].id = kunaiskill->GetID();
-	totalData.sdata[ID].skillType = skill->Getskilltype();
-	totalData.sdata[ID].size = skill->Getsize();
-	totalData.sdata[ID].size2 = skill->Getsize2();
-	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderPosition = kunaiskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].colliderSize = kunaicollider->GetWidth();
-	totalData.sdata[ID].colliderSize2 = kunaicollider->GetHeight();
-	totalData.sdata[ID].colliderShape = skill->GetcolliderShape();
-	totalData.sdata[ID].targetnum = skill->Gettargetnum();
-	totalData.sdata[ID].angle = skill->Getangle();
-	totalData.sdata[ID].dataType = SKILLTYPE;
-
-	return true;
-}
 
 void UpdateKunaiSkill(Skill*& skill)
 {

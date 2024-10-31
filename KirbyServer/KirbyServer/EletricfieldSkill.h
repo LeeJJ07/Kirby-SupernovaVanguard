@@ -38,25 +38,6 @@ public:
 
 ElectricfieldSkill* electricfieldskill = nullptr;
 
-bool SetElectricfieldSkillInDatasheet(Skill*& skill, int& ID)
-{
-	electricfieldskill = dynamic_cast<ElectricfieldSkill*>(skill);
-	Circle2D* electriccollider = dynamic_cast<Circle2D*>(electricfieldskill->GetCollider());
-
-	totalData.sdata[ID].isActivate = electricfieldskill->Getisactivate();
-	totalData.sdata[ID].id = electricfieldskill->GetID();
-	totalData.sdata[ID].skillType = skill->Getskilltype();
-	totalData.sdata[ID].size = skill->Getsize();
-	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderPosition = electricfieldskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].colliderSize = electriccollider->GetRadius();
-	totalData.sdata[ID].colliderShape = skill->GetcolliderShape();
-	totalData.sdata[ID].targetnum = skill->Gettargetnum();
-	totalData.sdata[ID].dataType = SKILLTYPE;
-
-	return true;
-}
-
 void UpdateElectricfieldSkill(Skill*& skill)
 {
 	electricfieldskill = dynamic_cast<ElectricfieldSkill*>(skill);

@@ -8,11 +8,6 @@ class MaberoaSkill : public Skill
 {
 private:
 	float biggersize;
-
-	Collider2D* collider;
-
-	std::chrono::high_resolution_clock::time_point t1_activate;
-	std::chrono::high_resolution_clock::time_point t2_activate;
 public:
 	MaberoaSkill(
 		int masternum,
@@ -24,6 +19,7 @@ public:
 		Circle2D* circle2D = new Circle2D(true, PMISSILE, radius);
 		circle2D->SetPosition(this->Getposition());
 		SetCollider(circle2D);
+		Sett1_destroy();
 
 	}
 	~MaberoaSkill()
@@ -33,38 +29,14 @@ public:
 
 	Collider2D* GetCollider() { return collider; }
 	float		Getbiggersize() { return biggersize; }
-	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }
-	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_activate; }
 
 	void SetCollider(Collider2D* collider) override { this->collider = collider; }
 	void Setbiggersize(float biggersize) { this->biggersize = biggersize; }
-
-	void Settime_1() { t1_activate = std::chrono::high_resolution_clock::now(); }
-	void Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
 
 	void MaberoaSkillBigger();
 };
 
 static MaberoaSkill* maberoaskill = nullptr;
-
-bool SetMaberoaSkillInDatasheet(Skill*& skill, int& ID)
-{
-	maberoaskill = dynamic_cast<MaberoaSkill*>(skill);
-	Circle2D* maberoacollider = dynamic_cast<Circle2D*>(maberoaskill->GetCollider());
-
-	totalData.sdata[ID].isActivate = maberoaskill->Getisactivate();
-	totalData.sdata[ID].id = maberoaskill->GetID();
-	totalData.sdata[ID].skillType = skill->Getskilltype();
-	totalData.sdata[ID].size = skill->Getsize();
-	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderPosition = maberoaskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].colliderSize = maberoacollider->GetRadius();
-	totalData.sdata[ID].colliderShape = skill->GetcolliderShape();
-	totalData.sdata[ID].targetnum = skill->Gettargetnum();
-	totalData.sdata[ID].dataType = SKILLTYPE;
-
-	return true;
-}
 
 void UpdateMaberoaSkill(Skill*& skill)
 {
@@ -85,31 +57,31 @@ void UpdateMaberoaSkill(Skill*& skill)
 		maberoaskill->Setposition(newpos);
 	}
 
-	maberoaskill->GetCollider()->SetPosition(maberoaskill->Getposition());
-	Circle2D* circle = dynamic_cast<Circle2D*>(maberoaskill->GetCollider());
-	circle->SetRadius(maberoaskill->Getsize());
+	skill->GetCollider()->SetPosition(maberoaskill->Getposition());
+	Circle2D* circle = dynamic_cast<Circle2D*>(skill->GetCollider());
+	circle->SetRadius(skill->Getsize());
 
-	maberoaskill->SetCollider(circle);
+	skill->SetCollider(circle);
 
-	maberoaskill->Settime_2();
-	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(maberoaskill->Gettime_2() - maberoaskill->Gettime_1()).count();
+	skill->Sett2_destroy();
+	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(skill->Gett2_destroy() - skill->Gett1_destroy()).count();
 
-	maberoaskill->Sett2_attacktick();
-	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(maberoaskill->Gett2_attacktick() - maberoaskill->Gett1_attacktick()).count();
+	skill->Sett2_attacktick();
+	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(skill->Gett2_attacktick() - skill->Gett1_attacktick()).count();
 
 	if (hittime > MABEROATICK)
 	{
-		maberoaskill->Setcanhit(true);
-		maberoaskill->Sett1_attacktick();
+		skill->Setcanhit(true);
+		skill->Sett1_attacktick();
 	}
 	else
 	{
-		maberoaskill->Setcanhit(false);
+		skill->Setcanhit(false);
 	}
 
 	if (skilldestroytime > TKIRBYSKILLDESTROY)
 	{
-		OBJECTIDARR[maberoaskill->GetID()] = false;
+		OBJECTIDARR[skill->GetID()] = false;
 		delete skill;
 		skill = nullptr;
 	}

@@ -2,6 +2,8 @@
 
 #include "framework.h"
 
+class Skill;
+
 class SkillManager
 {
 private:

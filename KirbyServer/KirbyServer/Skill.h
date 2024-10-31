@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Player.h"
+#include "TotalData.h"
+
+extern struct SKILLDATA;
+extern struct MONSTERDATA;
 
 #define KIRBYTICK	0.1f
 #define DEDEDETICK	0.5f
@@ -51,6 +55,11 @@ private:
 
 	std::chrono::high_resolution_clock::time_point t1_coolTime;
 	std::chrono::high_resolution_clock::time_point t2_coolTime;
+
+	std::chrono::high_resolution_clock::time_point t1_destroy;
+	std::chrono::high_resolution_clock::time_point t2_destroy;
+protected:
+	Collider2D* collider;
 public:
 	Skill() :masternum(0), targetnum(0), skilltype(KIRBYSKILL), collidershape(ECOLLIDERSHAPE::CIRCLE),
 		speed(1), damage(1), size(0), size2(0), amount(1), curLevel(1), coolTime(5.0), offset({0,0}), position({0,0}), direction({1,0}), pierceCount(1) {}
@@ -84,6 +93,10 @@ public:
 	std::chrono::high_resolution_clock::time_point Gett2_attacktick() { return t2_attacktick; }
 	std::chrono::high_resolution_clock::time_point Gett1_coolTime() { return t1_coolTime; }
 	std::chrono::high_resolution_clock::time_point Gett2_coolTime() { return t2_coolTime; }
+	std::chrono::high_resolution_clock::time_point Gett1_destroy() { return t1_destroy; }
+	std::chrono::high_resolution_clock::time_point Gett2_destroy() { return t2_destroy; }
+
+	Collider2D* GetCollider() { return collider; }
 
 	void	Setisactivate(bool isactivate)	{ this->isactivate = isactivate; }
 	void	Setmasternum(int masternum) { this->masternum = masternum; }
@@ -109,8 +122,12 @@ public:
 	void	Sett2_attacktick() { t2_attacktick = std::chrono::high_resolution_clock::now(); }
 	void	Sett1_coolTime() { t1_coolTime = std::chrono::high_resolution_clock::now(); }
 	void	Sett2_coolTime() { t2_coolTime = std::chrono::high_resolution_clock::now(); }
+	void	Sett1_destroy() { t1_destroy = std::chrono::high_resolution_clock::now(); }
+	void	Sett2_destroy() { t2_destroy = std::chrono::high_resolution_clock::now(); }
 
-	virtual	void SetCollider(Collider2D* collider) = 0;
+	void	SetSkillInDataSheet(SKILLDATA&);
+	void	AssignSkill(int&, int&, PLAYERDATA&, MONSTERDATA&);
+	virtual	void	SetCollider(Collider2D* collider) =	0;
 };
 
 static int FindCloseMonster(POINT&);

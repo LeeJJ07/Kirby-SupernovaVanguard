@@ -52,6 +52,9 @@
     <ClCompile Include="MonsterSkillManager.h">
       <Filter>클래스\Object\Monster</Filter>
     </ClCompile>
+    <ClCompile Include="Skill.cpp">
+      <Filter>클래스\Object\Skill</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Boss.h">

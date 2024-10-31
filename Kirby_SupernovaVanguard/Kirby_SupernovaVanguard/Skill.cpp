@@ -162,6 +162,7 @@ void Skill::DrawSkill(HDC& hdc)
 	}
 
 	// 투명 블릿을 사용하여 이미지 그리기
+
 	TransparentBlt(
 		hdc, newLeft, newTop, WchangeValue, HchangeValue, // 수정된 좌표
 		hTempDC, 0, 0, WchangeValue, HchangeValue,

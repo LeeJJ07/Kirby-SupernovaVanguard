@@ -6,7 +6,6 @@ class MagicArrowSkill : public Skill
 {
 private:
 	int pass;
-	Collider2D* collider;
 
 	std::chrono::high_resolution_clock::time_point t1_activate;
 	std::chrono::high_resolution_clock::time_point t2_activate;
@@ -36,28 +35,6 @@ public:
 };
 
 MagicArrowSkill* magicarrowskill = nullptr;
-
-bool SetMagicArrowSkillInDatasheet(Skill*& skill, int& ID)
-{
-	magicarrowskill = dynamic_cast<MagicArrowSkill*>(skill);
-	Rectangle2D* magicArrowCollider = dynamic_cast<Rectangle2D*>(magicarrowskill->GetCollider());
-
-	totalData.sdata[ID].isActivate = magicarrowskill->Getisactivate();
-	totalData.sdata[ID].id = magicarrowskill->GetID();
-	totalData.sdata[ID].skillType = skill->Getskilltype();
-	totalData.sdata[ID].size = skill->Getsize();
-	totalData.sdata[ID].size2 = skill->Getsize2();
-	totalData.sdata[ID].position = skill->Getposition();
-	totalData.sdata[ID].colliderPosition = magicarrowskill->GetCollider()->GetPosition();
-	totalData.sdata[ID].colliderSize = magicArrowCollider->GetWidth();
-	totalData.sdata[ID].colliderSize2 = magicArrowCollider->GetHeight();
-	totalData.sdata[ID].colliderShape = skill->GetcolliderShape();
-	totalData.sdata[ID].targetnum = skill->Gettargetnum();
-	totalData.sdata[ID].angle = skill->Getangle();
-	totalData.sdata[ID].dataType = SKILLTYPE;
-
-	return true;
-}
 
 void UpdateMagicArrowSkill(Skill*& skill)
 {
