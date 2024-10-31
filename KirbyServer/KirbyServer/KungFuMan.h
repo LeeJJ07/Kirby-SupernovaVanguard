@@ -16,8 +16,8 @@ public:
 		:Monster(), attackSpeed(0.0f)
 	{}
 
-	KungFuMan(POINT p, EMonsterType mType, EMonsterState cs, POINT targetPos, int damage, int maxHealth, float speed, float attackSpeed, bool isEnabled)
-		:Monster(p, mType, cs, targetPos, damage, maxHealth, speed, isEnabled), attackSpeed(attackSpeed)
+	KungFuMan(POINT p, int radius, EMonsterType mType, EMonsterState cs, POINT targetPos, int damage, int maxHealth, float speed, float attackSpeed, bool isEnabled)
+		:Monster(p, radius, mType, cs, targetPos, damage, maxHealth, speed, isEnabled), attackSpeed(attackSpeed)
 	{}
 
 	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }

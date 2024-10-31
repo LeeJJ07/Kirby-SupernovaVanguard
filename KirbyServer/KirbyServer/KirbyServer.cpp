@@ -482,7 +482,7 @@ SOCKET AcceptSocket(HWND hWnd, SOCKET s, SOCKADDR_IN& c_addr, short userID)
 	socketList.push_back(cs);
 	totalData.udata[userID] = userData;
 
-	Player* player = new Player(userID, BASESIZE);
+	Player* player = new Player(userID, BASESIZE, 10);
 	vClient.push_back(player);
 
 	SetUserToData(player, userID);
@@ -606,7 +606,7 @@ unsigned __stdcall Update()
 {
 	while (TRUE)
 	{
-		if (timeSpan_update.count() >= 0.001)
+		if (timeSpan_update.count() >= 0.01 && totalData.publicdata.isAllPlayerChoice)
 		{
 			if (threadEnd_Update)
 				return 0;
@@ -645,7 +645,7 @@ unsigned __stdcall Send()
 			return 0;
 
 		// 시간 간격 체크
-		if (timeSpan_send.count() >= 0.0005)
+		if (timeSpan_send.count() >= 0.015)
 		{
 			//EnterCriticalSection(&criticalsection);
 
@@ -709,7 +709,7 @@ unsigned __stdcall Read()
 		t2_read = std::chrono::high_resolution_clock::now();  // t2_read 초기화
 		timeSpan_read = std::chrono::duration_cast<std::chrono::duration<double>>(t2_read - t1_read);
 
-		if (timeSpan_read.count() >= 0.0005)  // 시간을 10ms로 늘림
+		if (timeSpan_read.count() >= 0.01)  // 시간을 10ms로 늘림
 		{
 			//EnterCriticalSection(&criticalsection);
 
@@ -720,7 +720,7 @@ unsigned __stdcall Read()
 			// 타이머 초기화
 			t1_read = std::chrono::high_resolution_clock::now();
 		}
-		//Sleep(0);  // 짧은 대기 시간을 추가해 CPU 부하를 줄임
+		Sleep(0);  // 짧은 대기 시간을 추가해 CPU 부하를 줄임
 
 	}
 }
@@ -839,16 +839,16 @@ void SetBasisSkillData(int& playerIndex)
 	switch (vClient[playerIndex]->GetCharacterType())
 	{
 	case ECharacterType::KIRBY:
-		basisSkill = new KirbySkill(playerIndex, 0);
+		basisSkill = new KirbySkill(playerIndex, 0, 10);
 		break;
 	case ECharacterType::DEDEDE:
-		basisSkill = new DededeSkill(playerIndex, 0);
+		basisSkill = new DededeSkill(playerIndex, 0, 30);
 		break;
 	case ECharacterType::METAKNIGHT:
 		basisSkill = new MetaknightSkill(playerIndex, 0);
 		break;
 	case ECharacterType::MABOROA:
-		basisSkill = new MaberoaSkill(playerIndex, 0);
+		basisSkill = new MaberoaSkill(playerIndex, 0, 8);
 		break;
 	}
 
@@ -866,7 +866,7 @@ void SetSkillData(int& playerIndex, int skillnum)
 	switch (skillnum)
 	{
 	case SKILLTYPE::ELECTRICFIELDSKILL:
-		basisSkill = new ElectricfieldSkill(playerIndex, 0);
+		basisSkill = new ElectricfieldSkill(playerIndex, 0, 30);
 		break;
 	case SKILLTYPE::KUNAISKILL:
 		basisSkill = new KunaiSkill(playerIndex, 0);
@@ -938,7 +938,7 @@ void GenerateSkill()
 						{
 							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 
-							KirbySkill* kirbySkill = new KirbySkill(i, monsterIndex);
+							KirbySkill* kirbySkill = new KirbySkill(i, monsterIndex, 15);
 							if (!(vClient[i]->GetisLockOn()))
 								kirbySkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
 							else
@@ -963,7 +963,7 @@ void GenerateSkill()
 						{
 							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 
-							DededeSkill* dededeSkill = new DededeSkill(i, monsterIndex);
+							DededeSkill* dededeSkill = new DededeSkill(i, monsterIndex, 30);
 							if (!(vClient[i]->GetisLockOn()))
 								dededeSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
 							else
@@ -1025,7 +1025,7 @@ void GenerateSkill()
 						{
 							int monsterIndex = FindCloseMonster(totalData.udata[i].pos);
 
-							MaberoaSkill* maberoaSkill = new MaberoaSkill(i, monsterIndex);
+							MaberoaSkill* maberoaSkill = new MaberoaSkill(i, monsterIndex, 8);
 							if (!(vClient[i]->GetisLockOn()))
 								maberoaSkill->Setdirection({ (long)totalData.udata[i].lookingDir.first, (long)totalData.udata[i].lookingDir.second });
 							else
@@ -1050,7 +1050,7 @@ void GenerateSkill()
 						{
 							if (electricCreate[i])
 								continue;
-							ElectricfieldSkill* electricfieldskill = new ElectricfieldSkill(i, 0);
+							ElectricfieldSkill* electricfieldskill = new ElectricfieldSkill(i, 0, 30);
 							electricfieldskill->Setdirection({ 0,0 });
 							electricfieldskill->Settime_1();
 							electricfieldskill->Settime_2();
@@ -1256,7 +1256,7 @@ void GenerateMonsterSkill()
 							{
 								int playerIndex = FindClosePlayer(totalData.mdata[i].pos);
 
-								FiremanSkill* firemanSkill = new FiremanSkill(i, playerIndex);
+								FiremanSkill* firemanSkill = new FiremanSkill(i, playerIndex, 8);
 
 								PAIR lookingdir = { (firemanSkill->Getposition().x - totalData.udata[playerIndex].pos.x), (firemanSkill->Getposition().y - totalData.udata[playerIndex].pos.y) };
 								double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
@@ -1508,26 +1508,26 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 	switch (mType)
 	{
 	case RUNNER:
-		m = new RunnerMonster(generatePos, mType, CHASE, { 0, 0 },
+		m = new RunnerMonster(generatePos, 5, mType, CHASE, { 0, 0 },
 			RUNNER_BASE_DAMAGE, RUNNER_BASE_HEALTH, RUNNER_BASE_SPEED, TRUE);
 		break;
 	case SPEAR:
-		m = new SpearMonster(generatePos, mType, CHASE, { 0, 0 },
+		m = new SpearMonster(generatePos, 5, mType, CHASE, { 0, 0 },
 			SPEAR_BASE_DAMAGE, SPEAR_BASE_HEALTH, SPEAR_BASE_SPEED, SPEAR_BASE_RANGE, TRUE);
 
 		monsterSkill = new SpearSkill(ID, playerIdx);
 		break;
 	case WINGBUG:
-		m = new WingBugMonster(generatePos, mType, CHASE, { 0, 0 },
+		m = new WingBugMonster(generatePos, 5, mType, CHASE, { 0, 0 },
 			WINGBUG_BASE_DAMAGE, WINGBUG_BASE_HEALTH, WINGBUG_BASE_SPEED, TRUE);
 		if (generatePos.x < totalData.udata[playerIdx].pos.x) m->SetLookingDir({ -1, 0 });
 		else m->SetLookingDir({ 1, 0 });
 		break;
 	case FIREMAN:
-		m = new FireManMonster(generatePos, mType, CHASE, { 0, 0 },
+		m = new FireManMonster(generatePos, 5, mType, CHASE, { 0, 0 },
 			FIREMAN_BASE_DAMAGE, FIREMAN_BASE_HEALTH, FIREMAN_BASE_SPEED, TRUE);
 
-		monsterSkill = new FiremanSkill(ID, playerIdx);
+		monsterSkill = new FiremanSkill(ID, playerIdx, 8);
 		break;
 	}
 
@@ -1545,7 +1545,7 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 }
 void InitKFM(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
-	m = new KungFuMan(generatePos, KUNGFUMAN, CHASE, { 0, 0 },
+	m = new KungFuMan(generatePos, 20, KUNGFUMAN, CHASE, { 0, 0 },
 		KUNGFUMAN_BASE_DAMAGE, KUNGFUMAN_BASE_HEALTH, KUNGFUMAN_BASE_SPEED, KUNGFUMAN_BASE_ATTACK_SPEED, TRUE);
 
 	monsterCount++;
@@ -1557,7 +1557,7 @@ void InitKFM(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 }
 void InitGaoGao(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
-	m = new GaoGao(generatePos, GAOGAO, ATTACK, { generatePos.x +100, generatePos.y + 100 },
+	m = new GaoGao(generatePos, 15, GAOGAO, ATTACK, { generatePos.x +100, generatePos.y + 100 },
 		GAOGAO_BASE_DAMAGE, GAOGAO_BASE_HEALTH, GAOGAO_BASE_ATTACK_SPEED, TRUE);
 
 	monsterCount++;
@@ -1569,11 +1569,11 @@ void InitGaoGao(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 }
 void InitBoss(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
-	m = new Boss(generatePos, BOSS, CHASE, {totalData.udata[0].pos}, BOSS_BASE_DAMAGE, BOSS_BASE_HEALTH, BOSS_BASE_SPEED, TRUE);
+	m = new Boss(generatePos,15, BOSS, CHASE, {totalData.udata[0].pos}, BOSS_BASE_DAMAGE, BOSS_BASE_HEALTH, BOSS_BASE_SPEED, TRUE);
 
 	BossID = ID;
 
-	MonsterSkill* monsterSkill = new FireballSkill(ID, 0);
+	MonsterSkill* monsterSkill = new FireballSkill(ID, 0, 5);
 
 	monsterArr[ID - MONSTERINDEX]->GetMonsterSkillManager()->GetskillVector().push_back(monsterSkill);
 	monsterArr[ID - MONSTERINDEX]->SetMonsterState(ATTACK);
@@ -1587,7 +1587,7 @@ void InitBoss(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 }
 void InitLandMine(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
-	m = new LandMineMonster(generatePos, LANDMINE, CHASE, { 0, 0 },
+	m = new LandMineMonster(generatePos, 5, LANDMINE, CHASE, { 0, 0 },
 		LANDMINE_BASE_DAMAGE, LANDMINE_BASE_HEALTH, LANDMINE_BASE_SPEED, TRUE);
 
 	monsterCount++;
@@ -2304,7 +2304,7 @@ void GenerateFireballSkill(int& monsterID)
 			break;
 		if (!OBJECTIDARR[ns])
 		{
-			FireballSkill* fireballSkill = new FireballSkill(monsterID, 0);
+			FireballSkill* fireballSkill = new FireballSkill(monsterID, 0, 8);
 
 			int angle = count * offsetangle;
 			// laser 방향 설정 해주기
@@ -2340,7 +2340,7 @@ void InitLasorSkill(Monster*& monster)
 
 void InitFireballSkill(Monster*& monster)
 {
-	MonsterSkill* monsterSkill = new FireballSkill(BossID, 0);
+	MonsterSkill* monsterSkill = new FireballSkill(BossID, 0, 8);
 
 	monster->GetMonsterSkillManager()->GetskillVector().push_back(monsterSkill);
 }

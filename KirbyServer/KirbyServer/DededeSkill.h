@@ -14,11 +14,12 @@ private:
 public:
 	DededeSkill(
 		int masternum,
-		int targetnum)
+		int targetnum,
+		int radius)
 		: Skill(masternum, targetnum, SKILLTYPE::DEDEDESKILL, ECOLLIDERSHAPE::CIRCLE, 0, 20, 1000, 40, 0, 5., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		biggersize(2)
 	{
-		Circle2D* circle2D = new Circle2D(true, PMISSILE);
+		Circle2D* circle2D = new Circle2D(true, PMISSILE, radius);
 		circle2D->SetPosition(this->Getposition());
 		SetCollider(circle2D);
 

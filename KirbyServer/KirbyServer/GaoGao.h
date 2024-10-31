@@ -17,8 +17,8 @@ public:
 		:Monster(), curTargetPos({ 0, 0 })
 	{}
 
-	GaoGao(POINT p, EMonsterType mType, EMonsterState cs, POINT targetPos, int damage, int maxHealth, float speed, bool isEnabled)
-		:Monster(p, mType, cs, targetPos, damage, maxHealth, speed, isEnabled), curTargetPos({ 0, 0 })
+	GaoGao(POINT p, int radius, EMonsterType mType, EMonsterState cs, POINT targetPos, int damage, int maxHealth, float speed, bool isEnabled)
+		:Monster(p, radius, mType, cs, targetPos, damage, maxHealth, speed, isEnabled), curTargetPos({ 0, 0 })
 	{}
 
 	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }

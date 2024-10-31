@@ -15,10 +15,11 @@ private:
 public:
 	FireballSkill(
 		int masternum,
-		int targetnum)
+		int targetnum,
+		int radius)
 		: MonsterSkill(masternum, targetnum, MONSTERSKILLTYPE::FIREBALLSKILL, ECOLLIDERSHAPE::CIRCLE, 1, 5, 20, 20, 4., { 0,0 }, { totalData.mdata[masternum].pos.x, totalData.mdata[masternum].pos.y }, { 5,0 })
 	{
-		Circle2D* circle2D = new Circle2D(true, EMISSILE);
+		Circle2D* circle2D = new Circle2D(true, EMISSILE, radius);
 		circle2D->SetPosition(this->Getposition());
 		SetCollider(circle2D);
 	}

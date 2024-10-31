@@ -36,7 +36,7 @@ protected:
 public:
 	Monster() : monsterType(RUNNER), curState(CHASE), Object()
 	{
-		Circle2D* c = new Circle2D(true, MONSTER);
+		Circle2D* c = new Circle2D(true, MONSTER, 10);
 		SetObject(c);
 
 		this->targetPos = { 0, 0 };
@@ -49,9 +49,9 @@ public:
 
 		vMonsterSkillManager = new MonsterSkillManager;
 	}
-	Monster(POINT p) : monsterType(RUNNER), curState(CHASE), Object(p)
+	Monster(POINT p, int radius) : monsterType(RUNNER), curState(CHASE), Object(p)
 	{
-		Circle2D* c = new Circle2D(true, MONSTER);
+		Circle2D* c = new Circle2D(true, MONSTER, radius);
 		SetObject(c);
 
 		this->targetPos = { 0, 0 };
@@ -64,10 +64,10 @@ public:
 
 		vMonsterSkillManager = new MonsterSkillManager;
 	}
-	Monster(POINT p, EMonsterType mType, EMonsterState cs, POINT targetPos, int damage, int maxHealth, float speed, bool isEnabled)
+	Monster(POINT p, int radius, EMonsterType mType, EMonsterState cs, POINT targetPos, int damage, int maxHealth, float speed, bool isEnabled)
 		: monsterType(mType), curState(cs), Object(p)
 	{
-		Circle2D* c = new Circle2D(true, MONSTER);
+		Circle2D* c = new Circle2D(true, MONSTER, radius);
 		SetObject(c);
 
 		this->targetPos = targetPos;

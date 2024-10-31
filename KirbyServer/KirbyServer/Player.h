@@ -37,11 +37,11 @@ private:
 	SkillManager* vSkillManager;
 	int allSkillLevel[10];
 public:
-	Player(int ID, int playerSize)
+	Player(int ID, int playerSize, int radius)
 		: characterType(KIRBY), Object(), ID(ID), playerSize(playerSize),isLockOn(true),
 		damage()
 	{
-		Circle2D* c = new Circle2D(true, PLAYER);
+		Circle2D* c = new Circle2D(true, PLAYER, radius);
 		SetObject(c);
 		for (int i = 0; i < 10; i++)
 			allSkillLevel[i] = 0;

@@ -17,13 +17,14 @@ private:
 public:
 	KirbySkill(
 		int masternum,
-		int targetnum)
+		int targetnum,
+		int radius )
 		: Skill(masternum, targetnum, SKILLTYPE::KIRBYSKILL, ECOLLIDERSHAPE::CIRCLE,
 			0.1, 10, 10, 5, 5, 3., { 0,0 }, { totalData.udata[masternum].pos.x, totalData.udata[masternum].pos.y }, { 5,0 }),
 		biggersize(1),
 		decelerationrate(0.01)
 	{
-		Circle2D* circle2D = new Circle2D(true, PMISSILE);
+		Circle2D* circle2D = new Circle2D(true, PMISSILE, radius);
 		circle2D->SetPosition(this->Getposition());
 		SetCollider(circle2D);
 
