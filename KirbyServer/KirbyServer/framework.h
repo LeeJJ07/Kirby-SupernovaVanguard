@@ -69,7 +69,7 @@ enum OBJECTINDEX
 // >> : Monster
 #define NORMAL_MONSTER_TYPE_COUNT		4
 
-#define BASE_DAMAGE						10
+#define BASE_DAMAGE						1
 #define BASE_HEALTH						100
 #define BASE_SPEED						1.5	
 
@@ -77,7 +77,7 @@ enum OBJECTINDEX
 #define RUNNER_BASE_HEALTH				160
 #define RUNNER_BASE_SPEED				1.5
 
-#define SPEAR_BASE_DAMAGE				5
+#define SPEAR_BASE_DAMAGE				1
 #define SPEAR_BASE_HEALTH				120
 #define SPEAR_BASE_SPEED				1.5
 #define SPEAR_BASE_RANGE				350

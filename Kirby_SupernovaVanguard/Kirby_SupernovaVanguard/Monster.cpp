@@ -186,8 +186,10 @@ void Monster::ObjectUpdate(int i, TOTALDATA& uData)
 	SetPosition(uData.mdata[i].pos);
     SetLookingDir(uData.mdata[i].lookingDir);
 	GetCollider()->SetOffset(uData.mdata[i].offset);
+    ((Circle2D*)GetCollider())->SetRadius(uData.mdata[i].radius);
     SetmaxHealth(uData.mdata[i].maxHealth);
     SetcurHealth(uData.mdata[i].curHealth);
+   
     
     SetMonsterType(uData.mdata[i].monsterType);
     

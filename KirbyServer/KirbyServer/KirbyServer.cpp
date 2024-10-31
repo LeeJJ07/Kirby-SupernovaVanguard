@@ -92,6 +92,7 @@ void InitUserData(PLAYERDATA& userData, int id);
 void SetUserToData(Player*&, short&);
 void SetUserData(PLAYERDATA& uData, ReceiveData rData);
 void PlayerHit(Player*& , MonsterSkill*&, int&);
+void PlayerHit(Player*& , Monster*&, int&);
 void PlayerDie(Player*&);
 void GameOver();
 // <<
@@ -314,7 +315,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					if (totalData.udata[pIdx].dataType == 0)
 						break;
 
-					GenerateMonster(pIdx);
+					static bool isGenerate = false;
+					if(!isGenerate)
+					{
+						GenerateMonster(pIdx);
+						isGenerate = true;
+					}
 				}
 				if (!isGameStart)
 				{
@@ -451,7 +457,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -1496,7 +1502,8 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 {
-	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+	//EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+	EMonsterType mType = (EMonsterType::SPEAR);
 
 	POINT generatePos = SetRandomSpawnPos(playerIdx, mType);
 
@@ -1541,7 +1548,8 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 	mData.dataType = MONSTERTYPE;
 	mData.pos = m->GetPosition();
 	mData.monsterType = mType;
-	mData.id = ID;                                                                                                                   
+	mData.id = ID;                     
+	mData.radius = ((Circle2D*)m->GetCollider())->GetRadius();
 }
 void InitKFM(MONSTERDATA& mData, Monster*& m, int ID, POINT generatePos)
 {
@@ -1972,7 +1980,7 @@ void MonsterCollisionUpdate()
 				int distanceMToS = sqrt(pow(monsterArr[i]->GetPosition().x - vSkill[j]->Getposition().x, 2)
 					+ pow(monsterArr[i]->GetPosition().y - vSkill[j]->Getposition().y, 2));
 
-				int radiusSum = 20 + vSkill[j]->Getsize();	//monsterArr[i].Getsize()와 vSkill의 사이즈
+				int radiusSum = ((Circle2D*)monsterArr[i]->GetCollider())->GetRadius(); + vSkill[j]->Getsize();	//monsterArr[i].Getsize()와 vSkill의 사이즈
 
 				if (distanceMToS < radiusSum)
 				{
@@ -2003,7 +2011,7 @@ void MonsterCollisionUpdate()
 				float angle3 = atan((float)vectorDistance.x / vectorDistance.y);
 				float distance = abs(d * cos(angle2 * 3.14 * 180));
 				float distance2 = abs(d * cos(angle3 * 3.14 * 180));
-				float distanceMToS = 20 + value1 + value2;
+				float distanceMToS = ((Circle2D*)monsterArr[i]->GetCollider())->GetRadius() + value1 + value2;
 
 				if (distanceMToS > distance && distanceMToS > distance2)
 				{
@@ -2116,6 +2124,27 @@ void PlayerCollisionUpdate()
 			}
 		}
 
+		for (int j = 0; j < monsterArr.size(); j++)
+		{
+			if (monsterArr[j] == nullptr)
+				continue;
+
+			int distancePToMS = sqrt(pow(vClient[i]->GetPosition().x - monsterArr[j]->GetPosition().x, 2)
+				+ pow(vClient[i]->GetPosition().y - monsterArr[j]->GetPosition().y, 2));
+
+			int radiusSum = vClient[i]->GetplayerSize() + ((Circle2D*)(monsterArr[j]->GetCollider()))->GetRadius();
+
+			if (distancePToMS < radiusSum)
+			{
+				PlayerHit(vClient[i], monsterArr[j], j);
+			}
+			if (vClient[i]->GetcurHealth() <= 0)
+			{
+				PlayerDie(vClient[i]);
+				break;
+			}
+		}
+
 		short ID = i;
 		SetUserToData(vClient[i], ID);
 	}
@@ -2131,6 +2160,11 @@ void PlayerHit(Player*& player, MonsterSkill*& monsterskill, int& j)
 		delete monsterskill;
 		monsterskill = nullptr;
 	}
+}
+
+void PlayerHit(Player*& player, Monster*& monster, int& j)
+{
+	player->SetcurHealth(player->GetcurHealth() - monster->GetDamage());
 }
 
 void PlayerDie(Player*& player)
@@ -2188,7 +2222,7 @@ void Rigidbody()
 			int distancePToMS = sqrt(pow(vClient[i]->GetPosition().x - monsterArr[j]->GetPosition().x, 2)
 				+ pow(vClient[i]->GetPosition().y - monsterArr[j]->GetPosition().y, 2));
 
-			int radiusSum = vClient[i]->GetplayerSize() + 20;	//vClient[i].size()와 monsterArr[j].size()의 합
+			int radiusSum = vClient[i]->GetplayerSize() + ((Circle2D*)monsterArr[j]->GetCollider())->GetRadius();	//vClient[i].size()와 monsterArr[j].size()의 합
 
 			if (distancePToMS < radiusSum)
 			{
@@ -2227,7 +2261,7 @@ void Rigidbody()
 			int distancePToMS = sqrt(pow(monsterArr[i]->GetPosition().x - monsterArr[j]->GetPosition().x, 2)
 				+ pow(monsterArr[i]->GetPosition().y - monsterArr[j]->GetPosition().y, 2));
 
-			int radiusSum = 20 + 20;	//monsterArr[i].size()와 monsterArr[j].size()의 합
+			int radiusSum = ((Circle2D*)monsterArr[i]->GetCollider())->GetRadius() + ((Circle2D*)monsterArr[j]->GetCollider())->GetRadius();	//monsterArr[i].size()와 monsterArr[j].size()의 합
 
 			if (distancePToMS < radiusSum)
 			{
