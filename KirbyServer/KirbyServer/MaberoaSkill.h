@@ -30,11 +30,45 @@ public:
 	Collider2D* GetCollider() { return collider; }
 	float		Getbiggersize() { return biggersize; }
 
-	void SetCollider(Collider2D* collider) override { this->collider = collider; }
 	void Setbiggersize(float biggersize) { this->biggersize = biggersize; }
 
 	void MaberoaSkillBigger();
+
+	void AssignSkill(int& , PLAYERDATA& , MONSTERDATA& );
 };
+
+void MaberoaSkill::AssignSkill(int& playerIndex, PLAYERDATA& playerData, MONSTERDATA& monsterData)
+{
+	static int num = 0;
+	if (!(vClient[playerIndex]->GetisLockOn()))
+		Setdirection({ (long)playerData.lookingDir.first, (long)playerData.lookingDir.second });
+	else
+	{
+		PAIR lookingdir = { (Getposition().x - monsterData.pos.x), (Getposition().y - monsterData.pos.y) };
+		double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+		lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
+
+		Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
+	}
+	Setisactivate(true);
+	switch (GetAmount())
+	{
+	case 1:
+		Setoffset({ 0, -20 });
+		break;
+	case 2:
+		Setoffset({ num * 30 - 15 * (GetAmount() - 1),-20 });
+		break;
+	case 3:
+		Setoffset({ num * 30 - 15 * (GetAmount() - 1),-20 });
+		break;
+	}
+	Setposition({ playerData.pos.x + Getoffset().x, playerData.pos.y + Getoffset().y });
+	Setmasternum(playerIndex);
+	num++;
+	if (GetAmount() == num)
+		num = 0;
+}
 
 static MaberoaSkill* maberoaskill = nullptr;
 
@@ -69,15 +103,7 @@ void UpdateMaberoaSkill(Skill*& skill)
 	skill->Sett2_attacktick();
 	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(skill->Gett2_attacktick() - skill->Gett1_attacktick()).count();
 
-	if (hittime > MABEROATICK)
-	{
-		skill->Setcanhit(true);
-		skill->Sett1_attacktick();
-	}
-	else
-	{
-		skill->Setcanhit(false);
-	}
+	skill->Sett1_attacktick();
 
 	if (skilldestroytime > TKIRBYSKILLDESTROY)
 	{

@@ -4,11 +4,6 @@
 
 class MetaknightSkill : public Skill
 {
-private:
-	Collider2D* collider;
-
-	std::chrono::high_resolution_clock::time_point t1_activate;
-	std::chrono::high_resolution_clock::time_point t2_activate;
 public:
 	MetaknightSkill(
 		int masternum,
@@ -26,15 +21,37 @@ public:
 		delete collider;
 	}
 
-	Collider2D* GetCollider() { return collider; }
-	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }
-	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_activate; }
-
-
-	void SetCollider(Collider2D* collider) override { this->collider = collider; }
-	void Settime_1() { t1_activate = std::chrono::high_resolution_clock::now(); }
-	void Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
+	void	AssignSkill(int&, PLAYERDATA&, MONSTERDATA&);
 };
+
+void MetaknightSkill::AssignSkill(int& playerIndex, PLAYERDATA& playerData, MONSTERDATA& monsterData)
+{
+	PAIR lookingdir;
+	if (!(vClient[playerIndex]->GetisLockOn()))
+	{
+		lookingdir = { (long)playerData.lookingDir.first, (long)playerData.lookingDir.second };
+		Setdirection({ (long)lookingdir.first, (long)lookingdir.second });
+	}
+	else
+	{
+		lookingdir = { (Getposition().x - monsterData.pos.x), (Getposition().y - monsterData.pos.y) };
+
+		if (lookingdir.first == 0)
+			lookingdir.first = 0.1f;
+		if (lookingdir.second == 0)
+			lookingdir.second = 0.1f;
+
+		double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+		lookingdir.first /= -temp / OFFSETADJUST; lookingdir.second /= -temp / OFFSETADJUST;
+
+		Setdirection({ (long)lookingdir.first,(long)lookingdir.second });
+	}
+	Setangle(LookingDirToDegree(lookingdir));
+	Setisactivate(true);
+	Setoffset({ (long)playerData.lookingDir.first * (long)Getsize() / OFFSETADJUST / 2, (long)playerData.lookingDir.second * (long)Getsize() / OFFSETADJUST / 2 });
+	Setposition({ playerData.pos.x + Getoffset().x, playerData.pos.y + Getoffset().y });
+	Setmasternum(playerIndex);
+}
 
 static MetaknightSkill* metaknightskill = nullptr;
 
@@ -54,21 +71,13 @@ void UpdateMetaknightSkill(Skill*& skill)
 
 	metaknightskill->SetCollider(rectangle);
 
-	metaknightskill->Settime_2();
-	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(metaknightskill->Gettime_2() - metaknightskill->Gettime_1()).count();
+	metaknightskill->Sett2_destroy();
+	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(metaknightskill->Gett2_destroy() - metaknightskill->Gett1_destroy()).count();
 
 	metaknightskill->Sett2_attacktick();
 	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(metaknightskill->Gett2_attacktick() - metaknightskill->Gett1_attacktick()).count();
 
-	if (hittime > METAKNIGHTTICK)
-	{
-		metaknightskill->Setcanhit(true);
-		metaknightskill->Sett1_attacktick();
-	}
-	else
-	{
-		metaknightskill->Setcanhit(false);
-	}
+	metaknightskill->Sett1_attacktick();
 
 	if (totalData.udata[metaknightskill->Getmasternum()].curState == (ECharacterState)PATTACK
 		&& skilldestroytime > METAKNIGHT_SKILL_END_TIME)

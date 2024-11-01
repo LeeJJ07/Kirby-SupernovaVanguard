@@ -6,9 +6,6 @@ class MagicArrowSkill : public Skill
 {
 private:
 	int pass;
-
-	std::chrono::high_resolution_clock::time_point t1_activate;
-	std::chrono::high_resolution_clock::time_point t2_activate;
 public:
 	MagicArrowSkill(
 		int masternum,
@@ -24,15 +21,31 @@ public:
 		delete collider;
 	}
 
-	Collider2D* GetCollider() { return collider; }
-	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }
-	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_activate; }
-
-	void SetCollider(Collider2D* collider) override { this->collider = collider; }
-
-	void Settime_1() { t1_activate = std::chrono::high_resolution_clock::now(); }
-	void Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
+	void	AssignSkill(int&, PLAYERDATA&, MONSTERDATA&);
 };
+
+void MagicArrowSkill::AssignSkill(int& playerIndex, PLAYERDATA& playerData, MONSTERDATA& monsterData)
+{
+	PAIR lookingdir;
+
+	lookingdir = { (Getposition().x - monsterData.pos.x), (Getposition().y - monsterData.pos.y) };
+
+	if (lookingdir.first == 0)
+		lookingdir.first = 0.1f;
+	if (lookingdir.second == 0)
+		lookingdir.second = 0.1f;
+
+	double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+	lookingdir.first /= -temp / OFFSETADJUST; lookingdir.second /= -temp / OFFSETADJUST;
+
+	Setdirection({ (long)lookingdir.first,(long)lookingdir.second });
+
+	Setangle(LookingDirToDegree(lookingdir));
+	Setisactivate(true);
+	Setoffset({ (long)playerData.lookingDir.first * (long)Getsize() / OFFSETADJUST / 2, (long)playerData.lookingDir.second * (long)Getsize() / OFFSETADJUST / 2 });
+	Setposition({ playerData.pos.x + Getoffset().x, playerData.pos.y + Getoffset().y });
+	Setmasternum(playerIndex);
+}
 
 MagicArrowSkill* magicarrowskill = nullptr;
 
@@ -52,21 +65,13 @@ void UpdateMagicArrowSkill(Skill*& skill)
 
 	magicarrowskill->SetCollider(rectangle);
 
-	magicarrowskill->Settime_2();
-	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(magicarrowskill->Gettime_2() - magicarrowskill->Gettime_1()).count();
+	magicarrowskill->Sett2_destroy();
+	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(magicarrowskill->Gett2_destroy() - magicarrowskill->Gett1_destroy()).count();
 
 	magicarrowskill->Sett2_attacktick();
 	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(magicarrowskill->Gett2_attacktick() - magicarrowskill->Gett1_attacktick()).count();
 
-	if (hittime > MAGICARROWTICK)
-	{
-		magicarrowskill->Setcanhit(true);
-		magicarrowskill->Sett1_attacktick();
-	}
-	else
-	{
-		magicarrowskill->Setcanhit(false);
-	}
+	magicarrowskill->Sett1_attacktick();
 
 	if (skilldestroytime > TKUNAISKILLDESTROY)
 	{

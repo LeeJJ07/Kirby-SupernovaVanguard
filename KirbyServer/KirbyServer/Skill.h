@@ -5,6 +5,7 @@
 
 extern struct SKILLDATA;
 extern struct MONSTERDATA;
+class Monster;
 
 #define KIRBYTICK	0.1f
 #define DEDEDETICK	0.5f
@@ -12,7 +13,7 @@ extern struct MONSTERDATA;
 #define MABEROATICK	0.05f
 #define ELECTRICFIELDTICK	0.8f
 #define KUNAITICK	0.02f
-#define MAGICARROWTICK	0.05f
+#define MAGICARROWTICK	0.1f
 #define TORNADOTICK	0.4f
 #define TRUCKTICK	0.5f
 
@@ -49,7 +50,6 @@ private:
 	POINT position;
 	POINT direction;
 
-	bool canhit = true;
 	std::chrono::high_resolution_clock::time_point t1_attacktick;
 	std::chrono::high_resolution_clock::time_point t2_attacktick;
 
@@ -62,12 +62,20 @@ protected:
 	Collider2D* collider;
 public:
 	Skill() :masternum(0), targetnum(0), skilltype(KIRBYSKILL), collidershape(ECOLLIDERSHAPE::CIRCLE),
-		speed(1), damage(1), size(0), size2(0), amount(1), curLevel(1), coolTime(5.0), offset({0,0}), position({0,0}), direction({1,0}), pierceCount(1) {}
-	Skill(int masternum, int targetnum, int skilltype, ECOLLIDERSHAPE collidershape, float speed, int damage,int pierceCount,
+		speed(1), damage(1), size(0), size2(0), amount(3), curLevel(1), coolTime(5.0), offset({0,0}), position({0,0}), direction({1,0}), pierceCount(1) {}
+	Skill(int masternum, int targetnum, int skilltype, ECOLLIDERSHAPE collidershape, float speed, int damage, int pierceCount,
 		int size, int size2, float coolTime, POINT offset, POINT position, POINT direction)
 		:masternum(masternum), targetnum(targetnum), skilltype(skilltype), collidershape(collidershape), pierceCount(pierceCount),
-		speed(speed), damage(damage), size(size), size2(size2), amount(1), curLevel(1), coolTime(coolTime), offset(offset), position(position), direction(direction) {}
-	~Skill() {}
+		speed(speed), damage(damage), size(size), size2(size2), amount(3), curLevel(1), coolTime(coolTime), offset(offset), position(position), direction(direction)
+	{
+		Sett1_destroy();
+	}
+	~Skill()
+	{
+		vHitMonster.clear(); // 벡터를 비워줌
+	}
+
+	std::vector< std::pair<Monster*, std::chrono::duration<float>>> vHitMonster;
 
 	bool	Getisactivate()	{ return isactivate; }
 	int	Getmasternum()	{ return masternum; }
@@ -86,7 +94,6 @@ public:
 	ECOLLIDERSHAPE	GetcolliderShape() { return collidershape; }
 	POINT	Getoffset()	{ return offset; }
 
-	bool	Getcanhit()	{ return canhit; }
 	POINT	Getposition()	{ return position; }
 	POINT	Getdirection()	{ return direction; }
 	std::chrono::high_resolution_clock::time_point Gett1_attacktick() { return t1_attacktick; }
@@ -116,8 +123,8 @@ public:
 	void	Setoffset(POINT offset)	{ this->offset = offset; }
 	void	Setposition(POINT position)	{ this->position = { position.x, position.y }; }
 	void	Setdirection(POINT direction)	{ this->direction = direction; }
+	void	SetCollider(Collider2D* collider) { this->collider = collider; }
 
-	void	Setcanhit(bool canhit) { this->canhit = canhit; }
 	void	Sett1_attacktick() { t1_attacktick = std::chrono::high_resolution_clock::now(); }
 	void	Sett2_attacktick() { t2_attacktick = std::chrono::high_resolution_clock::now(); }
 	void	Sett1_coolTime() { t1_coolTime = std::chrono::high_resolution_clock::now(); }
@@ -126,9 +133,37 @@ public:
 	void	Sett2_destroy() { t2_destroy = std::chrono::high_resolution_clock::now(); }
 
 	void	SetSkillInDataSheet(SKILLDATA&);
-	void	AssignSkill(int&, int&, PLAYERDATA&, MONSTERDATA&);
-	virtual	void	SetCollider(Collider2D* collider) =	0;
+	virtual void	AssignSkill(int&, PLAYERDATA&, MONSTERDATA&);
+
+	void	Update(float deltaTime)
+	{
+		for (auto it = vHitMonster.begin(); it != vHitMonster.end();) {
+			it->second -= std::chrono::duration<float>(deltaTime);
+			if (it->second.count() <= 0.0f) {
+				it = vHitMonster.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
+	}
+	virtual void	UpdateSkill() {}
 };
 
 static int FindCloseMonster(POINT&);
 static POINT GetNormalizationRange(POINT&, POINT&);
+
+static float LookingDirToDegree(PAIR& lookingdir)
+{
+	double angleRadians = atan2(lookingdir.second, lookingdir.first);
+
+	// 라디안 값을 도(degree)로 변환하려면
+	double angleDegrees = angleRadians * 180.0 / 3.14;
+
+	if (angleDegrees < 0)
+	{
+		angleDegrees = 180 + (180 - abs(angleDegrees));
+	}
+
+	return angleDegrees;
+}

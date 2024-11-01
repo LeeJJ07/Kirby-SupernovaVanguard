@@ -27,16 +27,12 @@ public:
 	}
 	~KirbySkill()
 	{
-		/*delete imageaddress;
-		delete collider;*/
+		delete collider;
 	}
 
-	Collider2D* GetCollider()	{ return collider; }
 	float		Getbiggersize()	{ return biggersize; }
 	float		Getdecelerationrate()	{ return decelerationrate; }
 
-
-	void SetCollider(Collider2D* collider) override		{ this->collider = collider; }
 	void Setbiggersize(float biggersize)	{ this->biggersize = biggersize; }
 	void Setdecelerationrate(float decelerationrate)	{ this->decelerationrate = decelerationrate; }
 
@@ -72,15 +68,7 @@ void UpdateKirbySkill(Skill* &skill)
 	kirbyskill->Sett2_attacktick();
 	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(kirbyskill->Gett2_attacktick() - kirbyskill->Gett1_attacktick()).count();
 	
-	if (hittime > KIRBYTICK)
-	{
-		kirbyskill->Setcanhit(true);
-		kirbyskill->Sett1_attacktick();
-	}
-	else
-	{
-		kirbyskill->Setcanhit(false);
-	}
+	kirbyskill->Sett1_attacktick();
 
 	if (totalData.udata[kirbyskill->Getmasternum()].curState == (ECharacterState)PATTACK
 		&& destroyTime > KIRBY_SKILL_END_TIME)

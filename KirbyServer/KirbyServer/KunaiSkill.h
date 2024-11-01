@@ -4,11 +4,6 @@
 
 class KunaiSkill : public Skill
 {
-private:
-	Collider2D* collider;
-
-	std::chrono::high_resolution_clock::time_point t1_activate;
-	std::chrono::high_resolution_clock::time_point t2_activate;
 public:
 	KunaiSkill(
 		int masternum,
@@ -23,13 +18,38 @@ public:
 	{
 		delete collider;
 	}
-	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }
-	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_activate; }
 
-	void SetCollider(Collider2D* collider) override { this->collider = collider; }
-	void Settime_1() { t1_activate = std::chrono::high_resolution_clock::now(); }
-	void Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
+	void	AssignSkill(int&, PLAYERDATA&, MONSTERDATA&);
 };
+
+void KunaiSkill::AssignSkill(int& playerIndex, PLAYERDATA& playerData, MONSTERDATA& monsterData)
+{
+	PAIR lookingdir;
+	if (!(vClient[playerIndex]->GetisLockOn()))
+	{
+		lookingdir = { (long)playerData.lookingDir.first, (long)playerData.lookingDir.second };
+		Setdirection({ (long)lookingdir.first, (long)lookingdir.second });
+	}
+	else
+	{
+		lookingdir = { (Getposition().x - monsterData.pos.x), (Getposition().y - monsterData.pos.y) };
+
+		if (lookingdir.first == 0)
+			lookingdir.first = 0.1f;
+		if (lookingdir.second == 0)
+			lookingdir.second = 0.1f;
+
+		double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
+		lookingdir.first /= -temp / OFFSETADJUST; lookingdir.second /= -temp / OFFSETADJUST;
+
+		Setdirection({ (long)lookingdir.first,(long)lookingdir.second });
+	}
+	Setangle(LookingDirToDegree(lookingdir));
+	Setisactivate(true);
+	Setoffset({ (long)playerData.lookingDir.first * (long)Getsize() / OFFSETADJUST / 2, (long)playerData.lookingDir.second * (long)Getsize() / OFFSETADJUST / 2 });
+	Setposition({ playerData.pos.x + Getoffset().x, playerData.pos.y + Getoffset().y });
+	Setmasternum(playerIndex);
+}
 
 KunaiSkill* kunaiskill = nullptr;
 
@@ -49,21 +69,13 @@ void UpdateKunaiSkill(Skill*& skill)
 
 	kunaiskill->SetCollider(rectangle);
 
-	kunaiskill->Settime_2();
-	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(kunaiskill->Gettime_2() - kunaiskill->Gettime_1()).count();
+	kunaiskill->Sett2_destroy();
+	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(kunaiskill->Gett2_destroy() - kunaiskill->Gett1_destroy()).count();
 
 	kunaiskill->Sett2_attacktick();
 	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(kunaiskill->Gett2_attacktick() - kunaiskill->Gett1_attacktick()).count();
 
-	if (hittime > KUNAITICK)
-	{
-		kunaiskill->Setcanhit(true);
-		kunaiskill->Sett1_attacktick();
-	}
-	else
-	{
-		kunaiskill->Setcanhit(false);
-	}
+	kunaiskill->Sett1_attacktick();
 
 	if (skilldestroytime > TKUNAISKILLDESTROY)
 	{

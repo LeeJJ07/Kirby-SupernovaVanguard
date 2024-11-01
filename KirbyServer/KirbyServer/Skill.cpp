@@ -32,20 +32,21 @@ void Skill::SetSkillInDataSheet(SKILLDATA& skillData)
 	skillData.dataType = SKILLTYPE;
 }
 
-void Skill::AssignSkill(int& monsterIndex, int& playerIndex, PLAYERDATA& playerData, MONSTERDATA& monsterData)
+void Skill::AssignSkill(int& playerIndex, PLAYERDATA& playerData, MONSTERDATA& monsterData)
 {
 	if (!(vClient[playerIndex]->GetisLockOn()))
 		Setdirection({ (long)playerData.lookingDir.first, (long)playerData.lookingDir.second });
 	else
 	{
-		PAIR lookingdir = { (Getposition().x - totalData.mdata[monsterIndex].pos.x), (Getposition().y - totalData.mdata[monsterIndex].pos.y) };
+		PAIR lookingdir = { (Getposition().x - monsterData.pos.x), (Getposition().y - monsterData.pos.y) };
 		double temp = sqrt(pow(lookingdir.first, 2) + pow(lookingdir.second, 2));
 		lookingdir.first /= temp / OFFSETADJUST; lookingdir.second /= temp / OFFSETADJUST;
 
 		Setdirection({ (long)(-lookingdir.first),(long)(-lookingdir.second) });
 	}
 	Setisactivate(true);
-	Setoffset({ (long)playerData.lookingDir.first * (long)Getsize() / OFFSETADJUST / 2, (long)playerData.lookingDir.second * (long)Getsize() / OFFSETADJUST / 2 });
+	Setoffset({ (long)playerData.lookingDir.first * (long)Getsize() / OFFSETADJUST / 2,
+		(long)playerData.lookingDir.second * (long)Getsize() / OFFSETADJUST / 2 });
 	Setposition({ playerData.pos.x + Getoffset().x, playerData.pos.y + Getoffset().y });
 	Setmasternum(playerIndex);
 }

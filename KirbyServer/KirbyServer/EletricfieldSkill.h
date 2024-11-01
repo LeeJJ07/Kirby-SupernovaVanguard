@@ -4,11 +4,6 @@
 
 class ElectricfieldSkill : public Skill
 {
-private:
-	Collider2D* collider;
-
-	std::chrono::high_resolution_clock::time_point t1_activate;
-	std::chrono::high_resolution_clock::time_point t2_activate;
 public:
 	ElectricfieldSkill(
 		int masternum,
@@ -25,16 +20,17 @@ public:
 		delete collider;
 	}
 
-	Collider2D* GetCollider() { return collider; }
-	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }
-	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_activate; }
-
-
-	void SetCollider(Collider2D* collider) override { this->collider = collider; }
-
-	void Settime_1() { t1_activate = std::chrono::high_resolution_clock::now(); }
-	void Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
+	void	AssignSkill(int&, PLAYERDATA&, MONSTERDATA&);
 };
+
+void ElectricfieldSkill::AssignSkill(int& playerIndex, PLAYERDATA& playerData, MONSTERDATA& monsterData)
+{
+	Setdirection({ 0,0 });
+	Setisactivate(true);
+	Setoffset({ 0, 0 });
+	Setposition({ playerData.pos.x + Getoffset().x, playerData.pos.y + Getoffset().y });
+	Setmasternum(playerIndex);
+}
 
 ElectricfieldSkill* electricfieldskill = nullptr;
 
@@ -53,26 +49,11 @@ void UpdateElectricfieldSkill(Skill*& skill)
 
 	electricfieldskill->SetCollider(circle);
 
-	electricfieldskill->Settime_2();
-	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(electricfieldskill->Gettime_2() - electricfieldskill->Gettime_1()).count();
+	electricfieldskill->Sett1_destroy();
+	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(electricfieldskill->Gett2_destroy() - electricfieldskill->Gett1_destroy()).count();
 
 	electricfieldskill->Sett2_attacktick();
 	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(electricfieldskill->Gett2_attacktick() - electricfieldskill->Gett1_attacktick()).count();
 
-	if (hittime > ELECTRICFIELDTICK)
-	{
-		electricfieldskill->Setcanhit(true);
-		electricfieldskill->Sett1_attacktick();
-	}
-	else
-	{
-		electricfieldskill->Setcanhit(false);
-	}
-
-	/*if (skilldestroytime > 0.1)
-	{
-		OBJECTIDARR[electricfieldskill->GetID()] = false;
-		delete skill;
-		skill = nullptr;
-	}*/
+	electricfieldskill->Sett1_attacktick();
 }

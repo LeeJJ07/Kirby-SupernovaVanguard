@@ -6,11 +6,6 @@ class DededeSkill : public Skill
 {
 private:
 	float biggersize;
-
-	Collider2D* collider;
-
-	std::chrono::high_resolution_clock::time_point t1_activate;
-	std::chrono::high_resolution_clock::time_point t2_activate;
 public:
 	DededeSkill(
 		int masternum,
@@ -30,18 +25,11 @@ public:
 		delete collider;
 	}
 
-	Collider2D* GetCollider() { return collider; }
 	float		Getbiggersize() { return biggersize; }
-	std::chrono::high_resolution_clock::time_point	Gettime_1() { return t1_activate; }
-	std::chrono::high_resolution_clock::time_point	Gettime_2() { return t2_activate; }
 
-
-	void SetCollider(Collider2D* collider) override { this->collider = collider; }
 	void Setbiggersize(float biggersize) { this->biggersize = biggersize; }
 
 	void DededeSkillBigger();
-	void Settime_1() { t1_activate = std::chrono::high_resolution_clock::now(); }
-	void Settime_2() { t2_activate = std::chrono::high_resolution_clock::now(); }
 };
 
 static DededeSkill* dededeskill = nullptr;
@@ -64,21 +52,13 @@ void UpdateDededeSkill(Skill*& skill)
 
 	dededeskill->SetCollider(circle);
 
-	dededeskill->Settime_2();
-	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(dededeskill->Gettime_2() - dededeskill->Gettime_1()).count();
+	dededeskill->Sett2_destroy();
+	double skilldestroytime = std::chrono::duration_cast<std::chrono::duration<double>>(dededeskill->Gett2_destroy() - dededeskill->Gett1_destroy()).count();
 
 	dededeskill->Sett2_attacktick();
 	double hittime = std::chrono::duration_cast<std::chrono::duration<double>>(dededeskill->Gett2_attacktick() - dededeskill->Gett1_attacktick()).count();
 
-	if (hittime > DEDEDETICK)
-	{
-		dededeskill->Setcanhit(true);
-		dededeskill->Sett1_attacktick();
-	}
-	else
-	{
-		dededeskill->Setcanhit(false);
-	}
+	dededeskill->Sett1_attacktick();
 
 	if (totalData.udata[dededeskill->Getmasternum()].curState == (ECharacterState)PATTACK
 		&& skilldestroytime > DEDEDE_SKILL_END_TIME)
