@@ -12,8 +12,8 @@ class Monster;
 #define METAKNIGHTTICK	0.1f
 #define MABEROATICK	0.05f
 #define ELECTRICFIELDTICK	0.8f
-#define KUNAITICK	0.02f
-#define MAGICARROWTICK	0.1f
+#define KUNAITICK	1.f
+#define MAGICARROWTICK	0.5f
 #define TORNADOTICK	0.4f
 #define TRUCKTICK	0.5f
 
