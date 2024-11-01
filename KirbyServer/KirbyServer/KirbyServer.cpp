@@ -1253,12 +1253,12 @@ POINT GetNormalizationRange(POINT& skill, POINT& monster)
 
 void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 {
-	int distance = pow(mData.pos.x - tData.udata[0].pos.x, 2) + pow(mData.pos.y - tData.udata[0].pos.y, 2);
+	int distance = 999999999;
 
 	mData.targetnum = 0;
 	monsterArr[monsterIdx]->SetTargetPos(tData.udata[0].pos);
 
-	for (int i = 1; i < PLAYERNUM; i++)
+	for (int i = 0; i < PLAYERNUM; i++)
 	{
 		if (tData.udata[i].dataType == 0 || !tData.udata[i].isAlive)
 			continue;
