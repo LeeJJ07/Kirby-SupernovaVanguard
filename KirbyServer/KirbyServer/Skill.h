@@ -62,11 +62,11 @@ protected:
 	Collider2D* collider;
 public:
 	Skill() :masternum(0), targetnum(0), skilltype(KIRBYSKILL), collidershape(ECOLLIDERSHAPE::CIRCLE),
-		speed(1), damage(1), size(0), size2(0), amount(3), curLevel(1), coolTime(5.0), offset({0,0}), position({0,0}), direction({1,0}), pierceCount(1) {}
+		speed(1), damage(1), size(0), size2(0), amount(1), curLevel(1), coolTime(5.0), offset({0,0}), position({0,0}), direction({1,0}), pierceCount(1) {}
 	Skill(int masternum, int targetnum, int skilltype, ECOLLIDERSHAPE collidershape, float speed, int damage, int pierceCount,
 		int size, int size2, float coolTime, POINT offset, POINT position, POINT direction)
 		:masternum(masternum), targetnum(targetnum), skilltype(skilltype), collidershape(collidershape), pierceCount(pierceCount),
-		speed(speed), damage(damage), size(size), size2(size2), amount(3), curLevel(1), coolTime(coolTime), offset(offset), position(position), direction(direction)
+		speed(speed), damage(damage), size(size), size2(size2), amount(1), curLevel(1), coolTime(coolTime), offset(offset), position(position), direction(direction)
 	{
 		Sett1_destroy();
 	}

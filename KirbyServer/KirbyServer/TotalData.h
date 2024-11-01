@@ -36,6 +36,8 @@ struct PLAYERDATA :public OBJECTDATA
 	char	charactertype;
 	int	maxHealth;
 	int	curHealth;
+	int	killCount;
+	int	special;
 	ECharacterState	curState;
 
 	std::pair<short, int> levelUpSkillIndex[3];

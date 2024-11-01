@@ -12,6 +12,8 @@ void Player::ObjectUpdate(int i, TOTALDATA& uData)
     SetcurHealth(uData.udata[i].curHealth);
     SetplayerSize(uData.udata[i].radius);
     SetCharacterState(uData.udata[i].curState);
+    SetkillCount(uData.udata[i].killCount);
+    Setspecial(uData.udata[i].special);
     
     switch (GetCollider()->GetColliderShape())
     {

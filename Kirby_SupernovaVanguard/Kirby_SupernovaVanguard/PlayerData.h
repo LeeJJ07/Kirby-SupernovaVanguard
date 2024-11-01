@@ -20,14 +20,17 @@ struct OBJECTDATA
 
 struct PLAYERDATA :public OBJECTDATA
 {
-	POINT mousePos;
-	bool inGameStart;
-	char charactertype;
+	POINT	mousePos;
+	bool	inGameStart;
+	bool	isAlive;
+	char	charactertype;
 	int	maxHealth;
 	int	curHealth;
+	int	killCount;
+	int	special;
 	ECharacterState	curState;
 
-	std::pair<short, int> levelUpSkillIndex[3]; //��ų Ÿ��, ���� ���� �ޱ�
+	std::pair<short, int> levelUpSkillIndex[3];
 };
 
 struct MONSTERDATA :public OBJECTDATA

@@ -55,6 +55,7 @@ void DoubleBuffering(HDC, std::vector<Object*>);
 void DrawPlayerHp(HDC&, int&, int&);
 void DrawMonsterHp(HDC&, int&, int&);
 void DrawCamera(HDC hdc, int cLeft, int cTop);
+void DrawKillCount(HDC&, int&, int&);
 void DrawEXP(HDC&,int&,int&);
 void DrawTime(HDC& hdc, int& cameraLeft, int& cameraTop);
 void DrawLevelUp(HDC& hdc, int& cameraLeft, int& cameraTop);
@@ -520,6 +521,7 @@ void DoubleBuffering(HDC hdc)
 	DrawPlayerHp(bufferdc, cLeft, cTop);
 	DrawMonsterHp(bufferdc, cLeft, cTop);
 
+	DrawKillCount(bufferdc, cTop, cLeft);
 	DrawEXP(bufferdc, cTop, cLeft);
 
 	if (isDrawCollider)
@@ -680,6 +682,39 @@ void DrawMonsterHp(HDC& hdc, int& cLeft, int& cTop)
 		SelectObject(hdc, oldBrush);
 		DeleteObject(brush);
 	}
+}
+
+void DrawKillCount(HDC& hdc, int& cameraTop, int& cameraLeft)
+{
+	int kill = ((Player*)vClient[myID])->GetkillCount();
+
+	CString t;
+
+	t.Format(_T("KILL : %d"), kill);  // 두 자리의 분과 초로 출력
+
+	// 글꼴 생성 (예: Arial, 크기 50으로 설정)
+	HFONT hFont = CreateFont(50, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+		OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_SWISS, _T("Arial"));
+
+	// 기존 글꼴 저장
+	HFONT oldFont = (HFONT)SelectObject(bufferdc, hFont);
+
+	// 텍스트 색상을 흰색으로 설정
+	SetTextColor(bufferdc, RGB(255, 255, 255));
+
+	// 텍스트 배경색을 투명으로 설정
+	SetBkMode(bufferdc, TRANSPARENT);
+
+	// 시간의 텍스트 크기를 얻어 화면 상단 중앙에 배치
+	SIZE textSize;
+	GetTextExtentPoint32(bufferdc, t, t.GetLength(), &textSize);
+	int centerX = cameraLeft + (CAMERA_WIDTH - textSize.cx) / 1.2;  // 카메라 좌표 기준 중앙 X
+	TextOut(bufferdc, centerX, cameraTop + 60, t, t.GetLength());  // Y 좌표는 상단에 10픽셀 여백
+
+	// 기존 글꼴 및 색상 복원
+	SelectObject(bufferdc, oldFont);
+	DeleteObject(hFont);  // 새로 만든 글꼴 삭제
 }
 
 void DrawEXP(HDC& hdc, int& cameraTop, int& cameraLeft)

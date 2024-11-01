@@ -14,6 +14,8 @@ private:
 	int maxHealth;
 	int curHealth;
 	int playerSize;
+	int	killCount = 0;
+	int special = 0;
 
 	POINT mousePosition;
 	std::map<ECharacterState, Animation* > ani;
@@ -30,20 +32,24 @@ public:
 		ani.clear();
 	}
 
-	ECharacterType	GetCharacterType() { return characterType; }
-	ECharacterState	GetCharacterState() { return characterState; }
-	POINT	GetMousePosition() { return mousePosition; }
-	int		GetmaxHealth() { return maxHealth; }
-	int		GetcurHealth() { return curHealth; }
-	int		GetplayerSize() { return playerSize; }
+	ECharacterType	GetCharacterType()	{ return characterType; }
+	ECharacterState	GetCharacterState()	{ return characterState; }
+	POINT	GetMousePosition()	{ return mousePosition; }
+	int		GetmaxHealth()	{ return maxHealth; }
+	int		GetcurHealth()	{ return curHealth; }
+	int		GetplayerSize()	{ return playerSize; }
+	int		GetkillCount()	{ return killCount; }
+	int		Getspecial()	{ return special; }
 	std::map<ECharacterState, Animation* > Getani() { return ani; }
 
 	void	SetCharacterType(ECharacterType characterType)	{ this->characterType = characterType; }
 	void	SetCharacterState(ECharacterState characterState)	{ this->characterState = characterState; }
 	void	SetMousePosition(POINT mousePos)	{ mousePosition = mousePos; }
 	void	SetmaxHealth(int maxHealth)	{ this->maxHealth = maxHealth; }
-	void	SetcurHealth(int curHealth) { this->curHealth = curHealth; }
-	void	SetplayerSize(int playerSize) { this->playerSize = playerSize; }
+	void	SetcurHealth(int curHealth)	{ this->curHealth = curHealth; }
+	void	SetplayerSize(int playerSize)	{ this->playerSize = playerSize; }
+	void	SetkillCount(int killCount)	{ this->killCount = killCount; }
+	void	Setspecial(int special)	{ this->special = special; }
 
 	void	ObjectUpdate(int i, TOTALDATA& uData);
 	void	SetPlayerAni();

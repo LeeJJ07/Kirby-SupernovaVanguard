@@ -29,6 +29,8 @@ private:
 	int maxHealth =	100;
 	int curHealth =	maxHealth;
 	int playerSize;
+	int	killCount = 0;
+	int special = 0;
 	float	damage = 1.f;
 	float	speed =	1.f;
 	bool	isLockOn;
@@ -60,6 +62,8 @@ public:
 	int Getspeed()	{ return speed; }
 	int GetSkillLevel(int idx) { return allSkillLevel[idx]; }
 	int GetplayerSize() { return playerSize; }
+	int	GetkillCount()	{ return killCount; }
+	int	Getspecial()	{ return special; }
 	bool	GetisLockOn()	{ return isLockOn; }
 	bool	GetisAlive()	{ return isAlive; }
 	SkillManager*& GetSkillManager() { return vSkillManager; }
@@ -67,6 +71,10 @@ public:
 	void	SetmaxHealth(int maxHealth)	{ this->maxHealth = maxHealth; }
 	void	SetcurHealth(int curHealth)	{ this->curHealth = curHealth; }
 	void	SetplayerSize(int playerSize)	{ this->playerSize = playerSize; }
+	void	SetkillCount(int killCount)	{ this->killCount = killCount; }
+	void	Setspecial(int special)	{ this->special = special; }
+	void	PluskillCount()	{ killCount++; }
+	void	Plusspecial()	{ special++; }
 	void	Setdamage(float damage)	{ this->damage = damage; }
 	void	Setspeed(float speed)	{ this->speed = speed; }
 	void	SetisLockOn(bool isLockOn)	{ this->isLockOn = isLockOn; }

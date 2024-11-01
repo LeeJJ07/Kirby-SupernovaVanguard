@@ -772,6 +772,8 @@ void SetUserToData(Player*& player, short& ID)
 	totalData.udata[ID].pos = player->GetPosition();
 	totalData.udata[ID].radius = player->GetplayerSize();
 	totalData.udata[ID].isAlive = player->GetisAlive();
+	totalData.udata[ID].killCount = player->GetkillCount();
+	totalData.udata[ID].special = player->Getspecial();
 }
 
 void SetUserData(PLAYERDATA& uData, ReceiveData rData)
@@ -1774,7 +1776,12 @@ void MonsterCollisionUpdate()
 				}
 				if (monsterArr[i]->GetcurHealth() <= 0)
 				{
+					vClient[vSkill[j]->Getmasternum()]->PluskillCount();
+					if (vClient[vSkill[j]->Getmasternum()]->Getspecial() < 100)
+						vClient[vSkill[j]->Getmasternum()]->Plusspecial();
+
 					MonsterDie(monsterArr[i], i);
+
 					if (vSkill[j] != nullptr)
 						vSkill[j]->Settargetnum(0);
 					break;
@@ -1807,7 +1814,12 @@ void MonsterCollisionUpdate()
 				}
 				if (monsterArr[i]->GetcurHealth() <= 0)
 				{
+					vClient[vSkill[j]->Getmasternum()]->PluskillCount();
+					if (vClient[vSkill[j]->Getmasternum()]->Getspecial() < 100)
+						vClient[vSkill[j]->Getmasternum()]->Plusspecial();
+
 					MonsterDie(monsterArr[i], i);
+
 					if (vSkill[j] != nullptr)
 						vSkill[j]->Settargetnum(0);
 					break;
