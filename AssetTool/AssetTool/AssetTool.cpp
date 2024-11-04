@@ -779,7 +779,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 ofn.lpstrFile = sFilePathName;
                 ofn.nMaxFile = MAX_FILENAME_SIZE;
                 ofn.lpstrFile[0] = '\0'; // 파일 경로 버퍼 초기화
-                ofn.lpstrInitialDir = L"C:\\Users\\inha\\OneDrive\\문서\\Kirby-SupernovaVanguard\\AssetTool\\AssetTool\\Images\\bmp"; // 초기 디렉토리 설정
+                ofn.lpstrInitialDir = L"Images/bmp"; // 초기 디렉토리 설정
                 ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
 
                 // OFN_ENABLEHOOK 플래그를 사용하지 않도록 단순화

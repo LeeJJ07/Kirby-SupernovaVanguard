@@ -842,7 +842,7 @@ void DrawLevelUp(HDC& bufferdc, int& cameraLeft, int& cameraTop) {
 
 	// 아래쪽에 "배울 스킬을 선택하시오" 추가
 	int subTextY = textY + 650; // 추가된 텍스트의 Y 위치 (조정 가능)
-	TextOut(bufferdc, textX, subTextY, L"배울 스킬을 선택하십시오", lstrlen(L"배울 스킬을 선택하십시오"));
+	TextOut(bufferdc, textX, subTextY, L"Select Skill You Want", lstrlen(L"Select Skill You Want"));
 
 	// 폰트 해제 및 정리
 	SelectObject(bufferdc, hOldFont1);

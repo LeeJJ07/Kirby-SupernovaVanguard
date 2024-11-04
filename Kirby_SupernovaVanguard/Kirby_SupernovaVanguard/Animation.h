@@ -48,7 +48,7 @@ public:
 	{
 		int sumWidth = 0;
 		for (int i = 0; i < curIdx; i++)
-			sumWidth += lengths[i] + spacingX;
+			sumWidth += lengths[i] + spacingX - 1;
 		return sumWidth;
 	}
 	int GetHeight() { return height; }

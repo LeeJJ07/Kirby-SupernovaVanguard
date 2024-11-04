@@ -456,7 +456,7 @@ int InitServer(HWND hWnd)
 	addr.sin_family = AF_INET;
 	addr.sin_port = 12346;
 
-	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.94");
+	addr.sin_addr.S_un.S_addr = inet_addr("172.30.1.14");
 
 	bind(s, (LPSOCKADDR)&addr, sizeof(addr));
 
@@ -1276,8 +1276,8 @@ void SetTarget(MONSTERDATA& mData, TOTALDATA& tData, int monsterIdx)
 
 void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 {
-	//EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
-	EMonsterType mType = (EMonsterType::SPEAR);
+	EMonsterType mType = (EMonsterType)(rand() % NORMAL_MONSTER_TYPE_COUNT);
+	//EMonsterType mType = (EMonsterType::SPEAR);
 
 	POINT generatePos = SetRandomSpawnPos(playerIdx, mType);
 
@@ -1312,6 +1312,13 @@ void InitMonsterData(MONSTERDATA& mData, Monster*& m, int playerIdx, int ID)
 		break;
 	}
 
+	if (totalData.publicdata.currentTime > THIRD_BOSS_INIT_TIME)
+	{
+		m->SetmaxHealth(m->GetmaxHealth() + (totalData.publicdata.currentTime - THIRD_BOSS_INIT_TIME));
+		m->SetcurHealth(m->GetmaxHealth());
+
+		m->SetDamage(m->GetDamage() + (totalData.publicdata.currentTime - THIRD_BOSS_INIT_TIME) / 5);
+	}
 	if (monsterSkill != nullptr)
 	{
 		monsterArr[ID - MONSTERINDEX]->GetMonsterSkillManager()->GetskillVector().push_back(monsterSkill);
@@ -1772,7 +1779,8 @@ void MonsterCollisionUpdate()
 				if (distanceMToS < radiusSum)
 				{
 					MonsterHit(monsterArr[i], vSkill[j]);
-					HitMonsterPush(vSkill[j], monsterArr[i]);
+					if(vSkill[j] != nullptr)
+						HitMonsterPush(vSkill[j], monsterArr[i]);
 				}
 				if (monsterArr[i]->GetcurHealth() <= 0)
 				{
@@ -1806,17 +1814,20 @@ void MonsterCollisionUpdate()
 				float distance2 = abs(d * cos(angle3 * 3.14 * 180));
 				float distanceMToS = ((Circle2D*)monsterArr[i]->GetCollider())->GetRadius() + value1 + value2;
 
+				int masternum = vSkill[j]->Getmasternum();
 				if (distanceMToS > distance && distanceMToS > distance2)
 				{
+
 					MonsterHit(monsterArr[i], vSkill[j]);
 					if (vSkill[j] != nullptr)
 						HitMonsterPush(vSkill[j], monsterArr[i]);
 				}
 				if (monsterArr[i]->GetcurHealth() <= 0)
 				{
-					vClient[vSkill[j]->Getmasternum()]->PluskillCount();
-					if (vClient[vSkill[j]->Getmasternum()]->Getspecial() < 100)
-						vClient[vSkill[j]->Getmasternum()]->Plusspecial();
+					if(vSkill[j]!= nullptr)
+					vClient[masternum]->PluskillCount();
+					if (vClient[masternum]->Getspecial() < 100)
+						vClient[masternum]->Plusspecial();
 
 					MonsterDie(monsterArr[i], i);
 
@@ -2281,6 +2292,7 @@ void HitMonsterPush(Skill*& skill, Monster*& monster)
 		skill->vHitMonster.push_back({ monster, std::chrono::duration<float>(DEDEDETICK) });
 		break;
 	case METAKNIGHTSKILL:
+
 		skill->vHitMonster.push_back({ monster, std::chrono::duration<float>(METAKNIGHTTICK) });
 		break;
 	case MABEROASKILL:

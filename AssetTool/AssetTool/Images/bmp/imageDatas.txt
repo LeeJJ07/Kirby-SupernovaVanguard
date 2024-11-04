@@ -58,3 +58,4 @@ C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images
 C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\starFull.bmp  1 0 255 0 255 59 61 120 120
 D:\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\gameover.bmp  6 8 112 154 209 104 21 320 21 536 21 748 21 964 21 1180 21 208 208 208 208 208 208 48
 D:\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\Restart.bmp  4 8 112 154 209 64 48 200 48 336 48 472 48 128 128 128 128 96
+C:\Users\inha\OneDrive\문서\Kirby-SupernovaVanguard\AssetTool\AssetTool\Images\bmp\aaa.bmp  4 0 136 160 88 51 25 171 26 271 22 381 21 110 110 110 110 50
